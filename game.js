@@ -10,6 +10,7 @@ let canClick = false;
 let currentChange = null;
 let previousState = {};
 let currentState = {};
+let isTransitioning = false; // Flag to prevent multiple transitions
 
 // Game elements
 const sceneContainer = document.getElementById('scene-container');
@@ -86,9 +87,8 @@ function setupClickHandlers() {
 /**
  * Handle clicks on scene elements
  */
-
 function handleElementClick(event) {
-    if (!canClick) return;
+    if (!canClick || isTransitioning) return;
     
     const clickedId = event.target.id;
     
@@ -113,11 +113,8 @@ function handleElementClick(event) {
             }, 1000);
         }
         
-        // Enable the button again after a short delay
-        setTimeout(() => {
-            trainButton.disabled = false;
-            currentChange = null; // Clear the current change since it was found
-        }, 1500);
+        // Mark the change as found but don't proceed to next day automatically
+        currentChange.found = true;
     } else {
         // Wrong element clicked
         showMessage("That's not what changed...", 1500);
@@ -128,11 +125,13 @@ function handleElementClick(event) {
  * Take the train to the next day
  */
 function takeTrain() {
-    // Enable the player to take the train even if they haven't found the change
-    trainButton.disabled = true;
+    // Prevent multiple clicks during transition
+    if (isTransitioning) return;
     
-    // Highlight any missed change before transitioning
-    if (currentChange && canClick) {
+    isTransitioning = true;
+    
+    // Check if there's an unfound change to highlight
+    if (currentChange && !currentChange.found) {
         highlightMissedChange(currentChange);
         
         // Short delay to allow the highlight to be seen
@@ -140,12 +139,12 @@ function takeTrain() {
             proceedToNextDay();
         }, GAME_SETTINGS.missedChangeHighlightDuration);
     } else {
-        // No current change or player already found it, proceed immediately
+        // No change or player already found it, proceed immediately
         proceedToNextDay();
     }
 }
 
-// New function to handle the transition to the next day
+// Function to handle the transition to the next day
 function proceedToNextDay() {
     // Fade out
     sceneContainer.classList.add('fading');
@@ -164,6 +163,7 @@ function proceedToNextDay() {
         
         // Generate new change(s)
         currentChange = selectRandomChange();
+        currentChange.found = false; // Initialize as not found
         
         // Apply the change
         applyChange(currentChange);
@@ -178,13 +178,14 @@ function proceedToNextDay() {
             // Allow clicking after fade completes
             setTimeout(() => {
                 canClick = true;
+                isTransitioning = false; // Reset transition flag
                 showMessage(`Find what changed today... (Day ${day})`, 2000);
             }, 1000);
         }, GAME_SETTINGS.waitDuration);
     }, GAME_SETTINGS.fadeOutDuration);
 }
 
-// New function to highlight missed changes
+// Function to highlight missed changes
 function highlightMissedChange(change) {
     const element = document.getElementById(change.id);
     if (element) {
@@ -207,15 +208,8 @@ function highlightMissedChange(change) {
         
         // Show a message about the missed change
         showMessage("You missed a change!", GAME_SETTINGS.missedChangeHighlightDuration);
-        
-        // Reset after highlight duration
-        setTimeout(() => {
-            // No need to reset since we're moving to a new day
-            // The element will be reset during the day transition
-        }, GAME_SETTINGS.missedChangeHighlightDuration);
     }
 }
-
 
 /**
  * Select a random element to change
@@ -254,7 +248,8 @@ function selectRandomChange() {
     return {
         id: elementId,
         type: category.type,
-        change: changeType
+        change: changeType,
+        found: false
     };
 }
 
@@ -387,9 +382,6 @@ function gameComplete() {
     if (player) {
         player.classList.add('victory-dance');
     }
-    
-    // Disable train button
-    trainButton.disabled = true;
     
     // Display final message
     setTimeout(() => {
