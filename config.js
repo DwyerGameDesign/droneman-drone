@@ -88,8 +88,8 @@ const GAME_SETTINGS = {
 
     // Add at the end of the GAME_SETTINGS object
     multipleChangesThreshold: 60, // Day when multiple changes start appearing
-    missedChangeHighlightColor: '#e9cb5f', // A muted yellow that fits the aesthetic
-    missedChangeHighlightDuration: 2000, // How long the highlight shows (ms)    
+    missedChangeHighlightColor: '#ffdd00', // Bright yellow for better visibility
+    missedChangeHighlightDuration: 2500, // Extended duration to make sure players see it
 
     // Gameplay settings
     baseAwarenessGain: 5,   // How much awareness increases per correct guess

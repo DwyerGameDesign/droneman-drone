@@ -105,10 +105,26 @@ body {
 .left-arm, .right-arm {
     position: absolute;
     top: 25px;
-    width: 5px;
+    width: 8px; /* Increased from 5px */
     height: 20px;
-    background-color: #555;
-    transition: transform 0.5s ease-in-out, background-color 1s ease-in-out;
+    background-color: #777; /* Lighter color for better visibility */
+    transition: transform 0.5s ease-in-out, background-color 1s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.accessory {
+    position: absolute;
+    width: 18px; /* Increased from 15px */
+    height: 18px; /* Increased from 15px */
+    background-color: #AAA; /* Lighter color for better visibility */
+    visibility: hidden;
+    transition: visibility 0.3s, background-color 1s ease-in-out, box-shadow 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+/* Add this new style for highlighting changes */
+.highlight {
+    box-shadow: 0 0 15px 5px #ffdd00 !important;
+    z-index: 5;
 }
 
 .left-arm {

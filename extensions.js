@@ -281,11 +281,12 @@ const audioSystem = {
 const saveSystem = {
     enabled: true, // Set to true to enable this feature
     
-    /**
-     * Initialize the save system
-     */
     init: function() {
         if (!this.enabled) return;
+        
+        // Clear saved game data to ensure fresh start
+        // Comment this line out after first run if you want save functionality
+        localStorage.removeItem('droneGameState');
         
         // Load saved game on start
         this.loadGame();

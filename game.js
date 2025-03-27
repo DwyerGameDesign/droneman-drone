@@ -102,15 +102,27 @@ function handleElementClick(event) {
         // Highlight the correct element
         const element = document.getElementById(clickedId);
         if (element) {
-            // Add a temporary highlight
+            // Add a much more visible highlight
             const originalTransition = element.style.transition;
             element.style.transition = 'all 0.5s ease-in-out';
-            element.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.8)';
+            element.style.boxShadow = '0 0 15px 5px rgba(100, 255, 100, 0.9)';
+            
+            // Make accessories visible if they were meant to be hidden
+            if (currentChange.type === 'accessory' && 
+                currentChange.change.property === 'visibility' && 
+                currentChange.change.value === 'hidden') {
+                element.style.visibility = 'visible';
+                element.style.backgroundColor = '#6f6';
+                
+                setTimeout(() => {
+                    element.style.visibility = 'hidden';
+                }, 1500);
+            }
             
             setTimeout(() => {
                 element.style.boxShadow = '';
                 element.style.transition = originalTransition;
-            }, 1000);
+            }, 1500);
         }
         
         // Mark the change as found but don't proceed to next day automatically
@@ -196,18 +208,44 @@ function highlightMissedChange(change) {
         
         // Apply highlight
         element.style.transition = 'all 0.5s ease-in-out';
-        element.style.boxShadow = `0 0 15px ${GAME_SETTINGS.missedChangeHighlightColor}`;
+        element.style.boxShadow = `0 0 20px 5px ${GAME_SETTINGS.missedChangeHighlightColor || '#ffdd00'}`;
         
         if (change.type === 'accessory' && change.change.property === 'visibility') {
-            // For accessories, also make them glow
-            element.style.backgroundColor = GAME_SETTINGS.missedChangeHighlightColor;
-        } else {
-            // For other changes, just highlight
-            element.style.borderColor = GAME_SETTINGS.missedChangeHighlightColor;
+            // For accessories, make them visible temporarily to show what was missed
+            element.style.visibility = 'visible';  
+            element.style.backgroundColor = GAME_SETTINGS.missedChangeHighlightColor || '#ffdd00';
+            
+            // For accessories that should be hidden, hide after showing briefly
+            if (change.change.value === 'hidden') {
+                setTimeout(() => {
+                    element.style.visibility = 'hidden';
+                }, (GAME_SETTINGS.missedChangeHighlightDuration || 2000) - 200);
+            }
+        } else if (change.type === 'arm') {
+            // For arm rotation, animate to show the change
+            const targetRotation = change.change.value;
+            
+            // Make arm temporarily more visible
+            element.style.backgroundColor = '#aaa';
+            element.style.width = '10px';
+            
+            // Reset to normal size after highlight
+            setTimeout(() => {
+                element.style.backgroundColor = '';
+                element.style.width = '';
+            }, GAME_SETTINGS.missedChangeHighlightDuration || 2000);
         }
         
-        // Show a message about the missed change
-        showMessage("You missed a change!", GAME_SETTINGS.missedChangeHighlightDuration);
+        // Describe what changed in the message
+        const elementType = change.type === 'arm' ? 'arm position' : 
+                          (change.id.includes('hat') ? 'hat' : 'bag');
+        showMessage(`You missed a change! A ${elementType} changed.`, 
+                  GAME_SETTINGS.missedChangeHighlightDuration || 2000);
+        
+        // Reset highlight after duration
+        setTimeout(() => {
+            element.style.boxShadow = '';
+        }, GAME_SETTINGS.missedChangeHighlightDuration || 2000);
     }
 }
 
