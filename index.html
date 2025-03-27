@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone: The Daily Commute</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>DRONE: THE DAILY COMMUTE</h1>
+        
+        <div class="hud">
+            <div class="day-counter">Day: <span id="day">1</span></div>
+            <div style="display: flex; align-items: center;">
+                <div class="awareness-text">Awareness:</div>
+                <div class="awareness-meter">
+                    <div id="awareness-fill" class="awareness-fill"></div>
+                </div>
+                <div id="awareness-percent">0%</div>
+            </div>
+        </div>
+        
+        <div class="lyric-display" id="lyric-display"></div>
+        
+        <div class="scene-container" id="scene-container">
+            <div class="fade-overlay" id="fade-overlay"></div>
+            
+            <div class="sign">PLATFORM 3</div>
+            
+            <div class="train">
+                <div class="window" style="top: 30px; left: 10%;"></div>
+                <div class="window" style="top: 30px; left: 25%;"></div>
+                <div class="window" style="top: 30px; left: 40%;"></div>
+                <div class="window" style="top: 30px; left: 55%;"></div>
+                <div class="window" style="top: 30px; left: 70%;"></div>
+                <div class="window" style="top: 30px; left: 85%;"></div>
+            </div>
+            
+            <div class="platform"></div>
+            
+            <!-- People on the platform -->
+            <div class="person" id="person1" style="left: 10%;">
+                <div class="head"></div>
+                <div class="body"></div>
+                <div class="left-arm" id="person1-left-arm"></div>
+                <div class="right-arm" id="person1-right-arm"></div>
+                <div class="left-leg"></div>
+                <div class="right-leg"></div>
+                <div class="accessory hat" id="person1-hat"></div>
+                <div class="accessory bag" id="person1-bag"></div>
+            </div>
+            
+            <div class="person" id="person2" style="left: 20%;">
+                <div class="head"></div>
+                <div class="body"></div>
+                <div class="left-arm" id="person2-left-arm"></div>
+                <div class="right-arm" id="person2-right-arm"></div>
+                <div class="left-leg"></div>
+                <div class="right-leg"></div>
+                <div class="accessory hat" id="person2-hat"></div>
+                <div class="accessory bag" id="person2-bag"></div>
+            </div>
+            
+            <div class="person" id="person3" style="left: 30%;">
+                <div class="head"></div>
+                <div class="body"></div>
+                <div class="left-arm" id="person3-left-arm"></div>
+                <div class="right-arm" id="person3-right-arm"></div>
+                <div class="left-leg"></div>
+                <div class="right-leg"></div>
+                <div class="accessory hat" id="person3-hat"></div>
+                <div class="accessory bag" id="person3-bag"></div>
+            </div>
+            
+            <div class="person" id="person4" style="left: 40%;">
+                <div class="head"></div>
+                <div class="body"></div>
+                <div class="left-arm" id="person4-left-arm"></div>
+                <div class="right-arm" id="person4-right-arm"></div>
+                <div class="left-leg"></div>
+                <div class="right-leg"></div>
+                <div class="accessory hat" id="person4-hat"></div>
+                <div class="accessory bag" id="person4-bag"></div>
+            </div>
+            
+            <div class="person" id="person5" style="left: 50%;">
+                <div class="head"></div>
+                <div class="body"></div>
+                <div class="left-arm" id="person5-left-arm"></div>
+                <div class="right-arm" id="person5-right-arm"></div>
+                <div class="left-leg"></div>
+                <div class="right-leg"></div>
+                <div class="accessory hat" id="person5-hat"></div>
+                <div class="accessory bag" id="person5-bag"></div>
+            </div>
+            
+            <div class="person" id="person6" style="left: 60%;">
+                <div class="head"></div>
+                <div class="body"></div>
+                <div class="left-arm" id="person6-left-arm"></div>
+                <div class="right-arm" id="person6-right-arm"></div>
+                <div class="left-leg"></div>
+                <div class="right-leg"></div>
+                <div class="accessory hat" id="person6-hat"></div>
+                <div class="accessory bag" id="person6-bag"></div>
+            </div>
+            
+            <!-- Player character -->
+            <div class="person" id="player" style="left: 75%;">
+                <div class="head"></div>
+                <div class="body"></div>
+                <div class="left-arm"></div>
+                <div class="right-arm"></div>
+                <div class="left-leg"></div>
+                <div class="right-leg"></div>
+            </div>
+            
+            <div class="thought-bubble" id="thought-bubble">
+                Something's different today...
+            </div>
+            
+            <div class="message" id="message"></div>
+        </div>
+        
+        <button class="train-button" id="train-button">Take the 6:40 Train</button>
+    </div>
+    
+    <script src="config.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
