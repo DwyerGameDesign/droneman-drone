@@ -86,6 +86,7 @@ function setupClickHandlers() {
 /**
  * Handle clicks on scene elements
  */
+
 function handleElementClick(event) {
     if (!canClick) return;
     
@@ -115,6 +116,7 @@ function handleElementClick(event) {
         // Enable the button again after a short delay
         setTimeout(() => {
             trainButton.disabled = false;
+            currentChange = null; // Clear the current change since it was found
         }, 1500);
     } else {
         // Wrong element clicked
@@ -126,10 +128,25 @@ function handleElementClick(event) {
  * Take the train to the next day
  */
 function takeTrain() {
-    if (!canClick && day > 1) return;
-    
+    // Enable the player to take the train even if they haven't found the change
     trainButton.disabled = true;
     
+    // Highlight any missed change before transitioning
+    if (currentChange && canClick) {
+        highlightMissedChange(currentChange);
+        
+        // Short delay to allow the highlight to be seen
+        setTimeout(() => {
+            proceedToNextDay();
+        }, GAME_SETTINGS.missedChangeHighlightDuration);
+    } else {
+        // No current change or player already found it, proceed immediately
+        proceedToNextDay();
+    }
+}
+
+// New function to handle the transition to the next day
+function proceedToNextDay() {
     // Fade out
     sceneContainer.classList.add('fading');
     
@@ -141,7 +158,11 @@ function takeTrain() {
         day++;
         dayDisplay.textContent = day;
         
-        // Generate new change
+        // Determine number of changes based on current day
+        const numberOfChanges = day >= GAME_SETTINGS.multipleChangesThreshold ? 
+            Math.min(3, Math.floor((day - GAME_SETTINGS.multipleChangesThreshold) / 20) + 1) : 1;
+        
+        // Generate new change(s)
         currentChange = selectRandomChange();
         
         // Apply the change
@@ -157,11 +178,44 @@ function takeTrain() {
             // Allow clicking after fade completes
             setTimeout(() => {
                 canClick = true;
-                showMessage("Find what changed today...", 2000);
+                showMessage(`Find what changed today... (Day ${day})`, 2000);
             }, 1000);
         }, GAME_SETTINGS.waitDuration);
     }, GAME_SETTINGS.fadeOutDuration);
 }
+
+// New function to highlight missed changes
+function highlightMissedChange(change) {
+    const element = document.getElementById(change.id);
+    if (element) {
+        // Store original properties
+        const originalBackgroundColor = element.style.backgroundColor;
+        const originalTransition = element.style.transition;
+        const originalBoxShadow = element.style.boxShadow;
+        
+        // Apply highlight
+        element.style.transition = 'all 0.5s ease-in-out';
+        element.style.boxShadow = `0 0 15px ${GAME_SETTINGS.missedChangeHighlightColor}`;
+        
+        if (change.type === 'accessory' && change.change.property === 'visibility') {
+            // For accessories, also make them glow
+            element.style.backgroundColor = GAME_SETTINGS.missedChangeHighlightColor;
+        } else {
+            // For other changes, just highlight
+            element.style.borderColor = GAME_SETTINGS.missedChangeHighlightColor;
+        }
+        
+        // Show a message about the missed change
+        showMessage("You missed a change!", GAME_SETTINGS.missedChangeHighlightDuration);
+        
+        // Reset after highlight duration
+        setTimeout(() => {
+            // No need to reset since we're moving to a new day
+            // The element will be reset during the day transition
+        }, GAME_SETTINGS.missedChangeHighlightDuration);
+    }
+}
+
 
 /**
  * Select a random element to change

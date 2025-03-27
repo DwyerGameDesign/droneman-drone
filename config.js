@@ -21,25 +21,25 @@ const SONG_LYRICS = [
 // Changeable elements configuration
 const CHANGEABLE_ELEMENTS = [
     // Arm positions
-    { 
-        type: 'arm', 
+    {
+        type: 'arm',
         ids: [
-            'person1-left-arm', 'person1-right-arm', 
+            'person1-left-arm', 'person1-right-arm',
             'person2-left-arm', 'person2-right-arm',
-            'person3-left-arm', 'person3-right-arm', 
+            'person3-left-arm', 'person3-right-arm',
             'person4-left-arm', 'person4-right-arm',
-            'person5-left-arm', 'person5-right-arm', 
+            'person5-left-arm', 'person5-right-arm',
             'person6-left-arm', 'person6-right-arm'
-        ] 
+        ]
     },
-    
+
     // Accessories (hats and bags)
-    { 
-        type: 'accessory', 
+    {
+        type: 'accessory',
         ids: [
             'person1-hat', 'person2-hat', 'person3-hat', 'person4-hat', 'person5-hat', 'person6-hat',
             'person1-bag', 'person2-bag', 'person3-bag', 'person4-bag', 'person5-bag', 'person6-bag'
-        ] 
+        ]
     }
 ];
 
@@ -85,14 +85,19 @@ const GAME_SETTINGS = {
     fadeOutDuration: 1000,  // How long the fade out animation takes (ms)
     fadeInDuration: 1000,   // How long the fade in animation takes (ms)
     waitDuration: 1000,     // How long to wait between fade out and fade in (ms)
-    
+
+    // Add at the end of the GAME_SETTINGS object
+    multipleChangesThreshold: 60, // Day when multiple changes start appearing
+    missedChangeHighlightColor: '#e9cb5f', // A muted yellow that fits the aesthetic
+    missedChangeHighlightDuration: 2000, // How long the highlight shows (ms)    
+
     // Gameplay settings
     baseAwarenessGain: 5,   // How much awareness increases per correct guess
-    
+
     // Win conditions
     maxAwareness: 100,      // Maximum awareness level
     winDay: 100,            // Day to reach for win condition
-    
+
     // Background stage thresholds (percentage of awareness)
     colorStages: [
         { threshold: 0, class: 'stage-1' },
