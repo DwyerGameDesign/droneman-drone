@@ -13,7 +13,7 @@
  * Gradually introduces color to specific elements as awareness increases
  */
 const colorSystem = {
-    enabled: false, // Set to true to enable this feature
+    enabled: true, // Set to true to enable this feature
     
     // Awareness thresholds for introducing color
     thresholds: {
@@ -134,7 +134,8 @@ const colorSystem = {
  * Adds sound effects and ambient audio to the game
  */
 const audioSystem = {
-    enabled: false, // Set to true to enable this feature
+    enabled: true, // Set to true to enable this feature
+    context: null,
     
     sounds: {
         trainDepart: null,
@@ -278,7 +279,7 @@ const audioSystem = {
  * Adds game state saving and loading
  */
 const saveSystem = {
-    enabled: false, // Set to true to enable this feature
+    enabled: true, // Set to true to enable this feature
     
     /**
      * Initialize the save system
@@ -433,36 +434,48 @@ const saveSystem = {
     }
 };
 
-// Initialize extensions if enabled
+// Fix for function overriding - properly store original functions
 document.addEventListener('DOMContentLoaded', () => {
+    // Store original functions before overriding
+    const originalIncreaseAwareness = window.increaseAwareness;
+    const originalTakeTrain = window.takeTrain;
+    const originalHandleElementClick = window.handleElementClick;
+    
+    // Initialize extensions
     colorSystem.init();
     audioSystem.init();
     saveSystem.init();
     
-    // Create custom events for other systems to hook into
-    const originalIncreaseAwareness = window.increaseAwareness;
+    // Override increaseAwareness function
     window.increaseAwareness = function(amount) {
-        const oldAwareness = awareness;
+        // Call the original function first
         originalIncreaseAwareness(amount);
         
         // Dispatch awareness changed event
         const event = new CustomEvent('awarenessChanged', {
             detail: {
-                oldAwareness,
+                oldAwareness: awareness - amount,
                 awareness,
                 change: amount
             }
         });
         document.dispatchEvent(event);
+        
+        // Check for milestone for audio system
+        if ((awareness % 10 === 0) || SONG_LYRICS.some(lyric => lyric.day === day)) {
+            document.dispatchEvent(new Event('milestoneReached'));
+        }
     };
     
-    // Create day changed event
-    const originalTakeTrain = window.takeTrain;
+    // Override takeTrain function
     window.takeTrain = function() {
+        // Store old day value
         const oldDay = day;
+        
+        // Call the original function
         originalTakeTrain();
         
-        // Dispatch day changed event
+        // Dispatch day changed event after a short delay to let original function complete
         setTimeout(() => {
             const event = new CustomEvent('dayChanged', {
                 detail: {
@@ -474,18 +487,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100);
     };
     
-    // Create events for correct/incorrect guesses
-    const originalHandleElementClick = window.handleElementClick;
+    // Override handleElementClick function
     window.handleElementClick = function(event) {
+        // Store if this was a correct click before calling original function
         const clickedId = event.target.id;
         const isCorrect = clickedId === currentChange?.id;
         
+        // Call the original function
         originalHandleElementClick(event);
         
+        // Dispatch appropriate event after a short delay
         setTimeout(() => {
             if (isCorrect) {
                 document.dispatchEvent(new Event('correctGuess'));
-            } else {
+            } else if (currentChange) {  // Only dispatch incorrect if there is a current change
                 document.dispatchEvent(new Event('incorrectGuess'));
             }
         }, 100);

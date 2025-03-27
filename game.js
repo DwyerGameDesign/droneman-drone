@@ -34,6 +34,38 @@ function init() {
     
     // Apply initial color stage
     updateColorStage();
+    
+    // Check if window includes utils.js and trigger mobile optimizations if necessary
+    if (typeof transitionBackgroundColor === 'function') {
+        setupMobileOptimizations();
+    }
+}
+
+/**
+ * Set up mobile-specific optimizations
+ */
+function setupMobileOptimizations() {
+    // Detect mobile devices
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        // Make clickable elements larger for mobile
+        document.querySelectorAll('.person, .accessory').forEach(el => {
+            el.style.minWidth = '40px';
+            el.style.minHeight = '40px';
+        });
+        
+        // Add touch feedback
+        document.querySelectorAll('.person, .accessory').forEach(el => {
+            el.addEventListener('touchstart', function() {
+                this.style.opacity = '0.7';
+            });
+            
+            el.addEventListener('touchend', function() {
+                this.style.opacity = '1';
+            });
+        });
+    }
 }
 
 /**
@@ -65,6 +97,20 @@ function handleElementClick(event) {
         increaseAwareness(GAME_SETTINGS.baseAwarenessGain);
         canClick = false;
         showThoughtBubble();
+        
+        // Highlight the correct element
+        const element = document.getElementById(clickedId);
+        if (element) {
+            // Add a temporary highlight
+            const originalTransition = element.style.transition;
+            element.style.transition = 'all 0.5s ease-in-out';
+            element.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.8)';
+            
+            setTimeout(() => {
+                element.style.boxShadow = '';
+                element.style.transition = originalTransition;
+            }, 1000);
+        }
         
         // Enable the button again after a short delay
         setTimeout(() => {
@@ -279,10 +325,44 @@ function checkForLyrics() {
 function gameComplete() {
     showMessage("You've broken free from the routine! DRONE NO MORE!", 5000);
     
-    // Additional game completion logic could go here
-    // - Play victory sound
-    // - Show end screen
-    // - Offer restart option
+    // Additional game completion effects
+    sceneContainer.classList.add('completion');
+    
+    // Play victory animation on player character
+    const player = document.getElementById('player');
+    if (player) {
+        player.classList.add('victory-dance');
+    }
+    
+    // Disable train button
+    trainButton.disabled = true;
+    
+    // Display final message
+    setTimeout(() => {
+        const completionMessage = document.createElement('div');
+        completionMessage.className = 'completion-message';
+        completionMessage.innerHTML = `
+            <h2>Congratulations!</h2>
+            <p>You've reached 100% awareness and broken free from the daily grind.</p>
+            <p>No longer a drone, you've taken control of your life.</p>
+            <p>Days on the train: ${day}</p>
+        `;
+        
+        // Style the completion message
+        completionMessage.style.position = 'absolute';
+        completionMessage.style.top = '50%';
+        completionMessage.style.left = '50%';
+        completionMessage.style.transform = 'translate(-50%, -50%)';
+        completionMessage.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        completionMessage.style.color = '#fff';
+        completionMessage.style.padding = '20px';
+        completionMessage.style.borderRadius = '10px';
+        completionMessage.style.textAlign = 'center';
+        completionMessage.style.zIndex = '1000';
+        
+        // Add to scene
+        sceneContainer.appendChild(completionMessage);
+    }, 6000);
 }
 
 /**
@@ -293,4 +373,4 @@ function getRandomFromArray(array) {
 }
 
 // Initialize the game
-init();
+document.addEventListener('DOMContentLoaded', init);

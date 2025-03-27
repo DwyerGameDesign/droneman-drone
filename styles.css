@@ -26,6 +26,7 @@ body {
     border: 3px solid #444;
     overflow: hidden;
     position: relative;
+    transition: background-color 1s ease;
 }
 
 .platform {
@@ -68,6 +69,7 @@ body {
     justify-content: center;
     font-size: 14px;
     border-radius: 4px;
+    transition: background-color 1s ease-in-out;
 }
 
 /* Person/Character Styles */
@@ -76,6 +78,7 @@ body {
     bottom: 80px;
     width: 30px;
     height: 80px;
+    cursor: pointer;
 }
 
 .head {
@@ -86,6 +89,7 @@ body {
     height: 20px;
     background-color: #555;
     border-radius: 10px;
+    transition: background-color 1s ease-in-out;
 }
 
 .body {
@@ -95,6 +99,7 @@ body {
     width: 10px;
     height: 30px;
     background-color: #555;
+    transition: background-color 1s ease-in-out;
 }
 
 .left-arm, .right-arm {
@@ -103,6 +108,7 @@ body {
     width: 5px;
     height: 20px;
     background-color: #555;
+    transition: transform 0.5s ease-in-out, background-color 1s ease-in-out;
 }
 
 .left-arm {
@@ -121,6 +127,7 @@ body {
     width: 5px;
     height: 30px;
     background-color: #555;
+    transition: background-color 1s ease-in-out;
 }
 
 .left-leg {
@@ -139,6 +146,8 @@ body {
     height: 15px;
     background-color: #777;
     visibility: hidden;
+    transition: visibility 0.3s, background-color 1s ease-in-out;
+    cursor: pointer;
 }
 
 .hat {
@@ -220,6 +229,7 @@ body {
     padding: 15px;
     border-radius: 5px;
     visibility: hidden;
+    z-index: 100;
 }
 
 .thought-bubble {
@@ -231,6 +241,7 @@ body {
     max-width: 150px;
     text-align: center;
     visibility: hidden;
+    z-index: 100;
 }
 
 .thought-bubble::after {
@@ -264,6 +275,47 @@ body {
     opacity: 1;
 }
 
+/* Victory animation */
+@keyframes victoryDance {
+    0% { transform: translateY(0); }
+    25% { transform: translateY(-10px) rotate(5deg); }
+    50% { transform: translateY(0) rotate(-5deg); }
+    75% { transform: translateY(-10px) rotate(5deg); }
+    100% { transform: translateY(0); }
+}
+
+.victory-dance {
+    animation: victoryDance 1s infinite;
+}
+
+/* Game completion effect */
+.completion {
+    animation: colorPulse 5s infinite;
+}
+
+@keyframes colorPulse {
+    0% { background-color: #2E3192; }
+    25% { background-color: #1BFFFF; }
+    50% { background-color: #D4145A; }
+    75% { background-color: #FBB03B; }
+    100% { background-color: #2E3192; }
+}
+
+/* Reset button styling */
+.reset-button {
+    background-color: #a33;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.reset-button:hover {
+    background-color: #c44;
+}
+
 /* Responsive Design */
 @media (max-width: 800px) {
     .scene-container {
@@ -277,6 +329,21 @@ body {
     
     .hud > div {
         margin-bottom: 10px;
+    }
+    
+    /* Mobile-specific improvements */
+    .person, .accessory {
+        cursor: pointer;
+    }
+    
+    .accessory {
+        min-width: 20px;
+        min-height: 20px;
+    }
+    
+    .message {
+        font-size: 16px;
+        max-width: 80%;
     }
 }
 

@@ -26,7 +26,7 @@
         <div class="scene-container" id="scene-container">
             <div class="fade-overlay" id="fade-overlay"></div>
             
-            <div class="sign">PLATFORM 3</div>
+            <div class="sign" id="sign">PLATFORM 3</div>
             
             <div class="train">
                 <div class="window" style="top: 30px; left: 10%;"></div>
@@ -126,7 +126,10 @@
         <button class="train-button" id="train-button">Take the 6:40 Train</button>
     </div>
     
+    <!-- Load all scripts in the proper order -->
     <script src="config.js"></script>
+    <script src="utils.js"></script>
     <script src="game.js"></script>
+    <script src="extensions.js"></script>
 </body>
 </html>
