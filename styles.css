@@ -358,3 +358,112 @@ body {
 .stage-8 { background-color: #4141b0; }
 .stage-9 { background-color: #4343c2; }
 .stage-10 { background-color: #4545d4; }
+
+/* Mobile Portrait Optimizations */
+@media (max-width: 600px), (orientation: portrait) {
+    /* Game container adjustments */
+    .game-container {
+        width: 100%;
+        padding: 0 10px;
+    }
+    
+    /* Make the scene taller for portrait mode */
+    .scene-container {
+        height: 60vh; /* Use viewport height instead of fixed pixels */
+        min-height: 400px;
+        max-height: 600px;
+    }
+    
+    /* Adjust the train position and size */
+    .train {
+        bottom: 60px; /* Smaller platform height */
+        height: 150px; /* Slightly shorter train */
+    }
+    
+    /* Adjust the platform height */
+    .platform {
+        height: 60px;
+    }
+    
+    /* Make characters more visible */
+    .person {
+        transform: scale(1.2);
+        bottom: 60px; /* Match platform height */
+    }
+    
+    /* Increase touchable area for mobile */
+    .accessory, .left-arm, .right-arm {
+        min-width: 20px;
+        min-height: 20px;
+    }
+    
+    /* Improve HUD layout for portrait */
+    .hud {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    
+    /* Better layout for awareness meter */
+    .awareness-meter {
+        width: 80%; /* Wider on mobile */
+        height: 15px;
+        margin: 0 5px;
+    }
+    
+    /* Make buttons larger and more touchable */
+    .train-button {
+        padding: 15px 0;
+        width: 80%;
+        font-size: 16px;
+        margin: 15px auto;
+    }
+    
+    /* Adjust thought bubble for portrait mode */
+    .thought-bubble {
+        max-width: 120px;
+        font-size: 0.9em;
+    }
+    
+    /* Make message more visible on mobile */
+    .message {
+        font-size: 14px;
+        padding: 10px;
+        max-width: 90%;
+    }
+    
+    /* Adjust people positioning for portrait mode */
+    #person1 { left: 8%; }
+    #person2 { left: 22%; }
+    #person3 { left: 36%; }
+    #person4 { left: 50%; }
+    #person5 { left: 64%; }
+    #person6 { left: 78%; }
+    #player { left: 92%; }
+    
+    /* Lyric display */
+    .lyric-display {
+        font-size: 0.9em;
+        padding: 0 10px;
+    }
+    
+    /* Title adjustment */
+    h1 {
+        font-size: 1.4em;
+        margin: 10px 0;
+    }
+    
+    /* For smaller phones */
+    @media (max-height: 700px) {
+        .scene-container {
+            height: 50vh;
+            min-height: 300px;
+        }
+        
+        h1 {
+            font-size: 1.2em;
+            margin: 8px 0;
+        }
+    }
+}

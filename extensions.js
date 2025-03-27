@@ -134,7 +134,7 @@ const colorSystem = {
  * Adds sound effects and ambient audio to the game
  */
 const audioSystem = {
-    enabled: true, // Set to true to enable this feature
+    enabled: false, // Set to true to enable this feature
     context: null,
     
     sounds: {

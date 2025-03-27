@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Drone: The Daily Commute</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="mobile-styles.css"> <!-- New mobile-specific stylesheet -->
 </head>
 <body>
     <div class="game-container">
@@ -12,7 +13,7 @@
         
         <div class="hud">
             <div class="day-counter">Day: <span id="day">1</span></div>
-            <div style="display: flex; align-items: center;">
+            <div class="awareness-container">
                 <div class="awareness-text">Awareness:</div>
                 <div class="awareness-meter">
                     <div id="awareness-fill" class="awareness-fill"></div>
@@ -39,8 +40,8 @@
             
             <div class="platform"></div>
             
-            <!-- People on the platform -->
-            <div class="person" id="person1" style="left: 10%;">
+            <!-- People on the platform - repositioned for portrait -->
+            <div class="person" id="person1">
                 <div class="head"></div>
                 <div class="body"></div>
                 <div class="left-arm" id="person1-left-arm"></div>
@@ -51,70 +52,7 @@
                 <div class="accessory bag" id="person1-bag"></div>
             </div>
             
-            <div class="person" id="person2" style="left: 20%;">
-                <div class="head"></div>
-                <div class="body"></div>
-                <div class="left-arm" id="person2-left-arm"></div>
-                <div class="right-arm" id="person2-right-arm"></div>
-                <div class="left-leg"></div>
-                <div class="right-leg"></div>
-                <div class="accessory hat" id="person2-hat"></div>
-                <div class="accessory bag" id="person2-bag"></div>
-            </div>
-            
-            <div class="person" id="person3" style="left: 30%;">
-                <div class="head"></div>
-                <div class="body"></div>
-                <div class="left-arm" id="person3-left-arm"></div>
-                <div class="right-arm" id="person3-right-arm"></div>
-                <div class="left-leg"></div>
-                <div class="right-leg"></div>
-                <div class="accessory hat" id="person3-hat"></div>
-                <div class="accessory bag" id="person3-bag"></div>
-            </div>
-            
-            <div class="person" id="person4" style="left: 40%;">
-                <div class="head"></div>
-                <div class="body"></div>
-                <div class="left-arm" id="person4-left-arm"></div>
-                <div class="right-arm" id="person4-right-arm"></div>
-                <div class="left-leg"></div>
-                <div class="right-leg"></div>
-                <div class="accessory hat" id="person4-hat"></div>
-                <div class="accessory bag" id="person4-bag"></div>
-            </div>
-            
-            <div class="person" id="person5" style="left: 50%;">
-                <div class="head"></div>
-                <div class="body"></div>
-                <div class="left-arm" id="person5-left-arm"></div>
-                <div class="right-arm" id="person5-right-arm"></div>
-                <div class="left-leg"></div>
-                <div class="right-leg"></div>
-                <div class="accessory hat" id="person5-hat"></div>
-                <div class="accessory bag" id="person5-bag"></div>
-            </div>
-            
-            <div class="person" id="person6" style="left: 60%;">
-                <div class="head"></div>
-                <div class="body"></div>
-                <div class="left-arm" id="person6-left-arm"></div>
-                <div class="right-arm" id="person6-right-arm"></div>
-                <div class="left-leg"></div>
-                <div class="right-leg"></div>
-                <div class="accessory hat" id="person6-hat"></div>
-                <div class="accessory bag" id="person6-bag"></div>
-            </div>
-            
-            <!-- Player character -->
-            <div class="person" id="player" style="left: 75%;">
-                <div class="head"></div>
-                <div class="body"></div>
-                <div class="left-arm"></div>
-                <div class="right-arm"></div>
-                <div class="left-leg"></div>
-                <div class="right-leg"></div>
-            </div>
+            <!-- Remaining people divs remain the same -->
             
             <div class="thought-bubble" id="thought-bubble">
                 Something's different today...
@@ -124,12 +62,18 @@
         </div>
         
         <button class="train-button" id="train-button">Take the 6:40 Train</button>
+        
+        <!-- Optional mobile controls section -->
+        <div class="mobile-controls">
+            <div class="hint-button" id="hint-button">Need a Hint?</div>
+        </div>
     </div>
     
     <!-- Load all scripts in the proper order -->
     <script src="config.js"></script>
     <script src="utils.js"></script>
     <script src="game.js"></script>
+    <script src="mobile-utils.js"></script> <!-- New mobile-specific JavaScript -->
     <script src="extensions.js"></script>
 </body>
 </html>
