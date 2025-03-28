@@ -267,15 +267,29 @@ h1 {
 .left-shoe { left: 6px; } /* Adjusted for wider body */
 .right-shoe { left: 16.5px; } /* Adjusted for wider body */
 
+/* Modified hat to look more like a top hat */
 .hat {
     position: absolute;
-    top: -4.5px; /* Adjusted for taller head */
+    top: -9px; /* Taller and sits higher on the head */
     left: 4.5px; /* Adjusted for wider head */
     width: 21px; /* 50% wider */
-    height: 4.5px; /* 50% taller */
+    height: 9px; /* Made taller for top hat look */
     background-color: #3d3d3d;
     visibility: hidden;
     transition: visibility 0.3s, background-color 0.5s;
+    border-radius: 2px 2px 0 0; /* Rounded top */
+}
+
+/* Top hat brim effect */
+.hat:after {
+    content: '';
+    position: absolute;
+    bottom: -1.5px;
+    left: -3px;
+    width: 27px; /* Wider than the hat */
+    height: 1.5px;
+    background-color: #3d3d3d; /* Same color as hat */
+    border-radius: 1px;
 }
 
 .bag {
@@ -343,10 +357,12 @@ h1 {
     transform: translate(-50%, -50%);
     background-color: rgba(20, 20, 20, 0.8);
     color: #d4d4c8;
-    padding: 12px;
+    padding: 12px 20px;
     visibility: hidden;
     z-index: 100;
     font-family: 'Courier New', monospace;
+    border-radius: 5px;
+    font-size: 18px;
 }
 
 .thought-bubble {
@@ -393,15 +409,15 @@ h1 {
     opacity: 1;
 }
 
-/* Highlight for elements */
+/* Modified highlight for elements - now goldish/yellow */
 .highlight {
     animation: blink 0.8s 2;
 }
 
 @keyframes blink {
-    0% { box-shadow: 0 0 0 3px rgba(255,255,255,0); }
-    50% { box-shadow: 0 0 0 3px rgba(255,255,255,0.8); }
-    100% { box-shadow: 0 0 0 3px rgba(255,255,255,0); }
+    0% { box-shadow: 0 0 0 3px rgba(233, 203, 95, 0); }
+    50% { box-shadow: 0 0 0 3px rgba(233, 203, 95, 0.8); }
+    100% { box-shadow: 0 0 0 3px rgba(233, 203, 95, 0); }
 }
 
 /* Color stages */

@@ -99,11 +99,11 @@ const CHANGEABLE_ELEMENTS = [
     }
 ];
 
-// First change configuration - make it obvious
+// First change configuration - modified to be on character 2
 const FIRST_CHANGE = {
     type: 'hat-visibility',
     property: 'visibility',
-    id: 'person4-hat',  // Middle person's hat
+    id: 'person2-hat',  // Changed to person2
     value: 'visible'    // Make a hat appear
 };
 
@@ -142,12 +142,12 @@ const THOUGHTS = {
 // Game settings
 const GAME_SETTINGS = {
     // Faster transition timing
-    fadeOutDuration: 500,  // How long the fade out animation takes (ms)
-    fadeInDuration: 500,   // How long the fade in animation takes (ms)
-    waitDuration: 300,     // How long to wait between fade out and fade in (ms)
+    fadeOutDuration: 300,  // How long the fade out animation takes (ms) - MADE FASTER
+    fadeInDuration: 300,   // How long the fade in animation takes (ms) - MADE FASTER
+    waitDuration: 200,     // How long to wait between fade out and fade in (ms)
     
     // Highlight a missed change
-    missedChangeHighlightColor: '#e9cb5f',
+    missedChangeHighlightColor: '#e9cb5f', // Changed to match the goldish/yellow color
     missedChangeHighlightDuration: 1500,
     
     // Gameplay settings

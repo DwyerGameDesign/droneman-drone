@@ -13,6 +13,7 @@ let currentState = {};
 let isTransitioning = false;
 let allChanges = [];
 let foundFirstChange = false;
+let typewriter = null;
 
 // Game elements
 const sceneContainer = document.getElementById('scene-container');
@@ -31,11 +32,14 @@ document.addEventListener('DOMContentLoaded', init);
  * Initialize the game
  */
 function init() {
+    // Initialize typewriter
+    initTypewriter();
+    
     // Update displays
     updateAwarenessDisplay();
     
     // Set initial narrative text
-    narrativeText.textContent = "everyday the same...";
+    typewriter.type("everyday the same...");
     
     // Setup click handlers for elements
     setupClickHandlers();
@@ -48,6 +52,45 @@ function init() {
     
     // Apply initial color stage
     updateColorStage();
+}
+
+/**
+ * Initialize the typewriter for narrative text
+ */
+function initTypewriter() {
+    // Create a new Typewriter instance
+    if (typeof Typewriter !== 'undefined') {
+        typewriter = new Typewriter(narrativeText, {
+            speed: 40,
+            delay: 0,
+            cursor: '|'
+        });
+    } else {
+        // Fallback for when the Typewriter class is not available
+        typewriter = {
+            type: function(text) {
+                narrativeText.textContent = text;
+                return this;
+            },
+            stop: function() {
+                // Do nothing
+            }
+        };
+        
+        // Try to load the Typewriter script dynamically
+        const script = document.createElement('script');
+        script.src = 'typewriter.js';
+        script.onload = function() {
+            // Once loaded, create a proper Typewriter instance
+            typewriter = new Typewriter(narrativeText, {
+                speed: 40,
+                delay: 0,
+                cursor: '|'
+            });
+            typewriter.type(narrativeText.textContent);
+        };
+        document.head.appendChild(script);
+    }
 }
 
 /**
@@ -86,17 +129,16 @@ function initializeDefaultStyles() {
         });
     });
     
-    // Make sure the first change element is initially hidden
-    if (FIRST_CHANGE && FIRST_CHANGE.property === 'visibility' && FIRST_CHANGE.value === 'visible') {
-        const element = document.getElementById(FIRST_CHANGE.id);
-        if (element) {
-            element.style.visibility = 'hidden';
-            currentState[FIRST_CHANGE.id] = {
-                property: FIRST_CHANGE.property,
+    // Make sure all hats are initially hidden
+    document.querySelectorAll('.hat').forEach(hat => {
+        hat.style.visibility = 'hidden';
+        if (hat.id) {
+            currentState[hat.id] = {
+                property: 'visibility',
                 value: 'hidden'
             };
         }
-    }
+    });
 }
 
 /**
@@ -151,7 +193,6 @@ function handleElementClick(event) {
         currentChange.found = true;
     } else {
         // Wrong element clicked - show message
-        // Create an explicit visible message in the center of the screen
         message.textContent = "everyday the same";
         message.style.visibility = 'visible';
         
@@ -169,6 +210,9 @@ function takeTrain() {
     if (isTransitioning) return;
     
     isTransitioning = true;
+    
+    // Disable train button during transition
+    trainButton.disabled = true;
     
     // Check if there's an unfound change to highlight
     if (currentChange && !currentChange.found) {
@@ -199,7 +243,7 @@ function proceedToNextDay() {
         day++;
         dayDisplay.textContent = day;
         
-        // Only generate changes starting from day 4
+        // Handle day 4 specifically for the first change
         if (day === 4) {
             // Use the predefined first change for day 4
             currentChange = createFirstChange();
@@ -240,9 +284,28 @@ function proceedToNextDay() {
         sceneContainer.style.height = '400px';
         narrativeText.style.width = '800px';
         
+        // Stop any previous typewriting
+        if (typewriter) {
+            typewriter.stop();
+        }
+        
         // Fade back in
         setTimeout(() => {
             sceneContainer.classList.remove('fading');
+            
+            // Start typewriter animation for the narrative text
+            if (typewriter) {
+                // Get the current narrative text
+                const textToType = narrativeText.textContent;
+                narrativeText.textContent = ''; // Clear for typewriter effect
+                setTimeout(() => {
+                    typewriter.type(textToType);
+                }, 100);
+            }
+            
+            // Re-enable train button
+            trainButton.disabled = false;
+            
             isTransitioning = false; // Reset transition flag
         }, GAME_SETTINGS.fadeInDuration);
     }, GAME_SETTINGS.fadeOutDuration);
@@ -425,23 +488,43 @@ function updateNarrativeText() {
     
     if (lyricForToday) {
         narrativeText.textContent = `"${lyricForToday.text}"`;
+        
+        // Restart the typewriter with this text
+        if (typewriter) {
+            typewriter.stop();
+            setTimeout(() => {
+                typewriter.type(narrativeText.textContent);
+            }, 100);
+        }
     } else {
         // Choose narrative based on awareness cycles (repeating every 40 awareness points)
         const narrativeCycle = Math.floor(awareness / 10) % 4;
         
+        let newText = "";
+        
         switch(narrativeCycle) {
             case 0:
-                narrativeText.textContent = "The routine continues. Same faces, same train. But something feels different today.";
+                newText = "The routine continues. Same faces, same train. But something feels different today.";
                 break;
             case 1:
-                narrativeText.textContent = "You're starting to notice the world around you more clearly. The routine is still there, but you're waking up.";
+                newText = "You're starting to notice the world around you more clearly. The routine is still there, but you're waking up.";
                 break;
             case 2:
-                narrativeText.textContent = "The grip is loosening. Each day you feel more conscious, more alive. The routine can be broken.";
+                newText = "The grip is loosening. Each day you feel more conscious, more alive. The routine can be broken.";
                 break;
             case 3:
-                narrativeText.textContent = "The world is more vibrant now. The daily commute is becoming a journey of choice, not necessity.";
+                newText = "The world is more vibrant now. The daily commute is becoming a journey of choice, not necessity.";
                 break;
+        }
+        
+        narrativeText.textContent = newText;
+        
+        // Restart the typewriter with this text
+        if (typewriter) {
+            typewriter.stop();
+            setTimeout(() => {
+                typewriter.type(newText);
+            }, 100);
         }
     }
 }
@@ -497,5 +580,13 @@ function gameComplete() {
         
         // Update narrative
         narrativeText.textContent = "DRONE NO MORE, I'M MY OWN MAN. You've broken free from the cycle.";
+        
+        // Use typewriter for final message
+        if (typewriter) {
+            typewriter.stop();
+            setTimeout(() => {
+                typewriter.type(narrativeText.textContent);
+            }, 100);
+        }
     }, 6000);
 }
