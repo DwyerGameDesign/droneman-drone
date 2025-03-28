@@ -188,6 +188,11 @@ function proceedToNextDay() {
         // Update narrative text
         updateNarrativeText();
         
+        // Maintain container size - fixed width and height
+        sceneContainer.style.width = '800px';
+        sceneContainer.style.height = '400px';
+        narrativeText.style.width = '800px';
+        
         // Fade back in
         setTimeout(() => {
             sceneContainer.classList.remove('fading');

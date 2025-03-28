@@ -2,9 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Drone: The Daily Commute</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Additional inline styles to ensure fixed width */
+        html, body {
+            min-width: 820px; /* Slightly larger than game width to account for padding */
+            overflow-x: hidden;
+        }
+    </style>
 </head>
 <body>
     <div class="game-container">
