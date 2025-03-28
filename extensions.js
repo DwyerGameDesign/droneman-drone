@@ -279,7 +279,7 @@ const audioSystem = {
  * Adds game state saving and loading
  */
 const saveSystem = {
-    enabled: true, // Set to true to enable this feature
+    enabled: false, // Set to true to enable this feature
     
     /**
      * Initialize the save system

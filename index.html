@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Drone: The Daily Commute</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="mobile-styles.css"> <!-- Mobile-specific stylesheet -->
+    <link rel="stylesheet" href="retro-styles.css">
+    <link rel="stylesheet" href="mobile-styles.css">
 </head>
 <body>
     <div class="game-container">
@@ -27,88 +27,164 @@
         <div class="scene-container" id="scene-container">
             <div class="fade-overlay" id="fade-overlay"></div>
             
-            <div class="sign" id="sign">PLATFORM 3</div>
-            
-            <div class="train">
-                <div class="window" style="top: 30px; left: 10%;"></div>
-                <div class="window" style="top: 30px; left: 25%;"></div>
-                <div class="window" style="top: 30px; left: 40%;"></div>
-                <div class="window" style="top: 30px; left: 55%;"></div>
-                <div class="window" style="top: 30px; left: 70%;"></div>
-                <div class="window" style="top: 30px; left: 85%;"></div>
+            <!-- Station structure -->
+            <div class="ceiling">
+                <div class="light light-1"></div>
+                <div class="light light-2"></div>
+                <div class="light light-3"></div>
+                <div class="light light-4"></div>
+                <div class="light light-5"></div>
             </div>
             
-            <div class="platform"></div>
+            <div class="station-background"></div>
             
-            <!-- People on the platform - Updated with pixel art trench coat style -->
-            <div class="person" id="person1" style="left: 10%;">
+            <div class="window-row">
+                <div class="window" style="left: 10%;"></div>
+                <div class="window" style="left: 20%;"></div>
+                <div class="window" style="left: 30%;"></div>
+                <div class="window" style="left: 40%;"></div>
+                <div class="window" style="left: 50%;"></div>
+                <div class="window" style="left: 60%;"></div>
+                <div class="window" style="left: 70%;"></div>
+                <div class="window" style="left: 80%;"></div>
+            </div>
+            
+            <div class="sign" id="sign">PLATFORM 3</div>
+            
+            <!-- Pillars -->
+            <div class="pillar pillar-1"></div>
+            <div class="pillar pillar-2"></div>
+            <div class="pillar pillar-3"></div>
+            
+            <!-- Train in background -->
+            <div class="train">
+                <div class="train-window" style="left: 8%;"></div>
+                <div class="train-window" style="left: 20%;"></div>
+                <div class="train-window" style="left: 32%;"></div>
+                <div class="train-window" style="left: 44%;"></div>
+                <div class="train-window" style="left: 56%;"></div>
+                <div class="train-window" style="left: 68%;"></div>
+                <div class="train-window" style="left: 80%;"></div>
+            </div>
+            
+            <div class="platform-edge"></div>
+            <div class="platform"></div>
+            <div class="platform-stripes"></div>
+            
+            <!-- People on the platform - in retro pixel art style -->
+            <div class="person" id="person1">
                 <div class="head" id="person1-head"></div>
                 <div class="body" id="person1-body"></div>
                 <div class="left-leg" id="person1-left-leg"></div>
                 <div class="right-leg" id="person1-right-leg"></div>
                 <div class="left-shoe" id="person1-left-shoe"></div>
                 <div class="right-shoe" id="person1-right-shoe"></div>
-                <div class="hat" id="person1-hat" style="visibility: hidden;"></div>
-                <div class="bag" id="person1-bag" style="visibility: hidden;"></div>
+                <div class="hat" id="person1-hat"></div>
+                <div class="bag" id="person1-bag"></div>
             </div>
             
-            <div class="person" id="person2" style="left: 20%;">
+            <div class="person" id="person2">
                 <div class="head" id="person2-head"></div>
                 <div class="body" id="person2-body"></div>
                 <div class="left-leg" id="person2-left-leg"></div>
                 <div class="right-leg" id="person2-right-leg"></div>
                 <div class="left-shoe" id="person2-left-shoe"></div>
                 <div class="right-shoe" id="person2-right-shoe"></div>
-                <div class="hat" id="person2-hat" style="visibility: hidden;"></div>
-                <div class="bag" id="person2-bag" style="visibility: hidden;"></div>
+                <div class="hat" id="person2-hat"></div>
+                <div class="bag" id="person2-bag"></div>
             </div>
             
-            <div class="person" id="person3" style="left: 30%;">
+            <div class="person" id="person3">
                 <div class="head" id="person3-head"></div>
                 <div class="body" id="person3-body"></div>
                 <div class="left-leg" id="person3-left-leg"></div>
                 <div class="right-leg" id="person3-right-leg"></div>
                 <div class="left-shoe" id="person3-left-shoe"></div>
                 <div class="right-shoe" id="person3-right-shoe"></div>
-                <div class="hat" id="person3-hat" style="visibility: hidden;"></div>
-                <div class="bag" id="person3-bag" style="visibility: hidden;"></div>
+                <div class="hat" id="person3-hat"></div>
+                <div class="bag" id="person3-bag"></div>
             </div>
             
-            <div class="person" id="person4" style="left: 40%;">
+            <div class="person" id="person4">
                 <div class="head" id="person4-head"></div>
                 <div class="body" id="person4-body"></div>
                 <div class="left-leg" id="person4-left-leg"></div>
                 <div class="right-leg" id="person4-right-leg"></div>
                 <div class="left-shoe" id="person4-left-shoe"></div>
                 <div class="right-shoe" id="person4-right-shoe"></div>
-                <div class="hat" id="person4-hat" style="visibility: hidden;"></div>
-                <div class="bag" id="person4-bag" style="visibility: hidden;"></div>
+                <div class="hat" id="person4-hat"></div>
+                <div class="bag" id="person4-bag"></div>
             </div>
             
-            <div class="person" id="person5" style="left: 50%;">
+            <div class="person" id="person5">
                 <div class="head" id="person5-head"></div>
                 <div class="body" id="person5-body"></div>
                 <div class="left-leg" id="person5-left-leg"></div>
                 <div class="right-leg" id="person5-right-leg"></div>
                 <div class="left-shoe" id="person5-left-shoe"></div>
                 <div class="right-shoe" id="person5-right-shoe"></div>
-                <div class="hat" id="person5-hat" style="visibility: hidden;"></div>
-                <div class="bag" id="person5-bag" style="visibility: hidden;"></div>
+                <div class="hat" id="person5-hat"></div>
+                <div class="bag" id="person5-bag"></div>
             </div>
             
-            <div class="person" id="person6" style="left: 60%;">
+            <div class="person" id="person6">
                 <div class="head" id="person6-head"></div>
                 <div class="body" id="person6-body"></div>
                 <div class="left-leg" id="person6-left-leg"></div>
                 <div class="right-leg" id="person6-right-leg"></div>
                 <div class="left-shoe" id="person6-left-shoe"></div>
                 <div class="right-shoe" id="person6-right-shoe"></div>
-                <div class="hat" id="person6-hat" style="visibility: hidden;"></div>
-                <div class="bag" id="person6-bag" style="visibility: hidden;"></div>
+                <div class="hat" id="person6-hat"></div>
+                <div class="bag" id="person6-bag"></div>
+            </div>
+            
+            <!-- Add more people to match the reference image -->
+            <div class="person" id="person7">
+                <div class="head" id="person7-head"></div>
+                <div class="body" id="person7-body"></div>
+                <div class="left-leg" id="person7-left-leg"></div>
+                <div class="right-leg" id="person7-right-leg"></div>
+                <div class="left-shoe" id="person7-left-shoe"></div>
+                <div class="right-shoe" id="person7-right-shoe"></div>
+                <div class="hat" id="person7-hat"></div>
+                <div class="bag" id="person7-bag"></div>
+            </div>
+            
+            <div class="person" id="person8">
+                <div class="head" id="person8-head"></div>
+                <div class="body" id="person8-body"></div>
+                <div class="left-leg" id="person8-left-leg"></div>
+                <div class="right-leg" id="person8-right-leg"></div>
+                <div class="left-shoe" id="person8-left-shoe"></div>
+                <div class="right-shoe" id="person8-right-shoe"></div>
+                <div class="hat" id="person8-hat"></div>
+                <div class="bag" id="person8-bag"></div>
+            </div>
+            
+            <div class="person" id="person9">
+                <div class="head" id="person9-head"></div>
+                <div class="body" id="person9-body"></div>
+                <div class="left-leg" id="person9-left-leg"></div>
+                <div class="right-leg" id="person9-right-leg"></div>
+                <div class="left-shoe" id="person9-left-shoe"></div>
+                <div class="right-shoe" id="person9-right-shoe"></div>
+                <div class="hat" id="person9-hat"></div>
+                <div class="bag" id="person9-bag"></div>
+            </div>
+            
+            <div class="person" id="person10">
+                <div class="head" id="person10-head"></div>
+                <div class="body" id="person10-body"></div>
+                <div class="left-leg" id="person10-left-leg"></div>
+                <div class="right-leg" id="person10-right-leg"></div>
+                <div class="left-shoe" id="person10-left-shoe"></div>
+                <div class="right-shoe" id="person10-right-shoe"></div>
+                <div class="hat" id="person10-hat"></div>
+                <div class="bag" id="person10-bag"></div>
             </div>
             
             <!-- Player character (Drone Man) -->
-            <div class="person" id="player" style="left: 75%;">
+            <div class="person" id="player">
                 <div class="head"></div>
                 <div class="body"></div>
                 <div class="left-leg"></div>
@@ -138,7 +214,7 @@
     <script src="config.js"></script>
     <script src="utils.js"></script>
     <script src="game.js"></script>
-    <script src="mobile-utils.js"></script> <!-- Mobile-specific JavaScript -->
+    <script src="mobile-utils.js"></script>
     <script src="extensions.js"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 /**
  * Drone: The Daily Commute
- * Configuration file - Updated for pixel art trench coat characters
+ * Configuration file - Updated for retro pixel art characters
  */
 
 // Song lyrics that appear at milestone days
@@ -18,7 +18,7 @@ const SONG_LYRICS = [
     { day: 100, text: "Drone no more, I'm my own man" }
 ];
 
-// Changeable elements configuration
+// Changeable elements configuration - Updated to include additional characters
 const CHANGEABLE_ELEMENTS = [
     // Hat properties
     {
@@ -26,7 +26,8 @@ const CHANGEABLE_ELEMENTS = [
         property: 'backgroundColor',
         ids: [
             'person1-hat', 'person2-hat', 'person3-hat', 
-            'person4-hat', 'person5-hat', 'person6-hat'
+            'person4-hat', 'person5-hat', 'person6-hat',
+            'person7-hat', 'person8-hat', 'person9-hat', 'person10-hat'
         ],
         values: [
             '#3d3d3d', '#4a4a4a', '#5a5a5a', 
@@ -39,7 +40,8 @@ const CHANGEABLE_ELEMENTS = [
         property: 'visibility',
         ids: [
             'person1-hat', 'person2-hat', 'person3-hat', 
-            'person4-hat', 'person5-hat', 'person6-hat'
+            'person4-hat', 'person5-hat', 'person6-hat',
+            'person7-hat', 'person8-hat', 'person9-hat', 'person10-hat'
         ],
         values: ['visible', 'hidden']
     },
@@ -49,7 +51,8 @@ const CHANGEABLE_ELEMENTS = [
         property: 'backgroundColor',
         ids: [
             'person1-body', 'person2-body', 'person3-body', 
-            'person4-body', 'person5-body', 'person6-body'
+            'person4-body', 'person5-body', 'person6-body',
+            'person7-body', 'person8-body', 'person9-body', 'person10-body'
         ],
         values: [
             '#4e392e', '#3b2e26', '#544033', '#4a3629',
@@ -62,9 +65,10 @@ const CHANGEABLE_ELEMENTS = [
         property: 'width',
         ids: [
             'person1-body', 'person2-body', 'person3-body', 
-            'person4-body', 'person5-body', 'person6-body'
+            'person4-body', 'person5-body', 'person6-body',
+            'person7-body', 'person8-body', 'person9-body', 'person10-body'
         ],
-        values: ['26px', '28px', '30px']
+        values: ['14px', '16px', '18px']
     },
     // Briefcase/bag color
     {
@@ -72,7 +76,8 @@ const CHANGEABLE_ELEMENTS = [
         property: 'backgroundColor',
         ids: [
             'person1-bag', 'person2-bag', 'person3-bag', 
-            'person4-bag', 'person5-bag', 'person6-bag'
+            'person4-bag', 'person5-bag', 'person6-bag',
+            'person7-bag', 'person8-bag', 'person9-bag', 'person10-bag'
         ],
         values: [
             '#59493f', '#4a3a30', '#5c4b41', '#4d3e34',
@@ -85,7 +90,8 @@ const CHANGEABLE_ELEMENTS = [
         property: 'visibility',
         ids: [
             'person1-bag', 'person2-bag', 'person3-bag', 
-            'person4-bag', 'person5-bag', 'person6-bag'
+            'person4-bag', 'person5-bag', 'person6-bag',
+            'person7-bag', 'person8-bag', 'person9-bag', 'person10-bag'
         ],
         values: ['visible', 'hidden']
     },
@@ -99,7 +105,11 @@ const CHANGEABLE_ELEMENTS = [
             'person3-left-leg', 'person3-right-leg',
             'person4-left-leg', 'person4-right-leg', 
             'person5-left-leg', 'person5-right-leg',
-            'person6-left-leg', 'person6-right-leg'
+            'person6-left-leg', 'person6-right-leg',
+            'person7-left-leg', 'person7-right-leg',
+            'person8-left-leg', 'person8-right-leg',
+            'person9-left-leg', 'person9-right-leg',
+            'person10-left-leg', 'person10-right-leg'
         ],
         values: [
             '#37322e', '#2a2a2a', '#403a36', '#343434',
@@ -116,7 +126,11 @@ const CHANGEABLE_ELEMENTS = [
             'person3-left-shoe', 'person3-right-shoe',
             'person4-left-shoe', 'person4-right-shoe',
             'person5-left-shoe', 'person5-right-shoe',
-            'person6-left-shoe', 'person6-right-shoe'
+            'person6-left-shoe', 'person6-right-shoe',
+            'person7-left-shoe', 'person7-right-shoe',
+            'person8-left-shoe', 'person8-right-shoe',
+            'person9-left-shoe', 'person9-right-shoe',
+            'person10-left-shoe', 'person10-right-shoe'
         ],
         values: [
             '#232323', '#1a1a1a', '#2c2c2c', '#262626',
@@ -129,7 +143,9 @@ const CHANGEABLE_ELEMENTS = [
         property: 'backgroundColor',
         ids: [
             'person1-head', 'person2-head', 'person3-head',
-            'person4-head', 'person5-head', 'person6-head'
+            'person4-head', 'person5-head', 'person6-head',
+            'person7-head', 'person8-head', 'person9-head',
+            'person10-head'
         ],
         values: [
             '#8a7159', '#83694f', '#9a8169', '#7a6245',
@@ -142,9 +158,11 @@ const CHANGEABLE_ELEMENTS = [
         property: 'left',
         ids: [
             'person1-bag', 'person2-bag', 'person3-bag',
-            'person4-bag', 'person5-bag', 'person6-bag'
+            'person4-bag', 'person5-bag', 'person6-bag',
+            'person7-bag', 'person8-bag', 'person9-bag',
+            'person10-bag'
         ],
-        values: ['-8px', '28px']
+        values: ['-6px', '16px']
     }
 ];
 
@@ -191,13 +209,14 @@ const GAME_SETTINGS = {
     fadeInDuration: 1000,   // How long the fade in animation takes (ms)
     waitDuration: 1000,     // How long to wait between fade out and fade in (ms)
 
-    // Add at the end of the GAME_SETTINGS object
-    multipleChangesThreshold: 60, // Day when multiple changes start appearing
+    // Add missed change highlight settings
     missedChangeHighlightColor: '#e9cb5f', // A muted yellow that fits the aesthetic
     missedChangeHighlightDuration: 2000, // How long the highlight shows (ms)    
+    fadeAfterHighlight: true, // NEW: Flag to control whether to fade after highlighting
 
     // Gameplay settings
     baseAwarenessGain: 5,   // How much awareness increases per correct guess
+    multipleChangesThreshold: 60, // Day when multiple changes start appearing
 
     // Win conditions
     maxAwareness: 100,      // Maximum awareness level

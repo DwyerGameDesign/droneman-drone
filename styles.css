@@ -1,15 +1,21 @@
-/* Main Layout Styles */
+/* Drone: The Daily Commute - Retro Pixel Art Styles */
+
+/* Base styling for pixelated rendering */
+html {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #222;
-    color: #ddd;
+    font-family: 'Courier New', monospace;
+    background-color: #1a1a1a;
+    color: #cccccc;
     margin: 0;
     padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    image-rendering: pixelated;
 }
 
 .game-container {
@@ -17,192 +23,323 @@ body {
     margin: 0 auto;
 }
 
-/* Game Scene Styles */
+/* Game Scene - Match the reference image */
 .scene-container {
     position: relative;
     width: 100%;
-    height: 400px;
-    background-color: #333;
+    height: 450px;
+    background-color: #2a2a2a;
     margin: 20px 0;
-    border: 3px solid #444;
+    border: 3px solid #3a3a3a;
     overflow: hidden;
-    position: relative;
-    transition: background-color 1s ease;
     image-rendering: pixelated;
+    transition: background-color 1s ease;
 }
 
-.platform {
+/* Station ceiling with beams */
+.ceiling {
     position: absolute;
-    bottom: 0;
+    top: 0;
     width: 100%;
     height: 80px;
-    background-color: #3a3a3a;
+    background-color: #3a2a28;
+    z-index: 1;
 }
 
-.train {
+.ceiling:before {
+    content: '';
     position: absolute;
-    bottom: 80px;
-    left: 5%;
-    width: 90%;
-    height: 180px;
-    background-color: #4a4a4a;
-    border-radius: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 20px,
+        #2a201e 20px,
+        #2a201e 22px
+    );
+}
+
+.ceiling:after {
+    content: '';
+    position: absolute;
+    top: 30px;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: #877;
+}
+
+/* Lighting */
+.light {
+    position: absolute;
+    top: 20px;
+    width: 60px;
+    height: 8px;
+    background-color: #fffce0;
+    z-index: 2;
+}
+
+.light-1 { left: 10%; }
+.light-2 { left: 30%; }
+.light-3 { left: 50%; }
+.light-4 { left: 70%; }
+.light-5 { left: 90%; }
+
+/* Station background */
+.station-background {
+    position: absolute;
+    top: 80px;
+    width: 100%;
+    height: 150px;
+    background-color: #c5c2b2;
+    z-index: 1;
+}
+
+.window-row {
+    position: absolute;
+    top: 100px;
+    width: 100%;
+    height: 40px;
+    background-color: transparent;
+    z-index: 2;
 }
 
 .window {
     position: absolute;
-    width: 50px;
-    height: 60px;
-    background-color: #bdbdbd;
-    border: 2px solid #777;
-    border-radius: 0;
+    top: 0;
+    width: 20px;
+    height: 30px;
+    background-color: #a8a595;
+    z-index: 2;
 }
 
+/* Platform */
+.platform {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100px;
+    background-color: #c5c2b2;
+    z-index: 2;
+}
+
+.platform-edge {
+    position: absolute;
+    bottom: 100px;
+    width: 100%;
+    height: 20px;
+    background-color: #878680;
+    z-index: 2;
+}
+
+.platform-edge:before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    width: 100%;
+    height: 4px;
+    background-color: #646260;
+}
+
+.platform-stripes {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    height: 10px;
+    background: repeating-linear-gradient(
+        90deg,
+        #646260,
+        #646260 20px,
+        #878680 20px,
+        #878680 40px
+    );
+    z-index: 3;
+}
+
+/* Train */
+.train {
+    position: absolute;
+    bottom: 120px;
+    width: 100%;
+    height: 150px;
+    background-color: #576065;
+    z-index: 3;
+}
+
+.train-window {
+    position: absolute;
+    width: 40px;
+    height: 50px;
+    top: 40px;
+    background-color: #deded2;
+    border: 4px solid #383d42;
+}
+
+/* People on platform - Retro pixel art style */
+.person {
+    position: absolute;
+    bottom: 100px;
+    width: 16px;
+    height: 40px;
+    cursor: pointer;
+    z-index: 4;
+    image-rendering: pixelated;
+}
+
+/* Head */
+.head {
+    position: absolute;
+    top: 0;
+    left: 4px;
+    width: 8px;
+    height: 8px;
+    background-color: #8a7159;
+    transition: background-color 0.5s ease-in-out;
+}
+
+/* Trench coat body */
+.body {
+    position: absolute;
+    top: 8px;
+    left: 0;
+    width: 16px;
+    height: 24px;
+    background-color: #4e392e;
+    transition: background-color 0.5s ease-in-out, width 0.5s ease-in-out;
+}
+
+/* Legs */
+.left-leg, .right-leg {
+    position: absolute;
+    top: 32px;
+    width: 4px;
+    height: 6px;
+    background-color: #37322e;
+    transition: background-color 0.5s ease-in-out;
+}
+
+.left-leg {
+    left: 3px;
+}
+
+.right-leg {
+    left: 9px;
+}
+
+/* Shoes */
+.left-shoe, .right-shoe {
+    position: absolute;
+    top: 38px;
+    width: 4px;
+    height: 2px;
+    background-color: #232323;
+    transition: background-color 0.5s ease-in-out;
+    cursor: pointer;
+}
+
+.left-shoe {
+    left: 3px;
+}
+
+.right-shoe {
+    left: 9px;
+}
+
+/* Hat */
+.hat {
+    position: absolute;
+    top: -2px;
+    left: 2px;
+    width: 12px;
+    height: 2px;
+    background-color: #3d3d3d;
+    visibility: hidden;
+    transition: visibility 0.3s, background-color 0.5s ease-in-out;
+    cursor: pointer;
+}
+
+/* Briefcase */
+.bag {
+    position: absolute;
+    top: 20px;
+    left: -6px;
+    width: 4px;
+    height: 8px;
+    background-color: #59493f;
+    visibility: hidden;
+    transition: visibility 0.3s, background-color 0.5s ease-in-out;
+    cursor: pointer;
+}
+
+/* Position people evenly */
+#person1 { left: 10%; }
+#person2 { left: 18%; }
+#person3 { left: 26%; }
+#person4 { left: 34%; }
+#person5 { left: 42%; }
+#person6 { left: 50%; }
+#person7 { left: 58%; }
+#person8 { left: 66%; }
+#person9 { left: 74%; }
+#person10 { left: 82%; }
+#player { left: 90%; }
+
+/* Columns/pillars */
+.pillar {
+    position: absolute;
+    bottom: 100px;
+    width: 12px;
+    height: 170px;
+    background-color: #483830;
+    z-index: 5;
+}
+
+.pillar-1 { left: 15%; }
+.pillar-2 { left: 45%; }
+.pillar-3 { left: 75%; }
+
+/* Station sign */
 .sign {
     position: absolute;
     top: 60px;
     left: 50%;
     transform: translateX(-50%);
-    width: 150px;
-    height: 40px;
-    background-color: #555;
-    color: white;
+    width: 120px;
+    height: 30px;
+    background-color: #52525b;
+    color: #d4d4c8;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
-    border-radius: 0;
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+    border: 2px solid #646470;
     transition: background-color 1s ease-in-out;
-}
-
-/* Updated Person/Character Styles for Pixel Art */
-.person {
-    position: absolute;
-    bottom: 80px;
-    width: 28px;
-    height: 80px;
-    cursor: pointer;
-    image-rendering: pixelated;
-}
-
-/* Head is now a rectangle for pixel art style */
-.head {
-    position: absolute;
-    top: 0;
-    left: 6px;
-    width: 16px;
-    height: 16px;
-    background-color: #8a7159;
-    border-radius: 0;
-    transition: background-color 1s ease-in-out;
-}
-
-/* Trench coat style body */
-.body {
-    position: absolute;
-    top: 16px;
-    left: 0;
-    width: 28px;
-    height: 45px;
-    background-color: #4e392e;
-    transition: background-color 1s ease-in-out, width 0.5s ease-in-out;
-    clip-path: polygon(0 0, 100% 0, 100% 80%, 60% 100%, 40% 100%, 0 80%);
-}
-
-/* Arms are hidden in the trench coat */
-.left-arm, .right-arm {
-    display: none;
-}
-
-/* Legs are now visible below the trench coat */
-.left-leg, .right-leg {
-    position: absolute;
-    top: 61px;
-    width: 6px;
-    height: 18px;
-    background-color: #37322e;
-    transition: background-color 1s ease-in-out;
-}
-
-.left-leg {
-    left: 7px;
-}
-
-.right-leg {
-    left: 15px;
-}
-
-/* Pants are integrated with legs */
-.pants {
-    display: none;
-}
-
-/* Shoes at the bottom of legs */
-.left-shoe, .right-shoe {
-    position: absolute;
-    top: 79px;
-    width: 8px;
-    height: 4px;
-    background-color: #232323;
-    transition: background-color 0.5s ease-in-out, height 0.5s ease-in-out;
-    cursor: pointer;
-}
-
-.left-shoe {
-    left: 6px;
-}
-
-.right-shoe {
-    left: 14px;
-}
-
-/* Hat sits on top of head */
-.hat {
-    position: absolute;
-    top: -4px;
-    left: 4px;
-    width: 20px;
-    height: 4px;
-    background-color: #3d3d3d;
-    border-radius: 0;
-    visibility: hidden;
-    transition: visibility 0.3s, background-color 0.5s ease-in-out;
-    cursor: pointer;
-}
-
-/* Briefcase instead of bag */
-.bag {
-    position: absolute;
-    top: 40px;
-    left: -8px;
-    width: 8px;
-    height: 14px;
-    background-color: #59493f;
-    border-radius: 0;
-    visibility: hidden;
-    transition: visibility 0.3s, background-color 0.5s ease-in-out;
-    cursor: pointer;
+    z-index: 6;
 }
 
 /* UI Element Styles */
 .train-button {
-    padding: 15px 25px;
-    font-size: 18px;
-    background-color: #555;
-    color: white;
+    padding: 12px 20px;
+    font-size: 16px;
+    background-color: #52525b;
+    color: #d4d4c8;
     border: none;
-    border-radius: 0; /* Square buttons for pixel style */
     cursor: pointer;
     margin-top: 20px;
+    font-family: 'Courier New', monospace;
     transition: background-color 0.3s;
 }
 
 .train-button:hover {
-    background-color: #777;
+    background-color: #646470;
 }
 
 .train-button:disabled {
-    background-color: #444;
+    background-color: #3a3a45;
     cursor: not-allowed;
 }
 
@@ -213,29 +350,34 @@ body {
     margin-bottom: 10px;
 }
 
+.awareness-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .awareness-meter {
     width: 200px;
-    height: 20px;
-    background-color: #444;
-    border-radius: 0; /* Square for pixel style */
+    height: 16px;
+    background-color: #3a3a45;
     overflow: hidden;
 }
 
 .awareness-fill {
     height: 100%;
-    background-color: #6a7fe4;
+    background-color: #6a7070;
     width: 0%;
     transition: width 0.5s;
 }
 
 .day-counter, .awareness-text {
-    font-size: 18px;
+    font-size: 16px;
     margin: 0 10px;
 }
 
 .lyric-display {
     font-style: italic;
-    color: #aaf;
+    color: #9e9e8e;
     margin: 15px 0;
     min-height: 20px;
 }
@@ -246,37 +388,37 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 15px;
-    border-radius: 0; /* Square for pixel style */
+    background-color: rgba(20, 20, 20, 0.8);
+    color: #d4d4c8;
+    padding: 12px;
     visibility: hidden;
     z-index: 100;
+    font-family: 'Courier New', monospace;
 }
 
 .thought-bubble {
     position: absolute;
-    background-color: white;
-    color: black;
-    padding: 10px;
-    border-radius: 0; /* Square for pixel style */
+    background-color: #d4d4c8;
+    color: #2a2a2a;
+    padding: 8px;
     max-width: 150px;
     text-align: center;
     visibility: hidden;
     z-index: 100;
+    font-family: 'Courier New', monospace;
 }
 
 .thought-bubble::after {
     content: '';
     position: absolute;
-    bottom: -10px;
+    bottom: -8px;
     left: 50%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 10px solid white;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #d4d4c8;
 }
 
 /* Fade Transition Styles */
@@ -297,75 +439,41 @@ body {
     opacity: 1;
 }
 
-/* Victory animation */
-@keyframes victoryDance {
-    0% { transform: translateY(0); }
-    25% { transform: translateY(-10px); }
-    50% { transform: translateY(0); }
-    75% { transform: translateY(-10px); }
-    100% { transform: translateY(0); }
-}
-
-.victory-dance {
-    animation: victoryDance 1s infinite;
-}
-
-/* Game completion effect */
-.completion {
-    animation: colorPulse 5s infinite;
-}
-
-@keyframes colorPulse {
-    0% { background-color: #2E3192; }
-    25% { background-color: #1BFFFF; }
-    50% { background-color: #D4145A; }
-    75% { background-color: #FBB03B; }
-    100% { background-color: #2E3192; }
-}
-
-/* Reset button styling */
-.reset-button {
-    background-color: #a33;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 0; /* Square for pixel style */
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.reset-button:hover {
-    background-color: #c44;
-}
-
-/* Highlight styling */
+/* Highlight for missed changes */
 .highlight {
-    box-shadow: 0 0 10px #e9cb5f;
-    z-index: 10;
+    animation: blink 1s 3;
 }
 
-/* Additional color stages for awareness progression */
-.stage-1 { background-color: #333; }
-.stage-2 { background-color: #353545; }
-.stage-3 { background-color: #373756; }
-.stage-4 { background-color: #393968; }
-.stage-5 { background-color: #3b3b7a; }
-.stage-6 { background-color: #3d3d8c; }
-.stage-7 { background-color: #3f3f9e; }
-.stage-8 { background-color: #4141b0; }
-.stage-9 { background-color: #4343c2; }
-.stage-10 { background-color: #4545d4; }
+@keyframes blink {
+    0% { box-shadow: 0 0 0 2px rgba(255,255,255,0); }
+    50% { box-shadow: 0 0 0 2px rgba(255,255,255,0.8); }
+    100% { box-shadow: 0 0 0 2px rgba(255,255,255,0); }
+}
 
-/* Mobile Portrait Optimizations */
-@media (max-width: 600px), (orientation: portrait) {
-    /* Mobile-specific adjustments */
-    .game-container {
-        width: 100%;
-        padding: 0 10px;
+/* Color stages */
+.stage-1 { background-color: #2a2a2a; }
+.stage-2 { background-color: #2c2c32; }
+.stage-3 { background-color: #2e2e39; }
+.stage-4 { background-color: #303042; }
+.stage-5 { background-color: #32324a; }
+.stage-6 { background-color: #343452; }
+.stage-7 { background-color: #36365a; }
+.stage-8 { background-color: #383862; }
+.stage-9 { background-color: #3a3a6a; }
+.stage-10 { background-color: #3c3c72; }
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+    .scene-container {
+        height: 350px;
     }
     
-    .scene-container {
-        height: 60vh;
-        min-height: 400px;
+    .person {
+        transform: scale(1.5);
+    }
+    
+    .train-button {
+        padding: 15px;
+        width: 80%;
     }
 }

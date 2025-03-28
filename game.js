@@ -1,6 +1,6 @@
 /**
  * Drone: The Daily Commute
- * Main game logic - Updated for pixel art trench coat characters
+ * Main game logic - Updated for retro pixel art style
  */
 
 // Game state
@@ -115,8 +115,8 @@ function setupMobileOptimizations() {
     if (isMobile) {
         // Make clickable elements larger for mobile
         document.querySelectorAll('.person, .hat, .bag, .left-leg, .right-leg, .left-shoe, .right-shoe').forEach(el => {
-            el.style.minWidth = '40px';
-            el.style.minHeight = '40px';
+            el.style.minWidth = '24px';
+            el.style.minHeight = '24px';
         });
         
         // Add touch feedback
@@ -180,10 +180,17 @@ function takeTrain() {
     if (currentChange && !currentChange.found) {
         highlightMissedChange(currentChange);
         
-        // Short delay to allow the highlight to be seen
-        setTimeout(() => {
-            proceedToNextDay();
-        }, GAME_SETTINGS.missedChangeHighlightDuration);
+        // If fadeAfterHighlight is enabled, proceed to next day after highlighting
+        if (GAME_SETTINGS.fadeAfterHighlight) {
+            setTimeout(() => {
+                proceedToNextDay();
+            }, GAME_SETTINGS.missedChangeHighlightDuration);
+        } else {
+            // Just restore the transition flag if we're not fading
+            setTimeout(() => {
+                isTransitioning = false;
+            }, GAME_SETTINGS.missedChangeHighlightDuration);
+        }
     } else {
         // No change or player already found it, proceed immediately
         proceedToNextDay();
@@ -233,7 +240,7 @@ function proceedToNextDay() {
                 canClick = true;
                 isTransitioning = false; // Reset transition flag
                 showMessage(`Find what changed today... (Day ${day})`, 2000);
-            }, 1000);
+            }, GAME_SETTINGS.fadeInDuration);
         }, GAME_SETTINGS.waitDuration);
     }, GAME_SETTINGS.fadeOutDuration);
 }
@@ -244,19 +251,15 @@ function proceedToNextDay() {
 function highlightMissedChange(change) {
     const element = document.getElementById(change.id);
     if (element) {
-        // Store original properties
-        const originalBorder = element.style.border;
+        // Remove any existing highlight class
+        element.classList.remove('highlight');
         
-        // Apply highlight - pixel art style with solid borders
-        element.style.border = `2px solid ${GAME_SETTINGS.missedChangeHighlightColor}`;
+        // Add the highlight class to trigger the animation
+        void element.offsetWidth; // Trigger reflow to restart animation
+        element.classList.add('highlight');
         
         // Show a message about the missed change
         showMessage("You missed a change!", GAME_SETTINGS.missedChangeHighlightDuration);
-        
-        // Reset after delay
-        setTimeout(() => {
-            element.style.border = originalBorder;
-        }, GAME_SETTINGS.missedChangeHighlightDuration);
     }
 }
 
@@ -445,17 +448,17 @@ function gameComplete() {
             <p>Days on the train: ${day}</p>
         `;
         
-        // Style the completion message - pixel art style
+        // Style the completion message - retro pixel art style
         completionMessage.style.position = 'absolute';
         completionMessage.style.top = '50%';
         completionMessage.style.left = '50%';
         completionMessage.style.transform = 'translate(-50%, -50%)';
         completionMessage.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-        completionMessage.style.color = '#fff';
+        completionMessage.style.color = '#d4d4c8';
         completionMessage.style.padding = '20px';
-        completionMessage.style.borderRadius = '0'; // Square for pixel art
         completionMessage.style.textAlign = 'center';
         completionMessage.style.zIndex = '1000';
+        completionMessage.style.fontFamily = 'Courier New, monospace';
         
         // Add to scene
         sceneContainer.appendChild(completionMessage);
