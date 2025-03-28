@@ -1,6 +1,6 @@
 /**
  * Drone: The Daily Commute
- * Main game logic - Updated for retro pixel art style
+ * Main game logic
  */
 
 // Game state
@@ -10,45 +10,50 @@ let canClick = false;
 let currentChange = null;
 let previousState = {};
 let currentState = {};
-let isTransitioning = false; // Flag to prevent multiple transitions
-let allChanges = []; // Array to store all changes for persistence
+let isTransitioning = false;
+let allChanges = [];
 
 // Game elements
 const sceneContainer = document.getElementById('scene-container');
 const trainButton = document.getElementById('train-button');
 const dayDisplay = document.getElementById('day');
-const awarenessPercent = document.getElementById('awareness-percent');
-const awarenessFill = document.getElementById('awareness-fill');
-const lyricDisplay = document.getElementById('lyric-display');
+const awarenessDisplay = document.getElementById('awareness-number');
+const narrativeText = document.getElementById('narrative-text');
 const fadeOverlay = document.getElementById('fade-overlay');
 const message = document.getElementById('message');
 const thoughtBubble = document.getElementById('thought-bubble');
+
+// Initialize the game when DOM is fully loaded
+document.addEventListener('DOMContentLoaded', init);
 
 /**
  * Initialize the game
  */
 function init() {
+    // Update displays
     updateAwarenessDisplay();
-    checkForLyrics();
+    updateNarrativeText();
+    
+    // Setup click handlers for elements
     setupClickHandlers();
+    
+    // Initialize default styles for all elements
     initializeDefaultStyles();
     
+    // Add train button listener
     trainButton.addEventListener('click', takeTrain);
     
     // Apply initial color stage
     updateColorStage();
     
-    // Check if window includes utils.js and trigger mobile optimizations if necessary
-    if (typeof transitionBackgroundColor === 'function') {
-        setupMobileOptimizations();
-    }
+    // Show initial message
+    showMessage("Find what's different each day", 3000);
 }
 
 /**
- * Initialize default styles for all changeable elements
+ * Initialize default property values for all changeable elements
  */
 function initializeDefaultStyles() {
-    // Initialize default property values for all changeable elements
     CHANGEABLE_ELEMENTS.forEach(category => {
         category.ids.forEach(id => {
             const element = document.getElementById(id);
@@ -57,24 +62,16 @@ function initializeDefaultStyles() {
                 switch(category.type) {
                     case 'hat-visibility':
                     case 'briefcase-visibility':
-                        // 80% chance to be hidden initially
                         element.style.visibility = Math.random() < 0.8 ? 'hidden' : 'visible';
                         break;
                     case 'hat':
                     case 'briefcase':
-                        // Random initial color if visible
                         if (element.style.visibility === 'visible') {
                             const randomColor = category.values[Math.floor(Math.random() * category.values.length)];
                             element.style.backgroundColor = randomColor;
                         }
                         break;
-                    case 'trench-coat':
-                    case 'trench-coat-width':
-                    case 'pants':
-                    case 'shoe-color':
-                    case 'face-color':
-                    case 'briefcase-position':
-                        // Random initial value
+                    default:
                         const randomValue = category.values[Math.floor(Math.random() * category.values.length)];
                         element.style[category.property] = randomValue;
                         break;
@@ -106,33 +103,6 @@ function setupClickHandlers() {
 }
 
 /**
- * Set up mobile-specific optimizations
- */
-function setupMobileOptimizations() {
-    // Detect mobile devices
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    if (isMobile) {
-        // Make clickable elements larger for mobile
-        document.querySelectorAll('.person, .hat, .bag, .left-leg, .right-leg, .left-shoe, .right-shoe').forEach(el => {
-            el.style.minWidth = '24px';
-            el.style.minHeight = '24px';
-        });
-        
-        // Add touch feedback
-        document.querySelectorAll('.person, .hat, .bag, .left-leg, .right-leg, .left-shoe, .right-shoe').forEach(el => {
-            el.addEventListener('touchstart', function() {
-                this.style.opacity = '0.7';
-            });
-            
-            el.addEventListener('touchend', function() {
-                this.style.opacity = '1';
-            });
-        });
-    }
-}
-
-/**
  * Handle clicks on scene elements
  */
 function handleElementClick(event) {
@@ -159,11 +129,11 @@ function handleElementClick(event) {
             }, 1000);
         }
         
-        // Mark the change as found but don't proceed to next day automatically
+        // Mark the change as found
         currentChange.found = true;
     } else {
         // Wrong element clicked
-        showMessage("That's not what changed...", 1500);
+        showMessage("everyday the same", 1500);
     }
 }
 
@@ -180,17 +150,10 @@ function takeTrain() {
     if (currentChange && !currentChange.found) {
         highlightMissedChange(currentChange);
         
-        // If fadeAfterHighlight is enabled, proceed to next day after highlighting
-        if (GAME_SETTINGS.fadeAfterHighlight) {
-            setTimeout(() => {
-                proceedToNextDay();
-            }, GAME_SETTINGS.missedChangeHighlightDuration);
-        } else {
-            // Just restore the transition flag if we're not fading
-            setTimeout(() => {
-                isTransitioning = false;
-            }, GAME_SETTINGS.missedChangeHighlightDuration);
-        }
+        // Proceed to next day after highlighting
+        setTimeout(() => {
+            proceedToNextDay();
+        }, GAME_SETTINGS.missedChangeHighlightDuration);
     } else {
         // No change or player already found it, proceed immediately
         proceedToNextDay();
@@ -212,24 +175,18 @@ function proceedToNextDay() {
         day++;
         dayDisplay.textContent = day;
         
-        // Determine number of changes based on current day
-        const numberOfChanges = day >= GAME_SETTINGS.multipleChangesThreshold ? 
-            Math.min(3, Math.floor((day - GAME_SETTINGS.multipleChangesThreshold) / 20) + 1) : 1;
-        
-        // Generate new change(s)
+        // Generate new change
         currentChange = selectRandomChange();
         currentChange.found = false; // Initialize as not found
         
         // Add the current change to the history of all changes
         allChanges.push(currentChange);
         
-        // Apply all past changes to maintain persistence
-        allChanges.forEach(change => {
-            applyChange(change);
-        });
+        // Apply the change to the element
+        applyChange(currentChange);
         
-        // Check for lyrics
-        checkForLyrics();
+        // Update narrative text
+        updateNarrativeText();
         
         // Fade back in
         setTimeout(() => {
@@ -239,7 +196,7 @@ function proceedToNextDay() {
             setTimeout(() => {
                 canClick = true;
                 isTransitioning = false; // Reset transition flag
-                showMessage(`Find what changed today... (Day ${day})`, 2000);
+                showMessage(`Day ${day}: Find what changed today`, 2000);
             }, GAME_SETTINGS.fadeInDuration);
         }, GAME_SETTINGS.waitDuration);
     }, GAME_SETTINGS.fadeOutDuration);
@@ -267,19 +224,17 @@ function highlightMissedChange(change) {
  * Select a random element to change
  */
 function selectRandomChange() {
-    // Use the day number as part of the seed for consistent randomness
-    const randomSeed = day * 17 % 1000;
-    
     // Randomly select a category
-    const categoryIndex = Math.floor((randomSeed / 1000) * CHANGEABLE_ELEMENTS.length);
+    const categoryIndex = Math.floor(Math.random() * CHANGEABLE_ELEMENTS.length);
     const category = CHANGEABLE_ELEMENTS[categoryIndex];
     
     // Randomly select an element from the category
-    const elementIndex = Math.floor((randomSeed % 100) / 100 * category.ids.length);
+    const elementIndex = Math.floor(Math.random() * category.ids.length);
     const elementId = category.ids[elementIndex];
     
     // Get current element
     const element = document.getElementById(elementId);
+    if (!element) return null;
     
     // Get current value for this property
     const currentValue = element.style[category.property];
@@ -371,25 +326,50 @@ function showThoughtBubble() {
  */
 function increaseAwareness(amount) {
     awareness += amount;
-    if (awareness > GAME_SETTINGS.maxAwareness) {
-        awareness = GAME_SETTINGS.maxAwareness;
-    }
     
     updateAwarenessDisplay();
     updateColorStage();
     
-    // Check for game completion
-    if (awareness >= GAME_SETTINGS.maxAwareness && day >= GAME_SETTINGS.winDay) {
-        gameComplete();
-    }
+    // No cap on maximum awareness, just keep incrementing
 }
 
 /**
  * Update the awareness display
  */
 function updateAwarenessDisplay() {
-    awarenessPercent.textContent = `${awareness}%`;
-    awarenessFill.style.width = `${awareness}%`;
+    awarenessDisplay.textContent = awareness;
+}
+
+/**
+ * Update the narrative text based on the current day/awareness
+ */
+function updateNarrativeText() {
+    // Check if there's a lyric for the current day
+    const lyricForToday = SONG_LYRICS.find(lyric => lyric.day === day);
+    
+    if (lyricForToday) {
+        narrativeText.textContent = `"${lyricForToday.text}"`;
+    } else if (day === 1) {
+        narrativeText.textContent = "Every day the same. Rolling to a paycheck. 6:40 train. Find the differences in your routine commute to break free from the monotony.";
+    } else {
+        // Choose narrative based on awareness cycles (repeating every 40 awareness points)
+        const narrativeCycle = Math.floor(awareness / 10) % 4;
+        
+        switch(narrativeCycle) {
+            case 0:
+                narrativeText.textContent = "The routine continues. Same faces, same train. But something feels different today.";
+                break;
+            case 1:
+                narrativeText.textContent = "You're starting to notice the world around you more clearly. The routine is still there, but you're waking up.";
+                break;
+            case 2:
+                narrativeText.textContent = "The grip is loosening. Each day you feel more conscious, more alive. The routine can be broken.";
+                break;
+            case 3:
+                narrativeText.textContent = "The world is more vibrant now. The daily commute is becoming a journey of choice, not necessity.";
+                break;
+        }
+    }
 }
 
 /**
@@ -411,18 +391,6 @@ function updateColorStage() {
 }
 
 /**
- * Check if there's a lyric for the current day
- */
-function checkForLyrics() {
-    const lyricForToday = SONG_LYRICS.find(lyric => lyric.day === day);
-    if (lyricForToday) {
-        lyricDisplay.textContent = `"${lyricForToday.text}"`;
-    } else {
-        lyricDisplay.textContent = '';
-    }
-}
-
-/**
  * Game completion
  */
 function gameComplete() {
@@ -430,12 +398,6 @@ function gameComplete() {
     
     // Additional game completion effects
     sceneContainer.classList.add('completion');
-    
-    // Play victory animation on player character
-    const player = document.getElementById('player');
-    if (player) {
-        player.classList.add('victory-dance');
-    }
     
     // Display final message
     setTimeout(() => {
@@ -448,7 +410,7 @@ function gameComplete() {
             <p>Days on the train: ${day}</p>
         `;
         
-        // Style the completion message - retro pixel art style
+        // Style the completion message
         completionMessage.style.position = 'absolute';
         completionMessage.style.top = '50%';
         completionMessage.style.left = '50%';
@@ -458,12 +420,11 @@ function gameComplete() {
         completionMessage.style.padding = '20px';
         completionMessage.style.textAlign = 'center';
         completionMessage.style.zIndex = '1000';
-        completionMessage.style.fontFamily = 'Courier New, monospace';
         
         // Add to scene
         sceneContainer.appendChild(completionMessage);
+        
+        // Update narrative
+        narrativeText.textContent = "DRONE NO MORE, I'M MY OWN MAN. You've broken free from the cycle.";
     }, 6000);
 }
-
-// Initialize the game
-document.addEventListener('DOMContentLoaded', init);

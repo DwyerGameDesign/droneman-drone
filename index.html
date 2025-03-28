@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Drone: The Daily Commute</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="mobile-styles.css">
 </head>
 <body>
     <div class="game-container">
@@ -13,16 +12,15 @@
         
         <div class="hud">
             <div class="day-counter">Day: <span id="day">1</span></div>
-            <div class="awareness-container">
-                <div class="awareness-text">Awareness:</div>
-                <div class="awareness-meter">
-                    <div id="awareness-fill" class="awareness-fill"></div>
-                </div>
-                <div id="awareness-percent">0%</div>
+            <div class="awareness-counter">
+                <span id="awareness-number">0</span>
+                <span class="awareness-icon"></span>
             </div>
         </div>
         
-        <div class="lyric-display" id="lyric-display"></div>
+        <div class="narrative-text" id="narrative-text">
+            Every day the same. Rolling to a paycheck. 6:40 train. Find the differences in your routine commute to break free from the monotony.
+        </div>
         
         <div class="scene-container" id="scene-container">
             <div class="fade-overlay" id="fade-overlay"></div>
@@ -38,16 +36,14 @@
             
             <div class="station-background"></div>
             
-            <div class="window-row">
-                <div class="window" style="left: 10%;"></div>
-                <div class="window" style="left: 20%;"></div>
-                <div class="window" style="left: 30%;"></div>
-                <div class="window" style="left: 40%;"></div>
-                <div class="window" style="left: 50%;"></div>
-                <div class="window" style="left: 60%;"></div>
-                <div class="window" style="left: 70%;"></div>
-                <div class="window" style="left: 80%;"></div>
-            </div>
+            <div class="window" style="left: 15%;"></div>
+            <div class="window" style="left: 25%;"></div>
+            <div class="window" style="left: 35%;"></div>
+            <div class="window" style="left: 45%;"></div>
+            <div class="window" style="left: 55%;"></div>
+            <div class="window" style="left: 65%;"></div>
+            <div class="window" style="left: 75%;"></div>
+            <div class="window" style="left: 85%;"></div>
             
             <div class="sign" id="sign">PLATFORM 3</div>
             
@@ -56,22 +52,19 @@
             <div class="pillar pillar-2"></div>
             <div class="pillar pillar-3"></div>
             
-            <!-- Train in background -->
+            <!-- Train -->
             <div class="train">
-                <div class="train-window" style="left: 8%;"></div>
-                <div class="train-window" style="left: 20%;"></div>
-                <div class="train-window" style="left: 32%;"></div>
-                <div class="train-window" style="left: 44%;"></div>
-                <div class="train-window" style="left: 56%;"></div>
-                <div class="train-window" style="left: 68%;"></div>
-                <div class="train-window" style="left: 80%;"></div>
+                <div class="train-window" style="left: 10%;"></div>
+                <div class="train-window" style="left: 25%;"></div>
+                <div class="train-window" style="left: 40%;"></div>
+                <div class="train-window" style="left: 55%;"></div>
+                <div class="train-window" style="left: 70%;"></div>
             </div>
             
             <div class="platform-edge"></div>
             <div class="platform"></div>
-            <div class="platform-stripes"></div>
             
-            <!-- People on the platform - in retro pixel art style -->
+            <!-- People on the platform -->
             <div class="person" id="person1">
                 <div class="head" id="person1-head"></div>
                 <div class="body" id="person1-body"></div>
@@ -138,7 +131,6 @@
                 <div class="bag" id="person6-bag"></div>
             </div>
             
-            <!-- Add more people to match the reference image -->
             <div class="person" id="person7">
                 <div class="head" id="person7-head"></div>
                 <div class="body" id="person7-body"></div>
@@ -150,40 +142,7 @@
                 <div class="bag" id="person7-bag"></div>
             </div>
             
-            <div class="person" id="person8">
-                <div class="head" id="person8-head"></div>
-                <div class="body" id="person8-body"></div>
-                <div class="left-leg" id="person8-left-leg"></div>
-                <div class="right-leg" id="person8-right-leg"></div>
-                <div class="left-shoe" id="person8-left-shoe"></div>
-                <div class="right-shoe" id="person8-right-shoe"></div>
-                <div class="hat" id="person8-hat"></div>
-                <div class="bag" id="person8-bag"></div>
-            </div>
-            
-            <div class="person" id="person9">
-                <div class="head" id="person9-head"></div>
-                <div class="body" id="person9-body"></div>
-                <div class="left-leg" id="person9-left-leg"></div>
-                <div class="right-leg" id="person9-right-leg"></div>
-                <div class="left-shoe" id="person9-left-shoe"></div>
-                <div class="right-shoe" id="person9-right-shoe"></div>
-                <div class="hat" id="person9-hat"></div>
-                <div class="bag" id="person9-bag"></div>
-            </div>
-            
-            <div class="person" id="person10">
-                <div class="head" id="person10-head"></div>
-                <div class="body" id="person10-body"></div>
-                <div class="left-leg" id="person10-left-leg"></div>
-                <div class="right-leg" id="person10-right-leg"></div>
-                <div class="left-shoe" id="person10-left-shoe"></div>
-                <div class="right-shoe" id="person10-right-shoe"></div>
-                <div class="hat" id="person10-hat"></div>
-                <div class="bag" id="person10-bag"></div>
-            </div>
-            
-            <!-- Player character (Drone Man) -->
+            <!-- Player character (Drone Person) -->
             <div class="person" id="player">
                 <div class="head"></div>
                 <div class="body"></div>
@@ -203,18 +162,9 @@
         </div>
         
         <button class="train-button" id="train-button">Take the 6:40 Train</button>
-        
-        <!-- Optional mobile controls section -->
-        <div class="mobile-controls">
-            <div class="hint-button" id="hint-button">Need a Hint?</div>
-        </div>
     </div>
-    
-    <!-- Load all scripts in the proper order -->
+
     <script src="config.js"></script>
-    <script src="utils.js"></script>
     <script src="game.js"></script>
-    <script src="mobile-utils.js"></script>
-    <script src="extensions.js"></script>
 </body>
 </html>
