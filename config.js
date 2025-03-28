@@ -64,7 +64,7 @@ const CHANGEABLE_ELEMENTS = [
             'person1-body', 'person2-body', 'person3-body', 
             'person4-body', 'person5-body', 'person6-body', 'person7-body'
         ],
-        values: ['16px', '20px', '24px']
+        values: ['24px', '30px', '36px'] // Adjusted for 50% larger characters
     },
     // Briefcase/bag color
     {

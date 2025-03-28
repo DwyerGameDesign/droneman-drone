@@ -12,6 +12,7 @@ let previousState = {};
 let currentState = {};
 let isTransitioning = false;
 let allChanges = [];
+let foundFirstChange = false;
 
 // Game elements
 const sceneContainer = document.getElementById('scene-container');
@@ -32,7 +33,9 @@ document.addEventListener('DOMContentLoaded', init);
 function init() {
     // Update displays
     updateAwarenessDisplay();
-    updateNarrativeText();
+    
+    // Set initial narrative text
+    narrativeText.textContent = "everyday the same...";
     
     // Setup click handlers for elements
     setupClickHandlers();
@@ -45,9 +48,6 @@ function init() {
     
     // Apply initial color stage
     updateColorStage();
-    
-    // Show initial message
-    showMessage("Find what's different each day", 3000);
 }
 
 /**
@@ -112,10 +112,16 @@ function handleElementClick(event) {
     
     if (clickedId === currentChange.id) {
         // Correct element clicked
-        showMessage("You noticed the difference!", 2000);
         increaseAwareness(GAME_SETTINGS.baseAwarenessGain);
         canClick = false;
         showThoughtBubble();
+        
+        // Only update narrative text when a change is found
+        updateNarrativeText();
+        
+        if (!foundFirstChange) {
+            foundFirstChange = true;
+        }
         
         // Highlight the correct element
         const element = document.getElementById(clickedId);
@@ -131,9 +137,6 @@ function handleElementClick(event) {
         
         // Mark the change as found
         currentChange.found = true;
-    } else {
-        // Wrong element clicked
-        showMessage("everyday the same", 1500);
     }
 }
 
@@ -175,18 +178,28 @@ function proceedToNextDay() {
         day++;
         dayDisplay.textContent = day;
         
-        // Generate new change
-        currentChange = selectRandomChange();
-        currentChange.found = false; // Initialize as not found
+        // Only generate changes starting from day 4
+        if (day >= 4) {
+            // Generate new change
+            currentChange = selectRandomChange();
+            currentChange.found = false; // Initialize as not found
+            
+            // Add the current change to the history of all changes
+            allChanges.push(currentChange);
+            
+            // Apply the change to the element
+            applyChange(currentChange);
+            
+            // Enable clicking only when there's something to find
+            canClick = true;
+        } else {
+            // No change to find yet
+            currentChange = null;
+            canClick = false;
+        }
         
-        // Add the current change to the history of all changes
-        allChanges.push(currentChange);
-        
-        // Apply the change to the element
-        applyChange(currentChange);
-        
-        // Update narrative text
-        updateNarrativeText();
+        // Only update lyrics if they exist for this day
+        checkForLyrics();
         
         // Maintain container size - fixed width and height
         sceneContainer.style.width = '800px';
@@ -196,14 +209,8 @@ function proceedToNextDay() {
         // Fade back in
         setTimeout(() => {
             sceneContainer.classList.remove('fading');
-            
-            // Allow clicking after fade completes
-            setTimeout(() => {
-                canClick = true;
-                isTransitioning = false; // Reset transition flag
-                showMessage(`Day ${day}: Find what changed today`, 2000);
-            }, GAME_SETTINGS.fadeInDuration);
-        }, GAME_SETTINGS.waitDuration);
+            isTransitioning = false; // Reset transition flag
+        }, GAME_SETTINGS.fadeInDuration);
     }, GAME_SETTINGS.fadeOutDuration);
 }
 
@@ -219,9 +226,6 @@ function highlightMissedChange(change) {
         // Add the highlight class to trigger the animation
         void element.offsetWidth; // Trigger reflow to restart animation
         element.classList.add('highlight');
-        
-        // Show a message about the missed change
-        showMessage("You missed a change!", GAME_SETTINGS.missedChangeHighlightDuration);
     }
 }
 
@@ -284,18 +288,6 @@ function applyChange(change) {
 }
 
 /**
- * Show a message for a specified duration
- */
-function showMessage(text, duration) {
-    message.textContent = text;
-    message.style.visibility = 'visible';
-    
-    setTimeout(() => {
-        message.style.visibility = 'hidden';
-    }, duration);
-}
-
-/**
  * Show the thought bubble with text based on awareness level
  */
 function showThoughtBubble() {
@@ -346,16 +338,32 @@ function updateAwarenessDisplay() {
 }
 
 /**
- * Update the narrative text based on the current day/awareness
+ * Check for lyrics for the current day
  */
-function updateNarrativeText() {
+function checkForLyrics() {
     // Check if there's a lyric for the current day
     const lyricForToday = SONG_LYRICS.find(lyric => lyric.day === day);
     
     if (lyricForToday) {
         narrativeText.textContent = `"${lyricForToday.text}"`;
-    } else if (day === 1) {
-        narrativeText.textContent = "Every day the same. Rolling to a paycheck. 6:40 train. Find the differences in your routine commute to break free from the monotony.";
+    }
+}
+
+/**
+ * Update the narrative text based on the current awareness
+ * Only called when a change is found
+ */
+function updateNarrativeText() {
+    // Don't change initial narrative until first change is found
+    if (!foundFirstChange) {
+        return;
+    }
+    
+    // Check if there's a lyric for the current day
+    const lyricForToday = SONG_LYRICS.find(lyric => lyric.day === day);
+    
+    if (lyricForToday) {
+        narrativeText.textContent = `"${lyricForToday.text}"`;
     } else {
         // Choose narrative based on awareness cycles (repeating every 40 awareness points)
         const narrativeCycle = Math.floor(awareness / 10) % 4;
@@ -399,8 +407,6 @@ function updateColorStage() {
  * Game completion
  */
 function gameComplete() {
-    showMessage("You've broken free from the routine! DRONE NO MORE!", 5000);
-    
     // Additional game completion effects
     sceneContainer.classList.add('completion');
     
@@ -409,9 +415,8 @@ function gameComplete() {
         const completionMessage = document.createElement('div');
         completionMessage.className = 'completion-message';
         completionMessage.innerHTML = `
-            <h2>Congratulations!</h2>
+            <h2>DRONE NO MORE</h2>
             <p>You've reached 100% awareness and broken free from the daily grind.</p>
-            <p>No longer a drone, you've taken control of your life.</p>
             <p>Days on the train: ${day}</p>
         `;
         
