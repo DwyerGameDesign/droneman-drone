@@ -33,9 +33,6 @@ function initMobileOptimizations() {
     // Add pinch-to-zoom prevention
     preventPinchZoom();
     
-    // Add swipe navigation if needed
-    // setupSwipeNavigation();
-    
     // Adjust elements based on current orientation
     adjustForOrientation();
 }
@@ -45,7 +42,7 @@ function initMobileOptimizations() {
  */
 function enhanceTapTargets() {
     // Increase clickable area for elements
-    document.querySelectorAll('.person, .accessory, .left-arm, .right-arm').forEach(el => {
+    document.querySelectorAll('.person, .accessory, .pants, .left-shoe, .right-shoe').forEach(el => {
         // Add an invisible larger hitbox
         el.style.position = 'relative';
         
@@ -75,7 +72,7 @@ function enhanceTapTargets() {
  * Add visual feedback for touch interactions
  */
 function addTouchFeedback() {
-    document.querySelectorAll('.person, .accessory, .train-button, .hint-button').forEach(el => {
+    document.querySelectorAll('.person, .accessory, .pants, .left-shoe, .right-shoe, .train-button, .hint-button').forEach(el => {
         el.addEventListener('touchstart', function() {
             this.style.opacity = '0.7';
         });
@@ -99,20 +96,37 @@ function setupHintSystem() {
         hintButton.addEventListener('click', function() {
             if (!currentChange) return;
             
-            // Provide a simple hint - highlight the general area
+            // Provide a simple hint based on the type of change
             const element = document.getElementById(currentChange.id);
             if (element) {
-                // Determine which quadrant the change is in
-                const rect = element.getBoundingClientRect();
-                const sceneRect = document.getElementById('scene-container').getBoundingClientRect();
+                let hintText = "Look for a change in ";
                 
-                const isTop = rect.top < (sceneRect.top + sceneRect.height / 2);
-                const isLeft = rect.left < (sceneRect.left + sceneRect.width / 2);
+                // Determine specific hint based on change type
+                if (currentChange.type.includes('hat')) {
+                    hintText += "someone's hat";
+                } else if (currentChange.type.includes('bag')) {
+                    hintText += "someone's bag";
+                } else if (currentChange.type.includes('torso')) {
+                    hintText += "someone's shirt";
+                } else if (currentChange.type.includes('pants')) {
+                    hintText += "someone's pants";
+                } else if (currentChange.type.includes('shoe')) {
+                    hintText += "someone's shoes";
+                } else {
+                    // Determine which quadrant the change is in
+                    const rect = element.getBoundingClientRect();
+                    const sceneRect = document.getElementById('scene-container').getBoundingClientRect();
+                    
+                    const isTop = rect.top < (sceneRect.top + sceneRect.height / 2);
+                    const isLeft = rect.left < (sceneRect.left + sceneRect.width / 2);
+                    
+                    let location = isTop ? 'top' : 'bottom';
+                    location += isLeft ? ' left' : ' right';
+                    
+                    hintText += `the ${location} area`;
+                }
                 
-                let location = isTop ? 'top' : 'bottom';
-                location += isLeft ? ' left' : ' right';
-                
-                showMessage(`Look in the ${location} area...`, 2000);
+                showMessage(hintText, 2000);
                 
                 // Disable hint button temporarily
                 this.disabled = true;
@@ -205,28 +219,22 @@ function preventPinchZoom() {
 }
 
 /**
- * Optional: Setup swipe navigation
+ * Show message - utility function for hint system
  */
-function setupSwipeNavigation() {
-    let touchStartX = 0;
-    let touchEndX = 0;
-    
-    document.addEventListener('touchstart', function(e) {
-        touchStartX = e.changedTouches[0].screenX;
-    });
-    
-    document.addEventListener('touchend', function(e) {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    });
-    
-    function handleSwipe() {
-        const threshold = 100;
-        if (touchEndX - touchStartX > threshold) {
-            // Swiped right - could be used for a menu or help system
-        }
-        if (touchStartX - touchEndX > threshold) {
-            // Swiped left - could be used for a menu or help system
+function showMessage(text, duration) {
+    // Check if the main game's showMessage is available
+    if (typeof window.showMessage === 'function') {
+        window.showMessage(text, duration);
+    } else {
+        // Fallback implementation
+        const message = document.getElementById('message');
+        if (message) {
+            message.textContent = text;
+            message.style.visibility = 'visible';
+            
+            setTimeout(() => {
+                message.style.visibility = 'hidden';
+            }, duration);
         }
     }
 }

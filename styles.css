@@ -72,7 +72,7 @@ body {
     transition: background-color 1s ease-in-out;
 }
 
-/* Person/Character Styles */
+/* Person/Character Styles - Updated */
 .person {
     position: absolute;
     bottom: 80px;
@@ -99,32 +99,16 @@ body {
     width: 10px;
     height: 30px;
     background-color: #555;
-    transition: background-color 1s ease-in-out;
+    transition: background-color 1s ease-in-out, width 0.5s ease-in-out;
 }
 
 .left-arm, .right-arm {
     position: absolute;
     top: 25px;
-    width: 8px; /* Increased from 5px */
+    width: 5px;
     height: 20px;
-    background-color: #777; /* Lighter color for better visibility */
-    transition: transform 0.5s ease-in-out, background-color 1s ease-in-out, box-shadow 0.3s ease-in-out;
-}
-
-.accessory {
-    position: absolute;
-    width: 18px; /* Increased from 15px */
-    height: 18px; /* Increased from 15px */
-    background-color: #AAA; /* Lighter color for better visibility */
-    visibility: hidden;
-    transition: visibility 0.3s, background-color 1s ease-in-out, box-shadow 0.3s ease-in-out;
-    cursor: pointer;
-}
-
-/* Add this new style for highlighting changes */
-.highlight {
-    box-shadow: 0 0 15px 5px #ffdd00 !important;
-    z-index: 5;
+    background-color: #555;
+    transition: transform 0.5s ease-in-out, background-color 1s ease-in-out;
 }
 
 .left-arm {
@@ -137,11 +121,12 @@ body {
     transform: rotate(-30deg);
 }
 
+/* Updated leg styles to include pants */
 .left-leg, .right-leg {
     position: absolute;
     top: 50px;
     width: 5px;
-    height: 30px;
+    height: 20px;
     background-color: #555;
     transition: background-color 1s ease-in-out;
 }
@@ -156,13 +141,45 @@ body {
     transform: rotate(-15deg);
 }
 
+/* New pants element */
+.pants {
+    position: absolute;
+    top: 50px;
+    left: 8px;
+    width: 14px;
+    height: 15px;
+    background-color: #444;
+    transition: background-color 0.5s ease-in-out;
+    cursor: pointer;
+}
+
+/* New shoe elements */
+.left-shoe, .right-shoe {
+    position: absolute;
+    bottom: 0;
+    width: 7px;
+    height: 7px;
+    background-color: #333;
+    border-radius: 2px;
+    transition: background-color 0.5s ease-in-out, height 0.5s ease-in-out;
+    cursor: pointer;
+}
+
+.left-shoe {
+    left: 7px;
+}
+
+.right-shoe {
+    left: 16px;
+}
+
 .accessory {
     position: absolute;
     width: 15px;
     height: 15px;
     background-color: #777;
     visibility: hidden;
-    transition: visibility 0.3s, background-color 1s ease-in-out;
+    transition: visibility 0.3s, background-color 0.5s ease-in-out;
     cursor: pointer;
 }
 
@@ -332,6 +349,12 @@ body {
     background-color: #c44;
 }
 
+/* Highlight styling */
+.highlight {
+    box-shadow: 0 0 10px #e9cb5f;
+    z-index: 10;
+}
+
 /* Responsive Design */
 @media (max-width: 800px) {
     .scene-container {
@@ -348,7 +371,7 @@ body {
     }
     
     /* Mobile-specific improvements */
-    .person, .accessory {
+    .person, .accessory, .pants, .left-shoe, .right-shoe {
         cursor: pointer;
     }
     
@@ -408,7 +431,7 @@ body {
     }
     
     /* Increase touchable area for mobile */
-    .accessory, .left-arm, .right-arm {
+    .accessory, .pants, .left-shoe, .right-shoe {
         min-width: 20px;
         min-height: 20px;
     }

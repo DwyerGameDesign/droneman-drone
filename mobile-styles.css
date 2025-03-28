@@ -88,6 +88,12 @@
         transform: scale(1.2);
     }
     
+    /* Increase tap target sizes for mobile */
+    .accessory, .pants, .left-shoe, .right-shoe {
+        min-width: 18px;
+        min-height: 18px;
+    }
+    
     /* Train button takes more width */
     .train-button {
         width: 80%;

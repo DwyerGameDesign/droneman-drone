@@ -1,6 +1,6 @@
 /**
  * Drone: The Daily Commute
- * Main game logic
+ * Main game logic - Updated to support persistent changes
  */
 
 // Game state
@@ -11,6 +11,7 @@ let currentChange = null;
 let previousState = {};
 let currentState = {};
 let isTransitioning = false; // Flag to prevent multiple transitions
+let allChanges = []; // Array to store all changes for persistence
 
 // Game elements
 const sceneContainer = document.getElementById('scene-container');
@@ -30,6 +31,7 @@ function init() {
     updateAwarenessDisplay();
     checkForLyrics();
     setupClickHandlers();
+    initializeDefaultStyles();
     
     trainButton.addEventListener('click', takeTrain);
     
@@ -43,6 +45,82 @@ function init() {
 }
 
 /**
+ * Initialize default styles for all changeable elements
+ */
+function initializeDefaultStyles() {
+    // Initialize default property values for all changeable elements
+    CHANGEABLE_ELEMENTS.forEach(category => {
+        category.ids.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                // Set initial defaults based on type
+                switch(category.type) {
+                    case 'hat-visibility':
+                    case 'bag-visibility':
+                        // 80% chance to be hidden initially
+                        element.style.visibility = Math.random() < 0.8 ? 'hidden' : 'visible';
+                        break;
+                    case 'hat':
+                    case 'bag':
+                        // Random initial color if visible
+                        if (element.style.visibility === 'visible') {
+                            const randomColor = category.values[Math.floor(Math.random() * category.values.length)];
+                            element.style.backgroundColor = randomColor;
+                        }
+                        break;
+                    case 'torso':
+                        // Random initial color
+                        const torsoColor = category.values[Math.floor(Math.random() * category.values.length)];
+                        element.style.backgroundColor = torsoColor;
+                        break;
+                    case 'torso-size':
+                        // Random initial width
+                        const torsoWidth = category.values[Math.floor(Math.random() * category.values.length)];
+                        element.style.width = torsoWidth;
+                        break;
+                    case 'pants':
+                        // Random initial color
+                        const pantsColor = category.values[Math.floor(Math.random() * category.values.length)];
+                        element.style.backgroundColor = pantsColor;
+                        break;
+                    case 'shoe-style':
+                        // Random initial height
+                        const shoeHeight = category.values[Math.floor(Math.random() * category.values.length)];
+                        element.style.height = shoeHeight;
+                        break;
+                    case 'shoe-color':
+                        // Random initial color
+                        const shoeColor = category.values[Math.floor(Math.random() * category.values.length)];
+                        element.style.backgroundColor = shoeColor;
+                        break;
+                }
+                
+                // Store initial state
+                currentState[id] = {
+                    property: category.property,
+                    value: element.style[category.property]
+                };
+            }
+        });
+    });
+}
+
+/**
+ * Set up click handlers for all elements
+ */
+function setupClickHandlers() {
+    // Add click handlers to all changeable elements
+    CHANGEABLE_ELEMENTS.forEach(category => {
+        category.ids.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('click', handleElementClick);
+            }
+        });
+    });
+}
+
+/**
  * Set up mobile-specific optimizations
  */
 function setupMobileOptimizations() {
@@ -51,13 +129,13 @@ function setupMobileOptimizations() {
     
     if (isMobile) {
         // Make clickable elements larger for mobile
-        document.querySelectorAll('.person, .accessory').forEach(el => {
+        document.querySelectorAll('.person, .accessory, .pants, .left-shoe, .right-shoe').forEach(el => {
             el.style.minWidth = '40px';
             el.style.minHeight = '40px';
         });
         
         // Add touch feedback
-        document.querySelectorAll('.person, .accessory').forEach(el => {
+        document.querySelectorAll('.person, .accessory, .pants, .left-shoe, .right-shoe').forEach(el => {
             el.addEventListener('touchstart', function() {
                 this.style.opacity = '0.7';
             });
@@ -67,21 +145,6 @@ function setupMobileOptimizations() {
             });
         });
     }
-}
-
-/**
- * Set up click handlers for all elements
- */
-function setupClickHandlers() {
-    // Add click handlers to all potentially changing elements
-    CHANGEABLE_ELEMENTS.forEach(category => {
-        category.ids.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.addEventListener('click', handleElementClick);
-            }
-        });
-    });
 }
 
 /**
@@ -102,27 +165,15 @@ function handleElementClick(event) {
         // Highlight the correct element
         const element = document.getElementById(clickedId);
         if (element) {
-            // Add a much more visible highlight
+            // Add a temporary highlight
             const originalTransition = element.style.transition;
             element.style.transition = 'all 0.5s ease-in-out';
-            element.style.boxShadow = '0 0 15px 5px rgba(100, 255, 100, 0.9)';
-            
-            // Make accessories visible if they were meant to be hidden
-            if (currentChange.type === 'accessory' && 
-                currentChange.change.property === 'visibility' && 
-                currentChange.change.value === 'hidden') {
-                element.style.visibility = 'visible';
-                element.style.backgroundColor = '#6f6';
-                
-                setTimeout(() => {
-                    element.style.visibility = 'hidden';
-                }, 1500);
-            }
+            element.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.8)';
             
             setTimeout(() => {
                 element.style.boxShadow = '';
                 element.style.transition = originalTransition;
-            }, 1500);
+            }, 1000);
         }
         
         // Mark the change as found but don't proceed to next day automatically
@@ -156,14 +207,16 @@ function takeTrain() {
     }
 }
 
-// Function to handle the transition to the next day
+/**
+ * Function to handle the transition to the next day
+ */
 function proceedToNextDay() {
     // Fade out
     sceneContainer.classList.add('fading');
     
     setTimeout(() => {
         // Save current state as previous
-        previousState = {...currentState};
+        previousState = JSON.parse(JSON.stringify(currentState));
         
         // Increment day
         day++;
@@ -177,8 +230,13 @@ function proceedToNextDay() {
         currentChange = selectRandomChange();
         currentChange.found = false; // Initialize as not found
         
-        // Apply the change
-        applyChange(currentChange);
+        // Add the current change to the history of all changes
+        allChanges.push(currentChange);
+        
+        // Apply all past changes to maintain persistence
+        allChanges.forEach(change => {
+            applyChange(change);
+        });
         
         // Check for lyrics
         checkForLyrics();
@@ -197,7 +255,9 @@ function proceedToNextDay() {
     }, GAME_SETTINGS.fadeOutDuration);
 }
 
-// Function to highlight missed changes
+/**
+ * Function to highlight missed changes
+ */
 function highlightMissedChange(change) {
     const element = document.getElementById(change.id);
     if (element) {
@@ -208,44 +268,18 @@ function highlightMissedChange(change) {
         
         // Apply highlight
         element.style.transition = 'all 0.5s ease-in-out';
-        element.style.boxShadow = `0 0 20px 5px ${GAME_SETTINGS.missedChangeHighlightColor || '#ffdd00'}`;
+        element.style.boxShadow = `0 0 15px ${GAME_SETTINGS.missedChangeHighlightColor}`;
         
-        if (change.type === 'accessory' && change.change.property === 'visibility') {
-            // For accessories, make them visible temporarily to show what was missed
-            element.style.visibility = 'visible';  
-            element.style.backgroundColor = GAME_SETTINGS.missedChangeHighlightColor || '#ffdd00';
-            
-            // For accessories that should be hidden, hide after showing briefly
-            if (change.change.value === 'hidden') {
-                setTimeout(() => {
-                    element.style.visibility = 'hidden';
-                }, (GAME_SETTINGS.missedChangeHighlightDuration || 2000) - 200);
-            }
-        } else if (change.type === 'arm') {
-            // For arm rotation, animate to show the change
-            const targetRotation = change.change.value;
-            
-            // Make arm temporarily more visible
-            element.style.backgroundColor = '#aaa';
-            element.style.width = '10px';
-            
-            // Reset to normal size after highlight
-            setTimeout(() => {
-                element.style.backgroundColor = '';
-                element.style.width = '';
-            }, GAME_SETTINGS.missedChangeHighlightDuration || 2000);
+        if (change.type.includes('visibility')) {
+            // For accessories, also make them glow
+            element.style.backgroundColor = GAME_SETTINGS.missedChangeHighlightColor;
+        } else {
+            // For other changes, just highlight
+            element.style.borderColor = GAME_SETTINGS.missedChangeHighlightColor;
         }
         
-        // Describe what changed in the message
-        const elementType = change.type === 'arm' ? 'arm position' : 
-                          (change.id.includes('hat') ? 'hat' : 'bag');
-        showMessage(`You missed a change! A ${elementType} changed.`, 
-                  GAME_SETTINGS.missedChangeHighlightDuration || 2000);
-        
-        // Reset highlight after duration
-        setTimeout(() => {
-            element.style.boxShadow = '';
-        }, GAME_SETTINGS.missedChangeHighlightDuration || 2000);
+        // Show a message about the missed change
+        showMessage("You missed a change!", GAME_SETTINGS.missedChangeHighlightDuration);
     }
 }
 
@@ -264,30 +298,32 @@ function selectRandomChange() {
     const elementIndex = Math.floor((randomSeed % 100) / 100 * category.ids.length);
     const elementId = category.ids[elementIndex];
     
-    // Determine what change to make
-    let changeType;
-    if (category.type === 'arm') {
-        // For arms, change rotation
-        const rotationAngle = Math.floor((randomSeed % 87) - 43); // Range: -43 to +43 degrees
-        changeType = {
-            property: 'transform',
-            value: `rotate(${rotationAngle}deg)`
-        };
-    } else if (category.type === 'accessory') {
-        // For accessories, toggle visibility
-        const element = document.getElementById(elementId);
-        const currentVisibility = element.style.visibility;
-        changeType = {
-            property: 'visibility',
-            value: currentVisibility === 'visible' ? 'hidden' : 'visible'
-        };
-    }
+    // Get current element
+    const element = document.getElementById(elementId);
+    
+    // Get current value for this property
+    const currentValue = element.style[category.property];
+    
+    // Choose a new value different from the current one
+    let newValue;
+    let attempts = 0;
+    
+    do {
+        const valueIndex = Math.floor(Math.random() * category.values.length);
+        newValue = category.values[valueIndex];
+        attempts++;
+        
+        // Prevent infinite loop
+        if (attempts > 10) break;
+    } while (newValue === currentValue);
     
     return {
         id: elementId,
         type: category.type,
-        change: changeType,
-        found: false
+        change: {
+            property: category.property,
+            value: newValue
+        }
     };
 }
 
@@ -447,13 +483,6 @@ function gameComplete() {
         // Add to scene
         sceneContainer.appendChild(completionMessage);
     }, 6000);
-}
-
-/**
- * Utility function to get a random item from an array
- */
-function getRandomFromArray(array) {
-    return array[Math.floor(Math.random() * array.length)];
 }
 
 // Initialize the game

@@ -20,25 +20,117 @@ const SONG_LYRICS = [
 
 // Changeable elements configuration
 const CHANGEABLE_ELEMENTS = [
-    // Arm positions
+    // Hat properties
     {
-        type: 'arm',
+        type: 'hat',
+        property: 'backgroundColor',
         ids: [
-            'person1-left-arm', 'person1-right-arm',
-            'person2-left-arm', 'person2-right-arm',
-            'person3-left-arm', 'person3-right-arm',
-            'person4-left-arm', 'person4-right-arm',
-            'person5-left-arm', 'person5-right-arm',
-            'person6-left-arm', 'person6-right-arm'
+            'person1-hat', 'person2-hat', 'person3-hat', 
+            'person4-hat', 'person5-hat', 'person6-hat'
+        ],
+        values: [
+            '#333333', '#555555', '#777777', '#999999', 
+            '#4a6741', '#6d504a', '#4a5a6d', '#6d4a5a'
         ]
     },
-
-    // Accessories (hats and bags)
+    // Hat visibility
     {
-        type: 'accessory',
+        type: 'hat-visibility',
+        property: 'visibility',
         ids: [
-            'person1-hat', 'person2-hat', 'person3-hat', 'person4-hat', 'person5-hat', 'person6-hat',
-            'person1-bag', 'person2-bag', 'person3-bag', 'person4-bag', 'person5-bag', 'person6-bag'
+            'person1-hat', 'person2-hat', 'person3-hat', 
+            'person4-hat', 'person5-hat', 'person6-hat'
+        ],
+        values: ['visible', 'hidden']
+    },
+    // Torso color
+    {
+        type: 'torso',
+        property: 'backgroundColor',
+        ids: [
+            'person1-body', 'person2-body', 'person3-body', 
+            'person4-body', 'person5-body', 'person6-body'
+        ],
+        values: [
+            '#4a4a4a', '#5a5a5a', '#6a6a6a', '#7a7a7a',
+            '#4a6741', '#6d504a', '#4a5a6d', '#6d4a5a'
+        ]
+    },
+    // Torso size
+    {
+        type: 'torso-size',
+        property: 'width',
+        ids: [
+            'person1-body', 'person2-body', 'person3-body', 
+            'person4-body', 'person5-body', 'person6-body'
+        ],
+        values: ['8px', '10px', '12px', '14px']
+    },
+    // Bag color
+    {
+        type: 'bag',
+        property: 'backgroundColor',
+        ids: [
+            'person1-bag', 'person2-bag', 'person3-bag', 
+            'person4-bag', 'person5-bag', 'person6-bag'
+        ],
+        values: [
+            '#555555', '#666666', '#777777', '#888888',
+            '#4a6741', '#6d504a', '#4a5a6d', '#6d4a5a'
+        ]
+    },
+    // Bag visibility
+    {
+        type: 'bag-visibility',
+        property: 'visibility',
+        ids: [
+            'person1-bag', 'person2-bag', 'person3-bag', 
+            'person4-bag', 'person5-bag', 'person6-bag'
+        ],
+        values: ['visible', 'hidden']
+    },
+    // Pants color
+    {
+        type: 'pants',
+        property: 'backgroundColor',
+        ids: [
+            'person1-pants', 'person2-pants', 'person3-pants', 
+            'person4-pants', 'person5-pants', 'person6-pants'
+        ],
+        values: [
+            '#333333', '#444444', '#555555', '#666666',
+            '#2d3e28', '#3e2d28', '#2d303e', '#3e2d30'
+        ]
+    },
+    // Shoe style (height)
+    {
+        type: 'shoe-style',
+        property: 'height',
+        ids: [
+            'person1-left-shoe', 'person1-right-shoe',
+            'person2-left-shoe', 'person2-right-shoe',
+            'person3-left-shoe', 'person3-right-shoe',
+            'person4-left-shoe', 'person4-right-shoe',
+            'person5-left-shoe', 'person5-right-shoe',
+            'person6-left-shoe', 'person6-right-shoe'
+        ],
+        values: ['5px', '7px', '9px']
+    },
+    // Shoe color
+    {
+        type: 'shoe-color',
+        property: 'backgroundColor',
+        ids: [
+            'person1-left-shoe', 'person1-right-shoe',
+            'person2-left-shoe', 'person2-right-shoe',
+            'person3-left-shoe', 'person3-right-shoe',
+            'person4-left-shoe', 'person4-right-shoe',
+            'person5-left-shoe', 'person5-right-shoe',
+            'person6-left-shoe', 'person6-right-shoe'
+        ],
+        values: [
+            '#222222', '#333333', '#444444', '#555555',
+            '#4a3520', '#203a4a', '#4a2035', '#354a20'
         ]
     }
 ];
@@ -88,8 +180,8 @@ const GAME_SETTINGS = {
 
     // Add at the end of the GAME_SETTINGS object
     multipleChangesThreshold: 60, // Day when multiple changes start appearing
-    missedChangeHighlightColor: '#ffdd00', // Bright yellow for better visibility
-    missedChangeHighlightDuration: 2500, // Extended duration to make sure players see it
+    missedChangeHighlightColor: '#e9cb5f', // A muted yellow that fits the aesthetic
+    missedChangeHighlightDuration: 2000, // How long the highlight shows (ms)    
 
     // Gameplay settings
     baseAwarenessGain: 5,   // How much awareness increases per correct guess

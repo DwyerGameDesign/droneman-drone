@@ -23,7 +23,7 @@ const colorSystem = {
     
     // Elements to colorize and their final colors
     elements: [
-        { id: 'player', parts: ['.head', '.body', '.left-arm', '.right-arm', '.left-leg', '.right-leg'], color: '#ffd700' },
+        { id: 'player', parts: ['.head', '.body', '.pants', '.left-shoe', '.right-shoe'], color: '#ffd700' },
         { id: 'sign', color: '#4a88ff' },
         { id: 'scene-container', property: 'backgroundColor', baseColor: [51, 51, 51], targetColor: [41, 62, 102] }
     ],
@@ -281,12 +281,11 @@ const audioSystem = {
 const saveSystem = {
     enabled: true, // Set to true to enable this feature
     
+    /**
+     * Initialize the save system
+     */
     init: function() {
         if (!this.enabled) return;
-        
-        // Clear saved game data to ensure fresh start
-        // Comment this line out after first run if you want save functionality
-        localStorage.removeItem('droneGameState');
         
         // Load saved game on start
         this.loadGame();
@@ -347,7 +346,8 @@ const saveSystem = {
         const gameState = {
             day,
             awareness,
-            currentState
+            currentState,
+            allChanges // Save the history of all changes for persistence
         };
         
         try {
@@ -371,20 +371,35 @@ const saveSystem = {
                 awareness = gameState.awareness;
                 currentState = gameState.currentState;
                 
+                // Restore change history for persistence
+                if (gameState.allChanges) {
+                    allChanges = gameState.allChanges;
+                }
+                
                 // Update UI
                 dayDisplay.textContent = day;
                 updateAwarenessDisplay();
                 updateColorStage();
                 checkForLyrics();
                 
-                // Apply current state to elements
-                Object.keys(currentState).forEach(id => {
-                    const element = document.getElementById(id);
-                    if (element) {
-                        const state = currentState[id];
-                        element.style[state.property] = state.value;
-                    }
-                });
+                // Apply all saved changes to maintain the state
+                if (allChanges && allChanges.length > 0) {
+                    allChanges.forEach(change => {
+                        const element = document.getElementById(change.id);
+                        if (element) {
+                            element.style[change.change.property] = change.change.value;
+                        }
+                    });
+                } else {
+                    // Apply current state to elements if no change history
+                    Object.keys(currentState).forEach(id => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            const state = currentState[id];
+                            element.style[state.property] = state.value;
+                        }
+                    });
+                }
             }
         } catch (error) {
             console.error('Error loading game:', error);
@@ -405,6 +420,7 @@ const saveSystem = {
         currentChange = null;
         previousState = {};
         currentState = {};
+        allChanges = [];
         
         // Update UI
         dayDisplay.textContent = day;
@@ -412,23 +428,8 @@ const saveSystem = {
         updateColorStage();
         checkForLyrics();
         
-        // Reset all element states
-        CHANGEABLE_ELEMENTS.forEach(category => {
-            category.ids.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    if (category.type === 'arm') {
-                        if (id.includes('left-arm')) {
-                            element.style.transform = 'rotate(30deg)';
-                        } else if (id.includes('right-arm')) {
-                            element.style.transform = 'rotate(-30deg)';
-                        }
-                    } else if (category.type === 'accessory') {
-                        element.style.visibility = 'hidden';
-                    }
-                }
-            });
-        });
+        // Reset all element states by reinitializing default styles
+        initializeDefaultStyles();
         
         // Enable train button
         trainButton.disabled = false;
