@@ -9,6 +9,7 @@ body {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    image-rendering: pixelated;
 }
 
 .game-container {
@@ -27,6 +28,7 @@ body {
     overflow: hidden;
     position: relative;
     transition: background-color 1s ease;
+    image-rendering: pixelated;
 }
 
 .platform {
@@ -44,15 +46,16 @@ body {
     width: 90%;
     height: 180px;
     background-color: #4a4a4a;
-    border-radius: 5px 5px 0 0;
+    border-radius: 0;
 }
 
 .window {
     position: absolute;
     width: 50px;
     height: 60px;
-    background-color: #333;
-    border-radius: 5px;
+    background-color: #bdbdbd;
+    border: 2px solid #777;
+    border-radius: 0;
 }
 
 .sign {
@@ -68,131 +71,117 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 14px;
-    border-radius: 4px;
+    border-radius: 0;
     transition: background-color 1s ease-in-out;
 }
 
-/* Person/Character Styles - Updated */
+/* Updated Person/Character Styles for Pixel Art */
 .person {
     position: absolute;
     bottom: 80px;
-    width: 30px;
+    width: 28px;
     height: 80px;
     cursor: pointer;
+    image-rendering: pixelated;
 }
 
+/* Head is now a rectangle for pixel art style */
 .head {
     position: absolute;
     top: 0;
-    left: 5px;
-    width: 20px;
-    height: 20px;
-    background-color: #555;
-    border-radius: 10px;
+    left: 6px;
+    width: 16px;
+    height: 16px;
+    background-color: #8a7159;
+    border-radius: 0;
     transition: background-color 1s ease-in-out;
 }
 
+/* Trench coat style body */
 .body {
     position: absolute;
-    top: 20px;
-    left: 10px;
-    width: 10px;
-    height: 30px;
-    background-color: #555;
+    top: 16px;
+    left: 0;
+    width: 28px;
+    height: 45px;
+    background-color: #4e392e;
     transition: background-color 1s ease-in-out, width 0.5s ease-in-out;
+    clip-path: polygon(0 0, 100% 0, 100% 80%, 60% 100%, 40% 100%, 0 80%);
 }
 
+/* Arms are hidden in the trench coat */
 .left-arm, .right-arm {
-    position: absolute;
-    top: 25px;
-    width: 5px;
-    height: 20px;
-    background-color: #555;
-    transition: transform 0.5s ease-in-out, background-color 1s ease-in-out;
+    display: none;
 }
 
-.left-arm {
-    left: 5px;
-    transform: rotate(30deg);
-}
-
-.right-arm {
-    left: 20px;
-    transform: rotate(-30deg);
-}
-
-/* Updated leg styles to include pants */
+/* Legs are now visible below the trench coat */
 .left-leg, .right-leg {
     position: absolute;
-    top: 50px;
-    width: 5px;
-    height: 20px;
-    background-color: #555;
+    top: 61px;
+    width: 6px;
+    height: 18px;
+    background-color: #37322e;
     transition: background-color 1s ease-in-out;
 }
 
 .left-leg {
-    left: 8px;
-    transform: rotate(15deg);
+    left: 7px;
 }
 
 .right-leg {
-    left: 17px;
-    transform: rotate(-15deg);
+    left: 15px;
 }
 
-/* New pants element */
+/* Pants are integrated with legs */
 .pants {
-    position: absolute;
-    top: 50px;
-    left: 8px;
-    width: 14px;
-    height: 15px;
-    background-color: #444;
-    transition: background-color 0.5s ease-in-out;
-    cursor: pointer;
+    display: none;
 }
 
-/* New shoe elements */
+/* Shoes at the bottom of legs */
 .left-shoe, .right-shoe {
     position: absolute;
-    bottom: 0;
-    width: 7px;
-    height: 7px;
-    background-color: #333;
-    border-radius: 2px;
+    top: 79px;
+    width: 8px;
+    height: 4px;
+    background-color: #232323;
     transition: background-color 0.5s ease-in-out, height 0.5s ease-in-out;
     cursor: pointer;
 }
 
 .left-shoe {
-    left: 7px;
+    left: 6px;
 }
 
 .right-shoe {
-    left: 16px;
+    left: 14px;
 }
 
-.accessory {
+/* Hat sits on top of head */
+.hat {
     position: absolute;
-    width: 15px;
-    height: 15px;
-    background-color: #777;
+    top: -4px;
+    left: 4px;
+    width: 20px;
+    height: 4px;
+    background-color: #3d3d3d;
+    border-radius: 0;
     visibility: hidden;
     transition: visibility 0.3s, background-color 0.5s ease-in-out;
     cursor: pointer;
 }
 
-.hat {
-    top: -10px;
-    left: 7.5px;
-    border-radius: 5px 5px 0 0;
-}
-
+/* Briefcase instead of bag */
 .bag {
-    top: 25px;
-    left: 25px;
-    border-radius: 3px;
+    position: absolute;
+    top: 40px;
+    left: -8px;
+    width: 8px;
+    height: 14px;
+    background-color: #59493f;
+    border-radius: 0;
+    visibility: hidden;
+    transition: visibility 0.3s, background-color 0.5s ease-in-out;
+    cursor: pointer;
 }
 
 /* UI Element Styles */
@@ -202,7 +191,7 @@ body {
     background-color: #555;
     color: white;
     border: none;
-    border-radius: 30px;
+    border-radius: 0; /* Square buttons for pixel style */
     cursor: pointer;
     margin-top: 20px;
     transition: background-color 0.3s;
@@ -228,7 +217,7 @@ body {
     width: 200px;
     height: 20px;
     background-color: #444;
-    border-radius: 10px;
+    border-radius: 0; /* Square for pixel style */
     overflow: hidden;
 }
 
@@ -260,7 +249,7 @@ body {
     background-color: rgba(0, 0, 0, 0.7);
     color: white;
     padding: 15px;
-    border-radius: 5px;
+    border-radius: 0; /* Square for pixel style */
     visibility: hidden;
     z-index: 100;
 }
@@ -270,7 +259,7 @@ body {
     background-color: white;
     color: black;
     padding: 10px;
-    border-radius: 15px;
+    border-radius: 0; /* Square for pixel style */
     max-width: 150px;
     text-align: center;
     visibility: hidden;
@@ -311,9 +300,9 @@ body {
 /* Victory animation */
 @keyframes victoryDance {
     0% { transform: translateY(0); }
-    25% { transform: translateY(-10px) rotate(5deg); }
-    50% { transform: translateY(0) rotate(-5deg); }
-    75% { transform: translateY(-10px) rotate(5deg); }
+    25% { transform: translateY(-10px); }
+    50% { transform: translateY(0); }
+    75% { transform: translateY(-10px); }
     100% { transform: translateY(0); }
 }
 
@@ -340,7 +329,7 @@ body {
     color: white;
     border: none;
     padding: 8px 15px;
-    border-radius: 5px;
+    border-radius: 0; /* Square for pixel style */
     cursor: pointer;
     transition: background-color 0.3s;
 }
@@ -353,37 +342,6 @@ body {
 .highlight {
     box-shadow: 0 0 10px #e9cb5f;
     z-index: 10;
-}
-
-/* Responsive Design */
-@media (max-width: 800px) {
-    .scene-container {
-        height: 350px;
-    }
-    
-    .hud {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .hud > div {
-        margin-bottom: 10px;
-    }
-    
-    /* Mobile-specific improvements */
-    .person, .accessory, .pants, .left-shoe, .right-shoe {
-        cursor: pointer;
-    }
-    
-    .accessory {
-        min-width: 20px;
-        min-height: 20px;
-    }
-    
-    .message {
-        font-size: 16px;
-        max-width: 80%;
-    }
 }
 
 /* Additional color stages for awareness progression */
@@ -400,109 +358,14 @@ body {
 
 /* Mobile Portrait Optimizations */
 @media (max-width: 600px), (orientation: portrait) {
-    /* Game container adjustments */
+    /* Mobile-specific adjustments */
     .game-container {
         width: 100%;
         padding: 0 10px;
     }
     
-    /* Make the scene taller for portrait mode */
     .scene-container {
-        height: 60vh; /* Use viewport height instead of fixed pixels */
+        height: 60vh;
         min-height: 400px;
-        max-height: 600px;
-    }
-    
-    /* Adjust the train position and size */
-    .train {
-        bottom: 60px; /* Smaller platform height */
-        height: 150px; /* Slightly shorter train */
-    }
-    
-    /* Adjust the platform height */
-    .platform {
-        height: 60px;
-    }
-    
-    /* Make characters more visible */
-    .person {
-        transform: scale(1.2);
-        bottom: 60px; /* Match platform height */
-    }
-    
-    /* Increase touchable area for mobile */
-    .accessory, .pants, .left-shoe, .right-shoe {
-        min-width: 20px;
-        min-height: 20px;
-    }
-    
-    /* Improve HUD layout for portrait */
-    .hud {
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 15px;
-    }
-    
-    /* Better layout for awareness meter */
-    .awareness-meter {
-        width: 80%; /* Wider on mobile */
-        height: 15px;
-        margin: 0 5px;
-    }
-    
-    /* Make buttons larger and more touchable */
-    .train-button {
-        padding: 15px 0;
-        width: 80%;
-        font-size: 16px;
-        margin: 15px auto;
-    }
-    
-    /* Adjust thought bubble for portrait mode */
-    .thought-bubble {
-        max-width: 120px;
-        font-size: 0.9em;
-    }
-    
-    /* Make message more visible on mobile */
-    .message {
-        font-size: 14px;
-        padding: 10px;
-        max-width: 90%;
-    }
-    
-    /* Adjust people positioning for portrait mode */
-    #person1 { left: 8%; }
-    #person2 { left: 22%; }
-    #person3 { left: 36%; }
-    #person4 { left: 50%; }
-    #person5 { left: 64%; }
-    #person6 { left: 78%; }
-    #player { left: 92%; }
-    
-    /* Lyric display */
-    .lyric-display {
-        font-size: 0.9em;
-        padding: 0 10px;
-    }
-    
-    /* Title adjustment */
-    h1 {
-        font-size: 1.4em;
-        margin: 10px 0;
-    }
-    
-    /* For smaller phones */
-    @media (max-height: 700px) {
-        .scene-container {
-            height: 50vh;
-            min-height: 300px;
-        }
-        
-        h1 {
-            font-size: 1.2em;
-            margin: 8px 0;
-        }
     }
 }

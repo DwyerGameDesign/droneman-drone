@@ -1,6 +1,6 @@
 /**
  * Drone: The Daily Commute
- * Configuration file
+ * Configuration file - Updated for pixel art trench coat characters
  */
 
 // Song lyrics that appear at milestone days
@@ -29,8 +29,8 @@ const CHANGEABLE_ELEMENTS = [
             'person4-hat', 'person5-hat', 'person6-hat'
         ],
         values: [
-            '#333333', '#555555', '#777777', '#999999', 
-            '#4a6741', '#6d504a', '#4a5a6d', '#6d4a5a'
+            '#3d3d3d', '#4a4a4a', '#5a5a5a', 
+            '#403020', '#302010', '#202030', '#483935'
         ]
     },
     // Hat visibility
@@ -43,45 +43,45 @@ const CHANGEABLE_ELEMENTS = [
         ],
         values: ['visible', 'hidden']
     },
-    // Torso color
+    // Trench coat color
     {
-        type: 'torso',
+        type: 'trench-coat',
         property: 'backgroundColor',
         ids: [
             'person1-body', 'person2-body', 'person3-body', 
             'person4-body', 'person5-body', 'person6-body'
         ],
         values: [
-            '#4a4a4a', '#5a5a5a', '#6a6a6a', '#7a7a7a',
-            '#4a6741', '#6d504a', '#4a5a6d', '#6d4a5a'
+            '#4e392e', '#3b2e26', '#544033', '#4a3629',
+            '#2e2e40', '#352b2b', '#4d3f34', '#58473a'
         ]
     },
-    // Torso size
+    // Trench coat width
     {
-        type: 'torso-size',
+        type: 'trench-coat-width',
         property: 'width',
         ids: [
             'person1-body', 'person2-body', 'person3-body', 
             'person4-body', 'person5-body', 'person6-body'
         ],
-        values: ['8px', '10px', '12px', '14px']
+        values: ['26px', '28px', '30px']
     },
-    // Bag color
+    // Briefcase/bag color
     {
-        type: 'bag',
+        type: 'briefcase',
         property: 'backgroundColor',
         ids: [
             'person1-bag', 'person2-bag', 'person3-bag', 
             'person4-bag', 'person5-bag', 'person6-bag'
         ],
         values: [
-            '#555555', '#666666', '#777777', '#888888',
-            '#4a6741', '#6d504a', '#4a5a6d', '#6d4a5a'
+            '#59493f', '#4a3a30', '#5c4b41', '#4d3e34',
+            '#3c3c3c', '#4a4a4a', '#3a3a3a'
         ]
     },
-    // Bag visibility
+    // Briefcase/bag visibility
     {
-        type: 'bag-visibility',
+        type: 'briefcase-visibility',
         property: 'visibility',
         ids: [
             'person1-bag', 'person2-bag', 'person3-bag', 
@@ -89,32 +89,22 @@ const CHANGEABLE_ELEMENTS = [
         ],
         values: ['visible', 'hidden']
     },
-    // Pants color
+    // Leg/pants color
     {
         type: 'pants',
         property: 'backgroundColor',
         ids: [
-            'person1-pants', 'person2-pants', 'person3-pants', 
-            'person4-pants', 'person5-pants', 'person6-pants'
+            'person1-left-leg', 'person1-right-leg',
+            'person2-left-leg', 'person2-right-leg', 
+            'person3-left-leg', 'person3-right-leg',
+            'person4-left-leg', 'person4-right-leg', 
+            'person5-left-leg', 'person5-right-leg',
+            'person6-left-leg', 'person6-right-leg'
         ],
         values: [
-            '#333333', '#444444', '#555555', '#666666',
-            '#2d3e28', '#3e2d28', '#2d303e', '#3e2d30'
+            '#37322e', '#2a2a2a', '#403a36', '#343434',
+            '#2c2c35', '#35302c', '#3a332d'
         ]
-    },
-    // Shoe style (height)
-    {
-        type: 'shoe-style',
-        property: 'height',
-        ids: [
-            'person1-left-shoe', 'person1-right-shoe',
-            'person2-left-shoe', 'person2-right-shoe',
-            'person3-left-shoe', 'person3-right-shoe',
-            'person4-left-shoe', 'person4-right-shoe',
-            'person5-left-shoe', 'person5-right-shoe',
-            'person6-left-shoe', 'person6-right-shoe'
-        ],
-        values: ['5px', '7px', '9px']
     },
     // Shoe color
     {
@@ -129,9 +119,32 @@ const CHANGEABLE_ELEMENTS = [
             'person6-left-shoe', 'person6-right-shoe'
         ],
         values: [
-            '#222222', '#333333', '#444444', '#555555',
-            '#4a3520', '#203a4a', '#4a2035', '#354a20'
+            '#232323', '#1a1a1a', '#2c2c2c', '#262626',
+            '#1f1f1f', '#292929', '#202020'
         ]
+    },
+    // Head/face color
+    {
+        type: 'face-color',
+        property: 'backgroundColor',
+        ids: [
+            'person1-head', 'person2-head', 'person3-head',
+            'person4-head', 'person5-head', 'person6-head'
+        ],
+        values: [
+            '#8a7159', '#83694f', '#9a8169', '#7a6245',
+            '#887862', '#77665a', '#948172'
+        ]
+    },
+    // Briefcase position
+    {
+        type: 'briefcase-position',
+        property: 'left',
+        ids: [
+            'person1-bag', 'person2-bag', 'person3-bag',
+            'person4-bag', 'person5-bag', 'person6-bag'
+        ],
+        values: ['-8px', '28px']
     }
 ];
 

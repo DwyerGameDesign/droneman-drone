@@ -1,6 +1,6 @@
 /**
  * Drone: The Daily Commute
- * Main game logic - Updated to support persistent changes
+ * Main game logic - Updated for pixel art trench coat characters
  */
 
 // Game state
@@ -56,42 +56,27 @@ function initializeDefaultStyles() {
                 // Set initial defaults based on type
                 switch(category.type) {
                     case 'hat-visibility':
-                    case 'bag-visibility':
+                    case 'briefcase-visibility':
                         // 80% chance to be hidden initially
                         element.style.visibility = Math.random() < 0.8 ? 'hidden' : 'visible';
                         break;
                     case 'hat':
-                    case 'bag':
+                    case 'briefcase':
                         // Random initial color if visible
                         if (element.style.visibility === 'visible') {
                             const randomColor = category.values[Math.floor(Math.random() * category.values.length)];
                             element.style.backgroundColor = randomColor;
                         }
                         break;
-                    case 'torso':
-                        // Random initial color
-                        const torsoColor = category.values[Math.floor(Math.random() * category.values.length)];
-                        element.style.backgroundColor = torsoColor;
-                        break;
-                    case 'torso-size':
-                        // Random initial width
-                        const torsoWidth = category.values[Math.floor(Math.random() * category.values.length)];
-                        element.style.width = torsoWidth;
-                        break;
+                    case 'trench-coat':
+                    case 'trench-coat-width':
                     case 'pants':
-                        // Random initial color
-                        const pantsColor = category.values[Math.floor(Math.random() * category.values.length)];
-                        element.style.backgroundColor = pantsColor;
-                        break;
-                    case 'shoe-style':
-                        // Random initial height
-                        const shoeHeight = category.values[Math.floor(Math.random() * category.values.length)];
-                        element.style.height = shoeHeight;
-                        break;
                     case 'shoe-color':
-                        // Random initial color
-                        const shoeColor = category.values[Math.floor(Math.random() * category.values.length)];
-                        element.style.backgroundColor = shoeColor;
+                    case 'face-color':
+                    case 'briefcase-position':
+                        // Random initial value
+                        const randomValue = category.values[Math.floor(Math.random() * category.values.length)];
+                        element.style[category.property] = randomValue;
                         break;
                 }
                 
@@ -129,13 +114,13 @@ function setupMobileOptimizations() {
     
     if (isMobile) {
         // Make clickable elements larger for mobile
-        document.querySelectorAll('.person, .accessory, .pants, .left-shoe, .right-shoe').forEach(el => {
+        document.querySelectorAll('.person, .hat, .bag, .left-leg, .right-leg, .left-shoe, .right-shoe').forEach(el => {
             el.style.minWidth = '40px';
             el.style.minHeight = '40px';
         });
         
         // Add touch feedback
-        document.querySelectorAll('.person, .accessory, .pants, .left-shoe, .right-shoe').forEach(el => {
+        document.querySelectorAll('.person, .hat, .bag, .left-leg, .right-leg, .left-shoe, .right-shoe').forEach(el => {
             el.addEventListener('touchstart', function() {
                 this.style.opacity = '0.7';
             });
@@ -166,13 +151,11 @@ function handleElementClick(event) {
         const element = document.getElementById(clickedId);
         if (element) {
             // Add a temporary highlight
-            const originalTransition = element.style.transition;
-            element.style.transition = 'all 0.5s ease-in-out';
-            element.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.8)';
+            const originalBorder = element.style.border;
+            element.style.border = '2px solid white';
             
             setTimeout(() => {
-                element.style.boxShadow = '';
-                element.style.transition = originalTransition;
+                element.style.border = originalBorder;
             }, 1000);
         }
         
@@ -262,24 +245,18 @@ function highlightMissedChange(change) {
     const element = document.getElementById(change.id);
     if (element) {
         // Store original properties
-        const originalBackgroundColor = element.style.backgroundColor;
-        const originalTransition = element.style.transition;
-        const originalBoxShadow = element.style.boxShadow;
+        const originalBorder = element.style.border;
         
-        // Apply highlight
-        element.style.transition = 'all 0.5s ease-in-out';
-        element.style.boxShadow = `0 0 15px ${GAME_SETTINGS.missedChangeHighlightColor}`;
-        
-        if (change.type.includes('visibility')) {
-            // For accessories, also make them glow
-            element.style.backgroundColor = GAME_SETTINGS.missedChangeHighlightColor;
-        } else {
-            // For other changes, just highlight
-            element.style.borderColor = GAME_SETTINGS.missedChangeHighlightColor;
-        }
+        // Apply highlight - pixel art style with solid borders
+        element.style.border = `2px solid ${GAME_SETTINGS.missedChangeHighlightColor}`;
         
         // Show a message about the missed change
         showMessage("You missed a change!", GAME_SETTINGS.missedChangeHighlightDuration);
+        
+        // Reset after delay
+        setTimeout(() => {
+            element.style.border = originalBorder;
+        }, GAME_SETTINGS.missedChangeHighlightDuration);
     }
 }
 
@@ -468,7 +445,7 @@ function gameComplete() {
             <p>Days on the train: ${day}</p>
         `;
         
-        // Style the completion message
+        // Style the completion message - pixel art style
         completionMessage.style.position = 'absolute';
         completionMessage.style.top = '50%';
         completionMessage.style.left = '50%';
@@ -476,7 +453,7 @@ function gameComplete() {
         completionMessage.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
         completionMessage.style.color = '#fff';
         completionMessage.style.padding = '20px';
-        completionMessage.style.borderRadius = '10px';
+        completionMessage.style.borderRadius = '0'; // Square for pixel art
         completionMessage.style.textAlign = 'center';
         completionMessage.style.zIndex = '1000';
         
