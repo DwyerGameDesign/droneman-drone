@@ -151,7 +151,13 @@ function handleElementClick(event) {
         currentChange.found = true;
     } else {
         // Wrong element clicked - show message
-        showMessage("everyday the same", 1500);
+        // Create an explicit visible message in the center of the screen
+        message.textContent = "everyday the same";
+        message.style.visibility = 'visible';
+        
+        setTimeout(() => {
+            message.style.visibility = 'hidden';
+        }, 1500);
     }
 }
 
