@@ -56,16 +56,6 @@ const CHANGEABLE_ELEMENTS = [
             '#2e2e40', '#352b2b', '#4d3f34', '#58473a'
         ]
     },
-    // Trench coat width
-    {
-        type: 'trench-coat-width',
-        property: 'width',
-        ids: [
-            'person1-body', 'person2-body', 'person3-body', 
-            'person4-body', 'person5-body', 'person6-body', 'person7-body'
-        ],
-        values: ['24px', '30px', '36px'] // Adjusted for 50% larger characters
-    },
     // Briefcase/bag color
     {
         type: 'briefcase',
@@ -106,21 +96,16 @@ const CHANGEABLE_ELEMENTS = [
             '#37322e', '#2a2a2a', '#403a36', '#343434',
             '#2c2c35', '#35302c', '#3a332d'
         ]
-    },
-    // Face color
-    {
-        type: 'face-color',
-        property: 'backgroundColor',
-        ids: [
-            'person1-head', 'person2-head', 'person3-head',
-            'person4-head', 'person5-head', 'person6-head', 'person7-head'
-        ],
-        values: [
-            '#8a7159', '#83694f', '#9a8169', '#7a6245',
-            '#887862', '#77665a', '#948172'
-        ]
     }
 ];
+
+// First change configuration - make it obvious
+const FIRST_CHANGE = {
+    type: 'hat-visibility',
+    property: 'visibility',
+    id: 'person4-hat',  // Middle person's hat
+    value: 'visible'    // Make a hat appear
+};
 
 // Thoughts shown in thought bubble based on awareness levels
 const THOUGHTS = {

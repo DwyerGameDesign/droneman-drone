@@ -85,6 +85,18 @@ function initializeDefaultStyles() {
             }
         });
     });
+    
+    // Make sure the first change element is initially hidden
+    if (FIRST_CHANGE && FIRST_CHANGE.property === 'visibility' && FIRST_CHANGE.value === 'visible') {
+        const element = document.getElementById(FIRST_CHANGE.id);
+        if (element) {
+            element.style.visibility = 'hidden';
+            currentState[FIRST_CHANGE.id] = {
+                property: FIRST_CHANGE.property,
+                value: 'hidden'
+            };
+        }
+    }
 }
 
 /**
@@ -137,6 +149,9 @@ function handleElementClick(event) {
         
         // Mark the change as found
         currentChange.found = true;
+    } else {
+        // Wrong element clicked - show message
+        showMessage("everyday the same", 1500);
     }
 }
 
@@ -179,10 +194,10 @@ function proceedToNextDay() {
         dayDisplay.textContent = day;
         
         // Only generate changes starting from day 4
-        if (day >= 4) {
-            // Generate new change
-            currentChange = selectRandomChange();
-            currentChange.found = false; // Initialize as not found
+        if (day === 4) {
+            // Use the predefined first change for day 4
+            currentChange = createFirstChange();
+            currentChange.found = false;
             
             // Add the current change to the history of all changes
             allChanges.push(currentChange);
@@ -190,7 +205,20 @@ function proceedToNextDay() {
             // Apply the change to the element
             applyChange(currentChange);
             
-            // Enable clicking only when there's something to find
+            // Enable clicking since there's something to find
+            canClick = true;
+        } else if (day > 4) {
+            // Generate random changes after the first one
+            currentChange = selectRandomChange();
+            currentChange.found = false;
+            
+            // Add the current change to the history of all changes
+            allChanges.push(currentChange);
+            
+            // Apply the change to the element
+            applyChange(currentChange);
+            
+            // Enable clicking since there's something to find
             canClick = true;
         } else {
             // No change to find yet
@@ -212,6 +240,21 @@ function proceedToNextDay() {
             isTransitioning = false; // Reset transition flag
         }, GAME_SETTINGS.fadeInDuration);
     }, GAME_SETTINGS.fadeOutDuration);
+}
+
+/**
+ * Create the first change - should be very obvious
+ */
+function createFirstChange() {
+    // Use the predefined first change
+    return {
+        id: FIRST_CHANGE.id,
+        type: FIRST_CHANGE.type,
+        change: {
+            property: FIRST_CHANGE.property,
+            value: FIRST_CHANGE.value
+        }
+    };
 }
 
 /**
@@ -285,6 +328,18 @@ function applyChange(change) {
             value: change.change.value
         };
     }
+}
+
+/**
+ * Show a message for a specified duration
+ */
+function showMessage(text, duration) {
+    message.textContent = text;
+    message.style.visibility = 'visible';
+    
+    setTimeout(() => {
+        message.style.visibility = 'hidden';
+    }, duration);
 }
 
 /**
