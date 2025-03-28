@@ -239,7 +239,7 @@ h1 {
     left: 0;
     width: 30px; /* 50% wider */
     height: 45px; /* 50% taller */
-    background-color: #4e392e;
+    background-color: #4e392e; /* Default brown */
     transition: background-color 0.5s, width 0.5s;
 }
 
@@ -248,7 +248,7 @@ h1 {
     top: 60px; /* Adjusted for taller body */
     width: 7.5px; /* 50% wider */
     height: 12px; /* 50% taller */
-    background-color: #37322e;
+    background-color: #37322e; /* Default dark gray */
     transition: background-color 0.5s;
 }
 
@@ -267,17 +267,18 @@ h1 {
 .left-shoe { left: 6px; } /* Adjusted for wider body */
 .right-shoe { left: 16.5px; } /* Adjusted for wider body */
 
-/* Modified hat to look more like a top hat */
+/* Modified hat to look more like a top hat with better visibility */
 .hat {
     position: absolute;
     top: -9px; /* Taller and sits higher on the head */
     left: 4.5px; /* Adjusted for wider head */
     width: 21px; /* 50% wider */
     height: 9px; /* Made taller for top hat look */
-    background-color: #3d3d3d;
+    background-color: #000000; /* Default black */
     visibility: hidden;
     transition: visibility 0.3s, background-color 0.5s;
     border-radius: 2px 2px 0 0; /* Rounded top */
+    z-index: 5; /* Ensure hat appears above head */
 }
 
 /* Top hat brim effect */
@@ -288,19 +289,22 @@ h1 {
     left: -3px;
     width: 27px; /* Wider than the hat */
     height: 1.5px;
-    background-color: #3d3d3d; /* Same color as hat */
+    background-color: inherit; /* Same color as hat */
     border-radius: 1px;
 }
 
+/* Modified bag with better visibility */
 .bag {
     position: absolute;
     top: 37.5px; /* Adjusted for taller body */
     left: -12px; /* Adjusted outward */
     width: 9px; /* 50% wider */
     height: 15px; /* 50% taller */
-    background-color: #59493f;
+    background-color: #8B4513; /* Default brown */
     visibility: hidden;
     transition: visibility 0.3s, background-color 0.5s;
+    z-index: 4;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Add shadow for depth */
 }
 
 /* Character positions - spread out for better visibility */
@@ -409,7 +413,7 @@ h1 {
     opacity: 1;
 }
 
-/* Modified highlight for elements - now goldish/yellow */
+/* Enhanced highlight for elements - now goldish/yellow */
 .highlight {
     animation: blink 0.8s 2;
 }
@@ -418,6 +422,17 @@ h1 {
     0% { box-shadow: 0 0 0 3px rgba(233, 203, 95, 0); }
     50% { box-shadow: 0 0 0 3px rgba(233, 203, 95, 0.8); }
     100% { box-shadow: 0 0 0 3px rgba(233, 203, 95, 0); }
+}
+
+/* Enhanced highlight for missed changes */
+.highlight-pulse {
+    animation: pulse 0.8s 2;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
 }
 
 /* Color stages */

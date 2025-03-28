@@ -18,7 +18,7 @@ const SONG_LYRICS = [
     { day: 100, text: "Drone no more, I'm my own man" }
 ];
 
-// Element categories that can change
+// Element categories that can change - UPDATED WITH HIGH CONTRAST COLORS
 const CHANGEABLE_ELEMENTS = [
     // Hat properties
     {
@@ -29,8 +29,9 @@ const CHANGEABLE_ELEMENTS = [
             'person4-hat', 'person5-hat', 'person6-hat', 'person7-hat'
         ],
         values: [
-            '#3d3d3d', '#4a4a4a', '#5a5a5a', 
-            '#403020', '#302010', '#202030', '#483935'
+            '#000000', // Black
+            '#8B4513', // Brown
+            '#000080'  // Navy
         ]
     },
     // Hat visibility
@@ -52,8 +53,9 @@ const CHANGEABLE_ELEMENTS = [
             'person4-body', 'person5-body', 'person6-body', 'person7-body'
         ],
         values: [
-            '#4e392e', '#3b2e26', '#544033', '#4a3629',
-            '#2e2e40', '#352b2b', '#4d3f34', '#58473a'
+            '#4e392e', // Brown
+            '#2e2e40', // Navy
+            '#5a5a5a'  // Gray
         ]
     },
     // Briefcase/bag color
@@ -65,8 +67,9 @@ const CHANGEABLE_ELEMENTS = [
             'person4-bag', 'person5-bag', 'person6-bag', 'person7-bag'
         ],
         values: [
-            '#59493f', '#4a3a30', '#5c4b41', '#4d3e34',
-            '#3c3c3c', '#4a4a4a', '#3a3a3a'
+            '#8B4513', // Brown
+            '#000000', // Black
+            '#D2B48C'  // Tan
         ]
     },
     // Briefcase/bag visibility
@@ -93,8 +96,8 @@ const CHANGEABLE_ELEMENTS = [
             'person7-left-leg', 'person7-right-leg'
         ],
         values: [
-            '#37322e', '#2a2a2a', '#403a36', '#343434',
-            '#2c2c35', '#35302c', '#3a332d'
+            '#37322e', // Dark gray
+            '#000000'  // Black
         ]
     }
 ];

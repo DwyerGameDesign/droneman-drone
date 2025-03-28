@@ -110,6 +110,7 @@ function initializeDefaultStyles() {
                     case 'hat':
                     case 'briefcase':
                         if (element.style.visibility === 'visible') {
+                            // Select a random color from the new high-contrast color list
                             const randomColor = category.values[Math.floor(Math.random() * category.values.length)];
                             element.style.backgroundColor = randomColor;
                         }
@@ -332,12 +333,26 @@ function createFirstChange() {
 function highlightMissedChange(change) {
     const element = document.getElementById(change.id);
     if (element) {
-        // Remove any existing highlight class
-        element.classList.remove('highlight');
+        // Store original styles
+        const originalBackgroundColor = element.style.backgroundColor;
+        const originalBorder = element.style.border;
+        const originalZIndex = element.style.zIndex;
         
-        // Add the highlight class to trigger the animation
-        void element.offsetWidth; // Trigger reflow to restart animation
-        element.classList.add('highlight');
+        // Apply highlight
+        element.style.backgroundColor = GAME_SETTINGS.missedChangeHighlightColor;
+        element.style.border = '3px solid white';
+        element.style.zIndex = '50'; // Bring to front
+        
+        // Create a pulse animation effect
+        element.classList.add('highlight-pulse');
+        
+        // Reset after duration
+        setTimeout(() => {
+            element.style.backgroundColor = originalBackgroundColor;
+            element.style.border = originalBorder;
+            element.style.zIndex = originalZIndex;
+            element.classList.remove('highlight-pulse');
+        }, GAME_SETTINGS.missedChangeHighlightDuration);
     }
 }
 
