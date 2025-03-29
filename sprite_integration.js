@@ -22,8 +22,8 @@ function initializeSpriteSystem() {
     // Remove existing commuter elements
     removeExistingCommuters();
     
-    // Add sprite-based commuters
-    createCommuterSprites();
+    // Add the first commuter only
+    createInitialCommuter();
     
     // Override game functions to work with sprites
     overrideGameFunctions();
@@ -44,83 +44,364 @@ function removeExistingCommuters() {
     if (player) {
         player.parentNode.removeChild(player);
     }
+    
+    // Clear the commuter sprites array
+    commuterSprites = [];
 }
 
 /**
- * Create sprite-based commuters
+ * Create the initial commuter (only one to start)
  */
-function createCommuterSprites() {
-    // Calculate positions
+function createInitialCommuter() {
+    // Calculate position - center of the platform
     const sceneContainer = document.getElementById('scene-container');
     const platformWidth = sceneContainer.offsetWidth;
-    const platformY = 120; // Same as in your existing game
+    const platformY = 120; // Bottom position
     
-    // Create 7 commuters to match original game
-    for (let i = 1; i <= 7; i++) {
-        const commuterX = (platformWidth / 8) * i;
-        
-        const commuter = spriteSystem.createCommuter({
-            id: `person${i}`,
-            x: commuterX,
-            y: platformY,
-            facingLeft: Math.random() > 0.5,
-            parts: {
-                hat: { 
-                    visible: false // Initially all hats are hidden
-                },
-                head: { visible: true },
-                body: { visible: true },
-                shirt: { visible: true },
-                pants: { visible: true },
-                briefcase: { 
-                    visible: Math.random() > 0.5 
-                },
-                leftShoe: { visible: true },
-                rightShoe: { visible: true }
-            }
-        });
-        
-        // Make commuter clickable for game interaction
-        spriteSystem.makeClickable(commuter.id, handleSpriteClick);
-        
-        commuterSprites.push(commuter);
-    }
+    // Create first commuter at center (50%)
+    const commuterX = platformWidth * (COMMUTER_ADDITION.positions[0] / 100);
     
-    // Create player character (Drone Person)
-    playerSprite = spriteSystem.createCommuter({
-        id: 'player',
-        x: (platformWidth / 8) * 7.5,
+    const commuter = spriteSystem.createCommuter({
+        id: `commuter-0`,
+        x: commuterX,
         y: platformY,
-        facingLeft: true,
+        facingLeft: Math.random() > 0.5,
         parts: {
-            hat: { visible: false },
+            hat: { visible: false }, // Initially no hat (first change will be adding a hat)
             head: { visible: true },
             body: { visible: true },
             shirt: { visible: true },
             pants: { visible: true },
-            briefcase: { visible: true },
+            briefcase: { visible: Math.random() > 0.5 },
             leftShoe: { visible: true },
             rightShoe: { visible: true }
         }
     });
+    
+    // Make commuter clickable for game interaction
+    spriteSystem.makeClickable(commuter.id, handleSpriteClick);
+    
+    commuterSprites.push(commuter);
+    
+    // Return the created commuter
+    return commuter;
+}
+
+/**
+ * Create a new commuter at a specified position index
+ * @param {number} positionIndex - Index in the COMMUTER_ADDITION.positions array
+ * @returns {Object} The created commuter
+ */
+function createNewCommuter(positionIndex) {
+    if (commuterSprites.length >= COMMUTER_ADDITION.maxCommuters) {
+        console.warn('Maximum number of commuters reached');
+        return null;
+    }
+    
+    // Calculate position
+    const sceneContainer = document.getElementById('scene-container');
+    const platformWidth = sceneContainer.offsetWidth;
+    const platformY = 120; // Bottom position
+    
+    // Get position from config or default to random position
+    const position = COMMUTER_ADDITION.positions[positionIndex] || (Math.random() * 80 + 10);
+    const commuterX = platformWidth * (position / 100);
+    
+    // Generate random appearance
+    const randomHat = COMMUTER_APPEARANCE.hats[Math.floor(Math.random() * COMMUTER_APPEARANCE.hats.length)];
+    const randomBriefcase = COMMUTER_APPEARANCE.briefcases[Math.floor(Math.random() * COMMUTER_APPEARANCE.briefcases.length)];
+    
+    const commuter = spriteSystem.createCommuter({
+        id: `commuter-${commuterSprites.length}`,
+        x: commuterX,
+        y: platformY,
+        facingLeft: Math.random() > 0.5,
+        parts: {
+            hat: { 
+                visible: randomHat.visible,
+                styles: {
+                    backgroundColor: randomHat.color
+                }
+            },
+            head: { visible: true },
+            body: { 
+                visible: true,
+                styles: {
+                    backgroundColor: COMMUTER_APPEARANCE.coats[Math.floor(Math.random() * COMMUTER_APPEARANCE.coats.length)]
+                }
+            },
+            shirt: { 
+                visible: true,
+                styles: {
+                    backgroundColor: COMMUTER_APPEARANCE.shirts[Math.floor(Math.random() * COMMUTER_APPEARANCE.shirts.length)]
+                }
+            },
+            pants: { 
+                visible: true,
+                styles: {
+                    backgroundColor: COMMUTER_APPEARANCE.pants[Math.floor(Math.random() * COMMUTER_APPEARANCE.pants.length)]
+                }
+            },
+            briefcase: { 
+                visible: randomBriefcase.visible,
+                styles: {
+                    backgroundColor: randomBriefcase.color
+                }
+            },
+            leftShoe: { 
+                visible: true,
+                styles: {
+                    backgroundColor: COMMUTER_APPEARANCE.shoes[Math.floor(Math.random() * COMMUTER_APPEARANCE.shoes.length)]
+                }
+            },
+            rightShoe: { 
+                visible: true,
+                styles: {
+                    backgroundColor: COMMUTER_APPEARANCE.shoes[Math.floor(Math.random() * COMMUTER_APPEARANCE.shoes.length)]
+                }
+            }
+        }
+    });
+    
+    // Make commuter clickable for game interaction
+    spriteSystem.makeClickable(commuter.id, handleSpriteClick);
+    
+    commuterSprites.push(commuter);
+    
+    // Return the created commuter
+    return commuter;
 }
 
 /**
  * Handle sprite click events
  */
 function handleSpriteClick(commuter, event) {
-    // Create synthetic event expected by the original game
-    const syntheticEvent = {
-        target: {
-            id: commuter.id
-        },
-        stopPropagation: () => event.stopPropagation()
-    };
+    // Ensure game is in clickable state
+    if (!window.canClick || window.isTransitioning) return;
     
-    // Call original click handler if it exists
-    if (typeof window.handleElementClick === 'function') {
-        window.handleElementClick(syntheticEvent);
+    // Check if this is the commuter with the current change
+    if (window.currentChange && window.currentChange.commuterId === getCommuterIndex(commuter.id)) {
+        console.log('Correct commuter clicked!');
+        
+        // Call the original increaseAwareness function
+        window.increaseAwareness(GAME_SETTINGS.baseAwarenessGain);
+        
+        // Set canClick to false to prevent further clicks
+        window.canClick = false;
+        
+        // Show thought bubble
+        window.showThoughtBubble();
+        
+        // Update narrative text
+        window.updateNarrativeText();
+        
+        // Mark change as found
+        window.currentChange.found = true;
+        
+        // Add a visual highlight to the commuter
+        highlightCommuter(commuter.element);
+    } else {
+        // Wrong commuter clicked
+        console.log('Wrong commuter clicked');
+        
+        // Show message
+        window.showMessage("I didn't notice anything different there", 1500);
     }
+}
+
+/**
+ * Get the index of a commuter from its ID
+ * @param {string} id - Commuter ID (format: "commuter-X")
+ * @returns {number} The commuter index
+ */
+function getCommuterIndex(id) {
+    const match = id.match(/commuter-(\d+)/);
+    return match ? parseInt(match[1]) : -1;
+}
+
+/**
+ * Apply highlight effect to a commuter element
+ * @param {HTMLElement} element - The commuter element to highlight
+ */
+function highlightCommuter(element) {
+    // Add highlighting effect
+    element.classList.add('highlight-pulse');
+    
+    // Remove after animation completes
+    setTimeout(() => {
+        element.classList.remove('highlight-pulse');
+    }, 1500);
+}
+
+/**
+ * Create the first change (adding a hat on day 4)
+ */
+function createFirstChange() {
+    if (commuterSprites.length === 0) return null;
+    
+    // Get the first commuter
+    const firstCommuter = commuterSprites[0];
+    const commuterId = getCommuterIndex(firstCommuter.id);
+    
+    // Create a change object
+    return {
+        commuterId: commuterId,
+        type: FIRST_CHANGE.type,
+        property: FIRST_CHANGE.property,
+        value: FIRST_CHANGE.value,
+        found: false
+    };
+}
+
+/**
+ * Select a random element to change on a commuter
+ */
+function selectRandomChange() {
+    if (commuterSprites.length === 0) return null;
+    
+    // Select a random commuter
+    const commuterIndex = Math.floor(Math.random() * commuterSprites.length);
+    const commuter = commuterSprites[commuterIndex];
+    
+    // Pick a random change type
+    const changeTypes = ['hat', 'coat', 'briefcase', 'pants', 'shoes', 'shirt'];
+    const changeType = changeTypes[Math.floor(Math.random() * changeTypes.length)];
+    
+    // Default change properties
+    let property = 'color';
+    let value = '#000000';
+    
+    // Customize change based on type
+    switch (changeType) {
+        case 'hat':
+            if (Math.random() > 0.7) {
+                // Toggle hat visibility
+                property = 'visible';
+                value = true; // We'll invert this based on current state
+            } else {
+                // Change hat color
+                property = 'color';
+                const hatColors = COMMUTER_APPEARANCE.hats.map(h => h.color);
+                value = hatColors[Math.floor(Math.random() * hatColors.length)];
+            }
+            break;
+            
+        case 'coat':
+            property = 'color';
+            value = COMMUTER_APPEARANCE.coats[Math.floor(Math.random() * COMMUTER_APPEARANCE.coats.length)];
+            break;
+            
+        case 'shirt':
+            property = 'color';
+            value = COMMUTER_APPEARANCE.shirts[Math.floor(Math.random() * COMMUTER_APPEARANCE.shirts.length)];
+            break;
+            
+        case 'pants':
+            property = 'color';
+            value = COMMUTER_APPEARANCE.pants[Math.floor(Math.random() * COMMUTER_APPEARANCE.pants.length)];
+            break;
+            
+        case 'shoes':
+            property = 'color';
+            value = COMMUTER_APPEARANCE.shoes[Math.floor(Math.random() * COMMUTER_APPEARANCE.shoes.length)];
+            break;
+            
+        case 'briefcase':
+            if (Math.random() > 0.7) {
+                // Toggle briefcase visibility
+                property = 'visible';
+                value = true; // We'll invert this based on current state
+            } else {
+                // Change briefcase color
+                property = 'color';
+                const briefcaseColors = COMMUTER_APPEARANCE.briefcases
+                    .filter(b => b.color !== null)
+                    .map(b => b.color);
+                value = briefcaseColors[Math.floor(Math.random() * briefcaseColors.length)];
+            }
+            break;
+    }
+    
+    return {
+        commuterId: getCommuterIndex(commuter.id),
+        type: changeType,
+        property: property,
+        value: value,
+        found: false
+    };
+}
+
+/**
+ * Apply the selected change to a commuter
+ */
+function applyChange(change) {
+    if (!change) return;
+    
+    // Find the commuter by ID
+    const commuter = commuterSprites[change.commuterId];
+    if (!commuter) return;
+    
+    // Create options object for updating the commuter
+    const updateOptions = { parts: {} };
+    
+    // Apply change based on type
+    switch (change.type) {
+        case 'hat':
+            if (change.property === 'visible') {
+                // Toggle hat visibility
+                const isVisible = commuter.config.parts.hat.visible;
+                updateOptions.parts.hat = { visible: !isVisible };
+            } else {
+                // Change hat color
+                updateOptions.parts.hat = { 
+                    styles: { backgroundColor: change.value }
+                };
+            }
+            break;
+            
+        case 'coat':
+            updateOptions.parts.body = { 
+                styles: { backgroundColor: change.value }
+            };
+            break;
+            
+        case 'shirt':
+            updateOptions.parts.shirt = { 
+                styles: { backgroundColor: change.value }
+            };
+            break;
+            
+        case 'pants':
+            updateOptions.parts.pants = { 
+                styles: { backgroundColor: change.value }
+            };
+            break;
+            
+        case 'shoes':
+            updateOptions.parts.leftShoe = { 
+                styles: { backgroundColor: change.value }
+            };
+            updateOptions.parts.rightShoe = { 
+                styles: { backgroundColor: change.value }
+            };
+            break;
+            
+        case 'briefcase':
+            if (change.property === 'visible') {
+                // Toggle briefcase visibility
+                const isVisible = commuter.config.parts.briefcase.visible;
+                updateOptions.parts.briefcase = { visible: !isVisible };
+            } else {
+                // Change briefcase color
+                updateOptions.parts.briefcase = { 
+                    styles: { backgroundColor: change.value }
+                };
+            }
+            break;
+    }
+    
+    // Update the commuter
+    spriteSystem.updateCommuter(commuter.id, updateOptions);
 }
 
 /**
@@ -128,69 +409,52 @@ function handleSpriteClick(commuter, event) {
  */
 function overrideGameFunctions() {
     // Store original functions
-    const originalApplyChange = window.applyChange;
+    const originalCreateFirstChange = window.createFirstChange;
     const originalSelectRandomChange = window.selectRandomChange;
+    const originalApplyChange = window.applyChange;
+    const originalHighlightMissedChange = window.highlightMissedChange;
     
-    // Override applyChange to work with sprites
+    // Override createFirstChange function
+    window.createFirstChange = function() {
+        return createFirstChange();
+    };
+    
+    // Override selectRandomChange function
+    window.selectRandomChange = function() {
+        return selectRandomChange();
+    };
+    
+    // Override applyChange function
     window.applyChange = function(change) {
+        applyChange(change);
+    };
+    
+    // Override highlightMissedChange function
+    window.highlightMissedChange = function(change) {
         if (!change) return;
         
-        console.log('Applying change:', change);
-        
-        // Extract the person ID (e.g., "person1-hat" -> "person1")
-        const match = change.id.match(/^(person\d+|player)/);
-        const personId = match ? match[1] : null;
-        
-        if (personId) {
-            // Find the commuter
-            const commuter = spriteSystem.commuters.find(c => c.id === personId);
-            
-            if (commuter) {
-                // Create update options based on the change
-                const updateOptions = { parts: {} };
-                
-                // Handle different types of changes
-                if (change.id.includes('-hat')) {
-                    updateOptions.parts.hat = {
-                        visible: change.change.value === 'visible'
-                    };
-                } 
-                else if (change.id.includes('-bag')) {
-                    updateOptions.parts.briefcase = {
-                        visible: change.change.value === 'visible'
-                    };
-                }
-                // For visibility changes on other parts, we need more specific handling
-                
-                // Update the commuter with new options
-                spriteSystem.updateCommuter(personId, updateOptions);
-                
-                // Update game state tracking
-                if (window.currentState) {
-                    window.currentState[change.id] = {
-                        property: change.change.property,
-                        value: change.change.value
-                    };
-                }
-            }
-        } else if (originalApplyChange) {
-            // Fall back to original function for non-sprite changes
-            originalApplyChange(change);
+        // Find the commuter element
+        const commuter = commuterSprites[change.commuterId];
+        if (commuter && commuter.element) {
+            // Highlight the commuter
+            highlightCommuter(commuter.element);
         }
     };
+}
+
+/**
+ * Add a new commuter to the scene when a meter segment is filled
+ * @param {number} segmentNumber - Current segment that was filled
+ */
+function addNewCommuter(segmentNumber) {
+    // Check if we can add more commuters
+    if (commuterSprites.length >= COMMUTER_ADDITION.maxCommuters) return;
     
-    // Override selectRandomChange to work better with sprites
-    window.selectRandomChange = function() {
-        // Use original function but adjust to ensure compatibility
-        const change = originalSelectRandomChange();
-        
-        if (change) {
-            // Adjust as needed for sprite system compatibility
-            console.log('Selected change:', change);
-        }
-        
-        return change;
-    };
+    // Add a new commuter at the position corresponding to the segment
+    createNewCommuter(segmentNumber);
+    
+    // Show notification
+    window.showMessage("The station seems more crowded now...", 2000);
 }
 
 // Initialize the sprite system when the game starts

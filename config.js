@@ -18,96 +18,66 @@ const SONG_LYRICS = [
     { day: 100, text: "Drone no more, I'm my own man" }
 ];
 
-// Element categories that can change - UPDATED WITH HIGH CONTRAST COLORS
-const CHANGEABLE_ELEMENTS = [
-    // Hat properties
-    {
-        type: 'hat',
-        property: 'backgroundColor',
-        ids: [
-            'person1-hat', 'person2-hat', 'person3-hat', 
-            'person4-hat', 'person5-hat', 'person6-hat', 'person7-hat'
-        ],
-        values: [
-            '#000000', // Black
-            '#8B4513', // Brown
-            '#000080'  // Navy
-        ]
-    },
-    // Hat visibility
-    {
-        type: 'hat-visibility',
-        property: 'visibility',
-        ids: [
-            'person1-hat', 'person2-hat', 'person3-hat', 
-            'person4-hat', 'person5-hat', 'person6-hat', 'person7-hat'
-        ],
-        values: ['visible', 'hidden']
-    },
-    // Trench coat color
-    {
-        type: 'trench-coat',
-        property: 'backgroundColor',
-        ids: [
-            'person1-body', 'person2-body', 'person3-body', 
-            'person4-body', 'person5-body', 'person6-body', 'person7-body'
-        ],
-        values: [
-            '#4e392e', // Brown
-            '#2e2e40', // Navy
-            '#5a5a5a'  // Gray
-        ]
-    },
-    // Briefcase/bag color
-    {
-        type: 'briefcase',
-        property: 'backgroundColor',
-        ids: [
-            'person1-bag', 'person2-bag', 'person3-bag', 
-            'person4-bag', 'person5-bag', 'person6-bag', 'person7-bag'
-        ],
-        values: [
-            '#8B4513', // Brown
-            '#000000', // Black
-            '#D2B48C'  // Tan
-        ]
-    },
-    // Briefcase/bag visibility
-    {
-        type: 'briefcase-visibility',
-        property: 'visibility',
-        ids: [
-            'person1-bag', 'person2-bag', 'person3-bag', 
-            'person4-bag', 'person5-bag', 'person6-bag', 'person7-bag'
-        ],
-        values: ['visible', 'hidden']
-    },
-    // Leg/pants color
-    {
-        type: 'pants',
-        property: 'backgroundColor',
-        ids: [
-            'person1-left-leg', 'person1-right-leg',
-            'person2-left-leg', 'person2-right-leg', 
-            'person3-left-leg', 'person3-right-leg',
-            'person4-left-leg', 'person4-right-leg', 
-            'person5-left-leg', 'person5-right-leg',
-            'person6-left-leg', 'person6-right-leg',
-            'person7-left-leg', 'person7-right-leg'
-        ],
-        values: [
-            '#37322e', // Dark gray
-            '#000000'  // Black
-        ]
-    }
-];
+// Commuter appearance settings
+const COMMUTER_APPEARANCE = {
+    hats: [
+        { visible: true, color: '#000000' }, // Black
+        { visible: true, color: '#8B4513' }, // Brown
+        { visible: true, color: '#000080' }  // Navy
+    ],
+    coats: [
+        '#4e392e', // Brown
+        '#2e2e40', // Navy
+        '#5a5a5a'  // Gray
+    ],
+    shirts: [
+        '#FFFFFF', // White
+        '#E6E6FA', // Lavender
+        '#E0FFFF'  // Light Cyan
+    ],
+    pants: [
+        '#37322e', // Dark gray
+        '#000000'  // Black
+    ],
+    shoes: [
+        '#000000', // Black
+        '#8B4513', // Brown
+        '#2F4F4F'  // Dark Slate Gray
+    ],
+    briefcases: [
+        { visible: true, color: '#8B4513' }, // Brown
+        { visible: true, color: '#000000' }, // Black
+        { visible: true, color: '#D2B48C' }, // Tan
+        { visible: false, color: null }      // No briefcase
+    ]
+};
 
-// First change configuration - modified to be on character 2
+// First change configuration (hat appears on day 4)
 const FIRST_CHANGE = {
-    type: 'hat-visibility',
-    property: 'visibility',
-    id: 'person2-hat',  // Changed to person2
-    value: 'visible'    // Make a hat appear
+    type: 'hat',
+    property: 'visible',
+    value: true,
+    commuterId: 0 // This will be the first commuter
+};
+
+// Awareness meter configuration
+const AWARENESS_METER_CONFIG = {
+    maxLevel: 100,
+    segmentSize: 20, // Each segment represents 20 awareness points
+    meterWidth: 200,
+    meterHeight: 15,
+    activeColor: '#4e4eb2', // Matches the most aware color stage
+    inactiveColor: '#3a3a3a',
+    borderColor: '#666'
+};
+
+// Configuration for commuter addition
+const COMMUTER_ADDITION = {
+    // We'll add a new commuter when each segment is filled
+    // So max 5 commuters (using 20 awareness per segment)
+    maxCommuters: 5,
+    // Starting positions for each commuter (percentage from left)
+    positions: [50, 30, 70, 10, 90]
 };
 
 // Thoughts shown in thought bubble based on awareness levels
@@ -154,8 +124,7 @@ const GAME_SETTINGS = {
     missedChangeHighlightDuration: 1500,
     
     // Gameplay settings
-    baseAwarenessGain: 1,  // How much awareness increases per correct guess - just increment by 1
-    multipleChangesThreshold: 60, // Day when multiple changes start appearing
+    baseAwarenessGain: 4,  // How much awareness increases per correct guess - increased to fill meter faster
     
     // Background stage thresholds
     colorStages: [

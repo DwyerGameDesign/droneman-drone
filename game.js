@@ -14,12 +14,12 @@ let isTransitioning = false;
 let allChanges = [];
 let foundFirstChange = false;
 let typewriter = null;
+let awarenessMeter = null;
 
 // Game elements
 const sceneContainer = document.getElementById('scene-container');
 const trainButton = document.getElementById('train-button');
 const dayDisplay = document.getElementById('day');
-const awarenessDisplay = document.getElementById('awareness-number');
 const narrativeText = document.getElementById('narrative-text');
 const fadeOverlay = document.getElementById('fade-overlay');
 const message = document.getElementById('message');
@@ -35,17 +35,14 @@ function init() {
     // Initialize typewriter
     initTypewriter();
     
+    // Create awareness meter
+    createAwarenessMeter();
+    
     // Update displays
     updateAwarenessDisplay();
     
     // Set initial narrative text
     typewriter.type("everyday the same...");
-    
-    // Setup click handlers for elements
-    setupClickHandlers();
-    
-    // Initialize default styles for all elements
-    initializeDefaultStyles();
     
     // Add train button listener
     trainButton.addEventListener('click', takeTrain);
@@ -94,112 +91,59 @@ function initTypewriter() {
 }
 
 /**
- * Initialize default property values for all changeable elements
+ * Create and initialize the awareness meter
  */
-function initializeDefaultStyles() {
-    CHANGEABLE_ELEMENTS.forEach(category => {
-        category.ids.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                // Set initial defaults based on type
-                switch(category.type) {
-                    case 'hat-visibility':
-                    case 'briefcase-visibility':
-                        element.style.visibility = Math.random() < 0.8 ? 'hidden' : 'visible';
-                        break;
-                    case 'hat':
-                    case 'briefcase':
-                        if (element.style.visibility === 'visible') {
-                            // Select a random color from the new high-contrast color list
-                            const randomColor = category.values[Math.floor(Math.random() * category.values.length)];
-                            element.style.backgroundColor = randomColor;
-                        }
-                        break;
-                    default:
-                        const randomValue = category.values[Math.floor(Math.random() * category.values.length)];
-                        element.style[category.property] = randomValue;
-                        break;
-                }
-                
-                // Store initial state
-                currentState[id] = {
-                    property: category.property,
-                    value: element.style[category.property]
-                };
+function createAwarenessMeter() {
+    // Create awareness container if it doesn't exist
+    let awarenessContainer = document.getElementById('awareness-container');
+    if (!awarenessContainer) {
+        awarenessContainer = document.createElement('div');
+        awarenessContainer.id = 'awareness-container';
+        awarenessContainer.className = 'awareness-container';
+        
+        // Insert into the HUD
+        const hud = document.querySelector('.hud');
+        if (hud) {
+            // Remove old awareness counter if it exists
+            const oldCounter = document.querySelector('.awareness-counter');
+            if (oldCounter) {
+                oldCounter.remove();
             }
-        });
-    });
-    
-    // Make sure all hats are initially hidden
-    document.querySelectorAll('.hat').forEach(hat => {
-        hat.style.visibility = 'hidden';
-        if (hat.id) {
-            currentState[hat.id] = {
-                property: 'visibility',
-                value: 'hidden'
-            };
-        }
-    });
-}
-
-/**
- * Set up click handlers for all elements
- */
-function setupClickHandlers() {
-    // Add click handlers to all changeable elements
-    CHANGEABLE_ELEMENTS.forEach(category => {
-        category.ids.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.addEventListener('click', handleElementClick);
-            }
-        });
-    });
-}
-
-/**
- * Handle clicks on scene elements
- */
-function handleElementClick(event) {
-    if (!canClick || isTransitioning) return;
-    
-    const clickedId = event.target.id;
-    
-    if (clickedId === currentChange.id) {
-        // Correct element clicked
-        increaseAwareness(GAME_SETTINGS.baseAwarenessGain);
-        canClick = false;
-        showThoughtBubble();
-        
-        // Only update narrative text when a change is found
-        updateNarrativeText();
-        
-        if (!foundFirstChange) {
-            foundFirstChange = true;
-        }
-        
-        // Highlight the correct element
-        const element = document.getElementById(clickedId);
-        if (element) {
-            // Add a temporary highlight
-            const originalBorder = element.style.border;
-            element.style.border = '2px solid white';
             
-            setTimeout(() => {
-                element.style.border = originalBorder;
-            }, 1000);
+            hud.appendChild(awarenessContainer);
         }
-        
-        // Mark the change as found
-        currentChange.found = true;
-    } else {
-        // Wrong element clicked - show message
-        message.textContent = "everyday the same";
-        message.style.visibility = 'visible';
-        
-        setTimeout(() => {
-            message.style.visibility = 'hidden';
-        }, 1500);
+    }
+    
+    // Create meter instance
+    awarenessMeter = new AwarenessMeter({
+        container: awarenessContainer,
+        ...AWARENESS_METER_CONFIG,
+        onSegmentFilled: handleSegmentFilled
+    });
+    
+    // Initial update
+    awarenessMeter.update(awareness);
+}
+
+/**
+ * Handle when a meter segment is filled
+ */
+function handleSegmentFilled(segmentNumber) {
+    console.log(`Segment ${segmentNumber} filled!`);
+    
+    // Add a new commuter when we have enough awareness
+    if (typeof addNewCommuter === 'function') {
+        addNewCommuter(segmentNumber);
+    }
+}
+
+/**
+ * Update the awareness display
+ */
+function updateAwarenessDisplay() {
+    // Update meter if available
+    if (awarenessMeter) {
+        awarenessMeter.update(awareness);
     }
 }
 
@@ -253,7 +197,7 @@ function proceedToNextDay() {
             // Add the current change to the history of all changes
             allChanges.push(currentChange);
             
-            // Apply the change to the element
+            // Apply the change to the commuter
             applyChange(currentChange);
             
             // Enable clicking since there's something to find
@@ -261,16 +205,18 @@ function proceedToNextDay() {
         } else if (day > 4) {
             // Generate random changes after the first one
             currentChange = selectRandomChange();
-            currentChange.found = false;
-            
-            // Add the current change to the history of all changes
-            allChanges.push(currentChange);
-            
-            // Apply the change to the element
-            applyChange(currentChange);
-            
-            // Enable clicking since there's something to find
-            canClick = true;
+            if (currentChange) {
+                currentChange.found = false;
+                
+                // Add the current change to the history of all changes
+                allChanges.push(currentChange);
+                
+                // Apply the change to the commuter
+                applyChange(currentChange);
+                
+                // Enable clicking since there's something to find
+                canClick = true;
+            }
         } else {
             // No change to find yet
             currentChange = null;
@@ -313,105 +259,51 @@ function proceedToNextDay() {
 }
 
 /**
- * Create the first change - should be very obvious
+ * Create the first change - uses predefined commuter change from config
  */
 function createFirstChange() {
-    // Use the predefined first change
     return {
-        id: FIRST_CHANGE.id,
+        commuterId: FIRST_CHANGE.commuterId,
         type: FIRST_CHANGE.type,
-        change: {
-            property: FIRST_CHANGE.property,
-            value: FIRST_CHANGE.value
-        }
+        property: FIRST_CHANGE.property,
+        value: FIRST_CHANGE.value
     };
 }
 
 /**
  * Function to highlight missed changes
+ * This is a stub that will be overridden by sprite_integration.js
  */
 function highlightMissedChange(change) {
-    const element = document.getElementById(change.id);
-    if (element) {
-        // Store original styles
-        const originalBackgroundColor = element.style.backgroundColor;
-        const originalBorder = element.style.border;
-        const originalZIndex = element.style.zIndex;
-        
-        // Apply highlight
-        element.style.backgroundColor = GAME_SETTINGS.missedChangeHighlightColor;
-        element.style.border = '3px solid white';
-        element.style.zIndex = '50'; // Bring to front
-        
-        // Create a pulse animation effect
-        element.classList.add('highlight-pulse');
-        
-        // Reset after duration
-        setTimeout(() => {
-            element.style.backgroundColor = originalBackgroundColor;
-            element.style.border = originalBorder;
-            element.style.zIndex = originalZIndex;
-            element.classList.remove('highlight-pulse');
-        }, GAME_SETTINGS.missedChangeHighlightDuration);
-    }
+    console.log('Highlighting missed change:', change);
+    // Implementation provided by sprite_integration.js
 }
 
 /**
  * Select a random element to change
+ * This is a stub that will be overridden by sprite_integration.js
  */
 function selectRandomChange() {
-    // Randomly select a category
-    const categoryIndex = Math.floor(Math.random() * CHANGEABLE_ELEMENTS.length);
-    const category = CHANGEABLE_ELEMENTS[categoryIndex];
-    
-    // Randomly select an element from the category
-    const elementIndex = Math.floor(Math.random() * category.ids.length);
-    const elementId = category.ids[elementIndex];
-    
-    // Get current element
-    const element = document.getElementById(elementId);
-    if (!element) return null;
-    
-    // Get current value for this property
-    const currentValue = element.style[category.property];
-    
-    // Choose a new value different from the current one
-    let newValue;
-    let attempts = 0;
-    
-    do {
-        const valueIndex = Math.floor(Math.random() * category.values.length);
-        newValue = category.values[valueIndex];
-        attempts++;
-        
-        // Prevent infinite loop
-        if (attempts > 10) break;
-    } while (newValue === currentValue);
-    
-    return {
-        id: elementId,
-        type: category.type,
-        change: {
-            property: category.property,
-            value: newValue
-        }
-    };
+    console.log('Selecting random change');
+    // Implementation provided by sprite_integration.js
+    return null;
 }
 
 /**
  * Apply the selected change to the element
+ * This is a stub that will be overridden by sprite_integration.js
  */
 function applyChange(change) {
-    const element = document.getElementById(change.id);
-    if (element) {
-        element.style[change.change.property] = change.change.value;
-        
-        // Store current state
-        currentState[change.id] = {
-            property: change.change.property,
-            value: change.change.value
-        };
-    }
+    console.log('Applying change:', change);
+    // Implementation provided by sprite_integration.js
+}
+
+/**
+ * Handle clicks on scene elements
+ * This is a stub that will be overridden by sprite_integration.js
+ */
+function handleElementClick(event) {
+    // Implementation provided by sprite_integration.js
 }
 
 /**
@@ -470,13 +362,6 @@ function increaseAwareness(amount) {
 }
 
 /**
- * Update the awareness display
- */
-function updateAwarenessDisplay() {
-    awarenessDisplay.textContent = awareness;
-}
-
-/**
  * Check for lyrics for the current day
  */
 function checkForLyrics() {
@@ -495,6 +380,15 @@ function checkForLyrics() {
 function updateNarrativeText() {
     // Don't change initial narrative until first change is found
     if (!foundFirstChange) {
+        foundFirstChange = true;
+        narrativeText.textContent = "I noticed something different today...";
+        
+        if (typewriter) {
+            typewriter.stop();
+            setTimeout(() => {
+                typewriter.type(narrativeText.textContent);
+            }, 100);
+        }
         return;
     }
     
@@ -603,5 +497,5 @@ function gameComplete() {
                 typewriter.type(narrativeText.textContent);
             }, 100);
         }
-    }, 6000);
+    }, 3000);
 }

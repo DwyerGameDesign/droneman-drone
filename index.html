@@ -11,6 +11,44 @@
             min-width: 820px; /* Slightly larger than game width to account for padding */
             overflow-x: hidden;
         }
+        
+        /* Style for the awareness meter */
+        .awareness-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .awareness-meter {
+            width: 200px;
+            height: 15px;
+            background-color: #3a3a3a;
+            border: 2px solid #666;
+            border-radius: 3px;
+            overflow: hidden;
+            display: flex;
+        }
+        
+        .awareness-segment {
+            flex: 1;
+            height: 100%;
+            margin: 0 1px;
+            background-color: #3a3a3a;
+            transition: background-color 0.8s ease-in-out;
+        }
+        
+        /* Style enhancement for the awareness icon */
+        .awareness-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background-color: #4e4eb2;
+            border-radius: 50%;
+            color: white;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -19,9 +57,8 @@
         
         <div class="hud">
             <div class="day-counter">Day: <span id="day">1</span></div>
-            <div class="awareness-counter">
-                <span id="awareness-number">0</span>
-                <span class="awareness-icon"></span>
+            <div id="awareness-container" class="awareness-container">
+                <!-- Awareness meter will be added here by JavaScript -->
             </div>
         </div>
         
@@ -71,95 +108,7 @@
             <div class="platform-edge"></div>
             <div class="platform"></div>
             
-            <!-- People on the platform -->
-            <div class="person" id="person1">
-                <div class="head" id="person1-head"></div>
-                <div class="body" id="person1-body"></div>
-                <div class="left-leg" id="person1-left-leg"></div>
-                <div class="right-leg" id="person1-right-leg"></div>
-                <div class="left-shoe" id="person1-left-shoe"></div>
-                <div class="right-shoe" id="person1-right-shoe"></div>
-                <div class="hat" id="person1-hat"></div>
-                <div class="bag" id="person1-bag"></div>
-            </div>
-            
-            <div class="person" id="person2">
-                <div class="head" id="person2-head"></div>
-                <div class="body" id="person2-body"></div>
-                <div class="left-leg" id="person2-left-leg"></div>
-                <div class="right-leg" id="person2-right-leg"></div>
-                <div class="left-shoe" id="person2-left-shoe"></div>
-                <div class="right-shoe" id="person2-right-shoe"></div>
-                <div class="hat" id="person2-hat"></div>
-                <div class="bag" id="person2-bag"></div>
-            </div>
-            
-            <div class="person" id="person3">
-                <div class="head" id="person3-head"></div>
-                <div class="body" id="person3-body"></div>
-                <div class="left-leg" id="person3-left-leg"></div>
-                <div class="right-leg" id="person3-right-leg"></div>
-                <div class="left-shoe" id="person3-left-shoe"></div>
-                <div class="right-shoe" id="person3-right-shoe"></div>
-                <div class="hat" id="person3-hat"></div>
-                <div class="bag" id="person3-bag"></div>
-            </div>
-            
-            <div class="person" id="person4">
-                <div class="head" id="person4-head"></div>
-                <div class="body" id="person4-body"></div>
-                <div class="left-leg" id="person4-left-leg"></div>
-                <div class="right-leg" id="person4-right-leg"></div>
-                <div class="left-shoe" id="person4-left-shoe"></div>
-                <div class="right-shoe" id="person4-right-shoe"></div>
-                <div class="hat" id="person4-hat"></div>
-                <div class="bag" id="person4-bag"></div>
-            </div>
-            
-            <div class="person" id="person5">
-                <div class="head" id="person5-head"></div>
-                <div class="body" id="person5-body"></div>
-                <div class="left-leg" id="person5-left-leg"></div>
-                <div class="right-leg" id="person5-right-leg"></div>
-                <div class="left-shoe" id="person5-left-shoe"></div>
-                <div class="right-shoe" id="person5-right-shoe"></div>
-                <div class="hat" id="person5-hat"></div>
-                <div class="bag" id="person5-bag"></div>
-            </div>
-            
-            <div class="person" id="person6">
-                <div class="head" id="person6-head"></div>
-                <div class="body" id="person6-body"></div>
-                <div class="left-leg" id="person6-left-leg"></div>
-                <div class="right-leg" id="person6-right-leg"></div>
-                <div class="left-shoe" id="person6-left-shoe"></div>
-                <div class="right-shoe" id="person6-right-shoe"></div>
-                <div class="hat" id="person6-hat"></div>
-                <div class="bag" id="person6-bag"></div>
-            </div>
-            
-            <div class="person" id="person7">
-                <div class="head" id="person7-head"></div>
-                <div class="body" id="person7-body"></div>
-                <div class="left-leg" id="person7-left-leg"></div>
-                <div class="right-leg" id="person7-right-leg"></div>
-                <div class="left-shoe" id="person7-left-shoe"></div>
-                <div class="right-shoe" id="person7-right-shoe"></div>
-                <div class="hat" id="person7-hat"></div>
-                <div class="bag" id="person7-bag"></div>
-            </div>
-            
-            <!-- Player character (Drone Person) -->
-            <div class="person" id="player">
-                <div class="head"></div>
-                <div class="body"></div>
-                <div class="left-leg"></div>
-                <div class="right-leg"></div>
-                <div class="left-shoe"></div>
-                <div class="right-shoe"></div>
-                <div class="hat" style="visibility: hidden;"></div>
-                <div class="bag" style="visibility: hidden;"></div>
-            </div>
+            <!-- Commuters will be added dynamically by the sprite system -->
             
             <div class="thought-bubble" id="thought-bubble">
                 Something's different today...
@@ -172,9 +121,11 @@
     </div>
 
     <script src="typewriter.js"></script>
+    <script src="awareness_meter.js"></script>
     <script src="config.js"></script>
     <script src="game.js"></script>
-    <script src="commuter-sprite-system.js"></script>
-    <script src="sprite-integration.js"></script>    
+    <script src="commuter_sprite_system.js"></script>
+    <script src="sprite_integration.js"></script>
+    <script src="extensions.js"></script>    
 </body>
 </html>
