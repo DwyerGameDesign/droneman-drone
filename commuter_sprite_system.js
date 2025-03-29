@@ -9,20 +9,20 @@ class CommuterSpriteSystem {
         this.options = {
             spriteSheetPath: 'assets/commuter-sprites.png', // Path to the sprite sheet
             container: document.getElementById('scene-container'),
-            spriteScale: 3, // Scale of sprites (multiplier)
+            spriteScale: 2, // Scale of sprites (multiplier)
             ...options
         };
         
         this.commuters = [];
         this.spriteSheet = null;
         this.spriteParts = {
-            hat: { x: 84, y: 0, width: 140, height: 64 },
-            head: { x: 628, y: 0, width: 128, height: 128 },
-            body: { x: 280, y: 64, width: 210, height: 240 },
-            shirt: { x: 628, y: 212, width: 128, height: 128 },
-            pants: { x: 628, y: 456, width: 128, height: 128 },
-            briefcase: { x: 84, y: 732, width: 154, height: 112 },
-            shoe: { x: 476, y: 732, width: 88, height: 112 }
+            head: { x: 0, y: 0, width: 32, height: 32 },
+            body: { x: 32, y: 0, width: 32, height: 48 },
+            leftArm: { x: 64, y: 0, width: 16, height: 48 },
+            rightArm: { x: 80, y: 0, width: 16, height: 48 },
+            leftLeg: { x: 96, y: 0, width: 16, height: 48 },
+            rightLeg: { x: 112, y: 0, width: 16, height: 48 },
+            briefcase: { x: 128, y: 0, width: 32, height: 32 }
         };
         
         // Load the sprite sheet
@@ -61,14 +61,13 @@ class CommuterSpriteSystem {
             x: 0,
             y: 0,
             parts: {
-                hat: { visible: Math.random() > 0.3 },
                 head: { visible: true },
                 body: { visible: true },
-                shirt: { visible: true },
-                pants: { visible: true },
-                briefcase: { visible: Math.random() > 0.5 },
-                leftShoe: { visible: true },
-                rightShoe: { visible: true }
+                leftArm: { visible: true },
+                rightArm: { visible: true },
+                leftLeg: { visible: true },
+                rightLeg: { visible: true },
+                briefcase: { visible: Math.random() > 0.5 }
             },
             facingLeft: Math.random() > 0.5
         };
@@ -83,8 +82,8 @@ class CommuterSpriteSystem {
         commuterElement.style.position = 'absolute';
         commuterElement.style.left = `${config.x}px`;
         commuterElement.style.bottom = `${config.y}px`;
-        commuterElement.style.width = `${this.spriteParts.body.width * this.options.spriteScale / 4}px`;
-        commuterElement.style.height = `${(this.spriteParts.body.height + this.spriteParts.pants.height) * this.options.spriteScale / 4}px`;
+        commuterElement.style.width = `${32 * this.options.spriteScale}px`;
+        commuterElement.style.height = `${96 * this.options.spriteScale}px`;
         commuterElement.style.transform = config.facingLeft ? 'scaleX(-1)' : '';
         commuterElement.style.zIndex = '10';
         commuterElement.style.cursor = 'pointer';
@@ -122,14 +121,7 @@ class CommuterSpriteSystem {
      * @returns {HTMLElement} - The created part element
      */
     _createSpritePart(partName, partConfig) {
-        // Special case for left/right shoe
-        let spritePart;
-        if (partName === 'leftShoe' || partName === 'rightShoe') {
-            spritePart = this.spriteParts.shoe;
-        } else {
-            spritePart = this.spriteParts[partName];
-        }
-        
+        const spritePart = this.spriteParts[partName];
         if (!spritePart) return null;
         
         const partElement = document.createElement('div');
@@ -143,43 +135,38 @@ class CommuterSpriteSystem {
         partElement.style.backgroundPosition = `-${spritePart.x}px -${spritePart.y}px`;
         
         // Set dimensions based on the sprite part size
-        partElement.style.width = `${spritePart.width * this.options.spriteScale / 4}px`;
-        partElement.style.height = `${spritePart.height * this.options.spriteScale / 4}px`;
+        partElement.style.width = `${spritePart.width * this.options.spriteScale}px`;
+        partElement.style.height = `${spritePart.height * this.options.spriteScale}px`;
         
         // Position each part appropriately
         switch (partName) {
-            case 'hat':
-                partElement.style.top = `-${spritePart.height * this.options.spriteScale / 8}px`;
-                partElement.style.left = `-${spritePart.width * this.options.spriteScale / 16}px`;
-                break;
             case 'head':
-                partElement.style.top = `${this.spriteParts.hat.height * this.options.spriteScale / 8}px`;
-                partElement.style.left = `${this.spriteParts.body.width * this.options.spriteScale / 10}px`;
+                partElement.style.top = '0px';
+                partElement.style.left = '0px';
                 break;
             case 'body':
-                partElement.style.top = `${(this.spriteParts.hat.height + this.spriteParts.head.height) * this.options.spriteScale / 12}px`;
-                partElement.style.left = `0px`;
+                partElement.style.top = `${32 * this.options.spriteScale}px`;
+                partElement.style.left = '0px';
                 break;
-            case 'shirt':
-                partElement.style.top = `${(this.spriteParts.hat.height + this.spriteParts.head.height) * this.options.spriteScale / 8}px`;
-                partElement.style.left = `${this.spriteParts.body.width * this.options.spriteScale / 10}px`;
-                partElement.style.zIndex = '2'; // Place shirt under body but above pants
+            case 'leftArm':
+                partElement.style.top = `${32 * this.options.spriteScale}px`;
+                partElement.style.left = `-${16 * this.options.spriteScale}px`;
                 break;
-            case 'pants':
-                partElement.style.top = `${(this.spriteParts.hat.height + this.spriteParts.head.height + this.spriteParts.body.height) * this.options.spriteScale / 8}px`;
-                partElement.style.left = `${this.spriteParts.body.width * this.options.spriteScale / 10}px`;
+            case 'rightArm':
+                partElement.style.top = `${32 * this.options.spriteScale}px`;
+                partElement.style.left = `${32 * this.options.spriteScale}px`;
+                break;
+            case 'leftLeg':
+                partElement.style.top = `${80 * this.options.spriteScale}px`;
+                partElement.style.left = '0px';
+                break;
+            case 'rightLeg':
+                partElement.style.top = `${80 * this.options.spriteScale}px`;
+                partElement.style.left = `${16 * this.options.spriteScale}px`;
                 break;
             case 'briefcase':
-                partElement.style.top = `${(this.spriteParts.hat.height + this.spriteParts.head.height + this.spriteParts.body.height / 2) * this.options.spriteScale / 8}px`;
-                partElement.style.left = `-${spritePart.width * this.options.spriteScale / 4}px`;
-                break;
-            case 'leftShoe':
-                partElement.style.top = `${(this.spriteParts.hat.height + this.spriteParts.head.height + this.spriteParts.body.height + this.spriteParts.pants.height) * this.options.spriteScale / 8}px`;
-                partElement.style.left = `${this.spriteParts.body.width * this.options.spriteScale / 16}px`;
-                break;
-            case 'rightShoe':
-                partElement.style.top = `${(this.spriteParts.hat.height + this.spriteParts.head.height + this.spriteParts.body.height + this.spriteParts.pants.height) * this.options.spriteScale / 8}px`;
-                partElement.style.left = `${this.spriteParts.body.width * this.options.spriteScale / 4}px`;
+                partElement.style.top = `${48 * this.options.spriteScale}px`;
+                partElement.style.left = `-${32 * this.options.spriteScale}px`;
                 break;
         }
         
@@ -246,14 +233,13 @@ class CommuterSpriteSystem {
                 x: spacing * (i + 1),
                 facingLeft: Math.random() > 0.5,
                 parts: {
-                    hat: { visible: Math.random() > 0.3 },
                     head: { visible: true },
                     body: { visible: true },
-                    shirt: { visible: true },
-                    pants: { visible: true },
-                    briefcase: { visible: Math.random() > 0.5 },
-                    leftShoe: { visible: true },
-                    rightShoe: { visible: true }
+                    leftArm: { visible: true },
+                    rightArm: { visible: true },
+                    leftLeg: { visible: true },
+                    rightLeg: { visible: true },
+                    briefcase: { visible: Math.random() > 0.5 }
                 }
             };
             
