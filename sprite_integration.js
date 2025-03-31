@@ -1,32 +1,11 @@
 /**
  * Drone: The Daily Commute
- * Simplified Sprite Integration for Briefcase Change with Enhanced Debugging
+ * Simplified Sprite Integration for Briefcase Change
  */
 
 // Global variables
 let commuterSprites = [];
 let spriteBasePath = 'assets/sprites/';
-let debugMode = true; // Enable detailed debugging
-
-/**
- * Debug function that logs only when debug mode is enabled
- */
-function debugLog(...args) {
-  if (debugMode) {
-    console.log(...args);
-  }
-}
-
-// Dump game state to console
-function dumpGameState() {
-  debugLog("--- GAME STATE DUMP ---");
-  debugLog("Day:", document.getElementById('day')?.textContent);
-  debugLog("canClick:", window.canClick);
-  debugLog("isTransitioning:", window.isTransitioning);
-  debugLog("currentChange:", window.currentChange);
-  debugLog("commuterSprites:", commuterSprites);
-  debugLog("----------------------");
-}
 
 // Initialize when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -37,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
  * Initialize the sprite system
  */
 function initializeSprites() {
-  debugLog("Initializing simplified sprite system");
+  console.log("Initializing simplified sprite system");
   
   // Set up the first commuter sprite (with briefcase)
   createInitialCommuter();
@@ -45,53 +24,17 @@ function initializeSprites() {
   // Install custom game function handlers
   installGameHandlers();
   
-  // Monitor day display changes
-  monitorDayChanges();
-  
   // Add a listener for the train button to reset canClick
   const trainButton = document.getElementById('train-button');
   if (trainButton) {
     trainButton.addEventListener('click', function() {
-      debugLog("Train button clicked");
       // We wait for a bit after the train button is clicked before enabling clicking
       setTimeout(function() {
-        debugLog("Enabling clicking after train button press");
+        console.log("Enabling clicking after train button press");
         window.canClick = true;
       }, 2000); // 2 seconds should be enough time for the day transition
     });
   }
-  
-  // Initial state dump
-  setTimeout(dumpGameState, 1000);
-}
-
-/**
- * Monitor day display for changes
- */
-function monitorDayChanges() {
-  const dayElement = document.getElementById('day');
-  if (!dayElement) return;
-  
-  // Create a MutationObserver to watch for changes to the day display
-  const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-      const newDay = dayElement.textContent;
-      debugLog(`Day changed to ${newDay}`);
-      
-      if (newDay === '4') {
-        debugLog("Day 4 detected - special handling for briefcase change");
-        // Force canClick to be true on day 4
-        setTimeout(function() {
-          window.canClick = true;
-          debugLog("Forced canClick to true on day 4");
-          dumpGameState();
-        }, 1000);
-      }
-    });
-  });
-  
-  // Start observing the day element
-  observer.observe(dayElement, { childList: true });
 }
 
 /**
@@ -147,7 +90,7 @@ function createInitialCommuter() {
     }
   });
   
-  debugLog("Initial commuter created");
+  console.log("Initial commuter created");
 }
 
 /**
@@ -199,17 +142,8 @@ function showPopupMessage(text, x, y) {
 function isClickOnCurrentChange(element) {
   // No current change
   if (!window.currentChange) {
-    debugLog("No current change to find");
+    console.log("No current change to find");
     return false;
-  }
-  
-  // IMPORTANT: On day 4, we're looking for the missing briefcase specifically
-  const currentDay = document.getElementById('day')?.textContent;
-  if (currentDay === '4') {
-    debugLog("Day 4 special check: Assuming commuter-0 is the target with missing briefcase");
-    if (element.id === 'commuter-0') {
-      return true;
-    }
   }
   
   // Check if this commuter matches the current change
@@ -222,12 +156,12 @@ function isClickOnCurrentChange(element) {
   const matchesByIndex = commuterIndex === window.currentChange.commuterId;
   
   // Log detailed information about the match attempt
-  debugLog("Current change:", window.currentChange);
-  debugLog("Element ID:", element.id);
-  debugLog("Matches by ID:", matchesById);
-  debugLog("Matches by commuterId:", matchesByCommuterId);
-  debugLog("Commuter index from element:", commuterIndex);
-  debugLog("Matches by index:", matchesByIndex);
+  console.log("Current change:", window.currentChange);
+  console.log("Element ID:", element.id);
+  console.log("Matches by ID:", matchesById);
+  console.log("Matches by commuterId:", matchesByCommuterId);
+  console.log("Commuter index from element:", commuterIndex);
+  console.log("Matches by index:", matchesByIndex);
   
   // Return true if any of the matching conditions are met
   return matchesById || matchesByCommuterId || matchesByIndex;
@@ -237,63 +171,42 @@ function isClickOnCurrentChange(element) {
  * Handle clicks on the commuter
  */
 function handleCommuterClick(event) {
-  debugLog("Commuter clicked");
-  dumpGameState();
+  console.log("Commuter clicked");
+  console.log("canClick state:", window.canClick);
+  console.log("isTransitioning state:", window.isTransitioning);
+  console.log("Current day:", document.getElementById('day')?.textContent);
+  
+  // Force canClick to be true if we're on day 4 and there's a currentChange
+  if (document.getElementById('day')?.textContent === '4' && window.currentChange) {
+    console.log("Day 4 with change, forcing canClick to true");
+    window.canClick = true;
+  }
   
   // Get click coordinates
   const clickX = event.clientX;
   const clickY = event.clientY;
   
-  // SPECIAL HANDLING FOR DAY 4
-  const currentDay = document.getElementById('day')?.textContent;
-  if (currentDay === '4' && event.target.id === 'commuter-0') {
-    debugLog("Day 4 special case: commuter-0 clicked, treating as correct");
-    
-    // Show the appropriate popup
-    showPopupMessage("everyday the same", clickX, clickY);
-    
-    // Increase awareness
-    if (typeof window.increaseAwareness === 'function' && window.GAME_SETTINGS) {
-      window.increaseAwareness(window.GAME_SETTINGS.baseAwarenessGain);
-      debugLog("Awareness increased on day 4 special case");
-    }
-    
-    // Highlight the commuter
-    event.target.classList.add('highlight-pulse');
-    setTimeout(() => {
-      event.target.classList.remove('highlight-pulse');
-    }, 1500);
-    
-    // Mark any current change as found
-    if (window.currentChange) {
-      window.currentChange.found = true;
-    }
-    
-    return;
-  }
-  
-  // Regular flow for non-day-4
   // Make sure the game allows clicking
   if (typeof window.canClick === 'undefined' || !window.canClick) {
-    debugLog("Clicking not allowed right now");
+    console.log("Clicking not allowed right now");
     showPopupMessage("everyday the same", clickX, clickY);
     return;
   }
   
   if (window.isTransitioning) {
-    debugLog("Game is transitioning");
+    console.log("Game is transitioning");
     showPopupMessage("everyday the same", clickX, clickY);
     return;
   }
   
   // Check if this is the current change to find
   if (isClickOnCurrentChange(event.target)) {
-    debugLog("Correct commuter clicked!");
+    console.log("Correct commuter clicked!");
     
     // Increase awareness
     if (typeof window.increaseAwareness === 'function' && window.GAME_SETTINGS) {
       window.increaseAwareness(window.GAME_SETTINGS.baseAwarenessGain);
-      debugLog("Awareness increased");
+      console.log("Awareness increased");
     } else {
       console.error("increaseAwareness function or GAME_SETTINGS not available");
     }
@@ -304,13 +217,13 @@ function handleCommuterClick(event) {
     // Show thought bubble
     if (typeof window.showThoughtBubble === 'function') {
       window.showThoughtBubble();
-      debugLog("Showing thought bubble");
+      console.log("Showing thought bubble");
     }
     
     // Update narrative text
     if (typeof window.updateNarrativeText === 'function') {
       window.updateNarrativeText();
-      debugLog("Updating narrative text");
+      console.log("Updating narrative text");
     }
     
     // Mark change as found
@@ -322,13 +235,18 @@ function handleCommuterClick(event) {
       event.target.classList.remove('highlight-pulse');
     }, 1500);
     
-    debugLog("Change found and processed");
+    console.log("Change found and processed");
   } else {
     // Wrong commuter or no change to find
-    debugLog("Wrong commuter clicked or no change to find");
+    console.log("Wrong commuter clicked or no change to find");
     
     // Show the "everyday the same" popup
     showPopupMessage("everyday the same", clickX, clickY);
+    
+    // Show message
+    if (typeof window.showMessage === 'function') {
+      window.showMessage("I didn't notice anything different there", 1500);
+    }
   }
 }
 
@@ -336,7 +254,7 @@ function handleCommuterClick(event) {
  * Install custom game function handlers
  */
 function installGameHandlers() {
-  debugLog("Installing game handlers");
+  console.log("Installing game handlers");
   
   // Keep original functions as backup
   const originalCreateFirstChange = window.createFirstChange;
@@ -344,27 +262,11 @@ function installGameHandlers() {
   const originalHighlightMissedChange = window.highlightMissedChange;
   const originalSelectRandomChange = window.selectRandomChange;
   const originalHandleElementClick = window.handleElementClick;
-  const originalShowMessage = window.showMessage;
-  
-  // Override showMessage to not interfere with our click handling
-  window.showMessage = function(text, duration) {
-    debugLog("showMessage called with:", text);
-    // Only show "I didn't notice anything different there" if it's not day 4
-    const currentDay = document.getElementById('day')?.textContent;
-    if (currentDay === '4' && text === "I didn't notice anything different there") {
-      debugLog("Suppressing 'I didn't notice anything different there' message on day 4");
-      return;
-    }
-    
-    // Call original if it exists
-    if (typeof originalShowMessage === 'function') {
-      originalShowMessage(text, duration);
-    }
-  };
+  const originalProceedToNextDay = window.proceedToNextDay;
   
   // Override createFirstChange
   window.createFirstChange = function() {
-    debugLog("Creating first change: removing briefcase");
+    console.log("Creating first change: removing briefcase");
     
     // Create the change object
     const changeObject = {
@@ -376,8 +278,11 @@ function installGameHandlers() {
       found: false
     };
     
-    debugLog("First change created:", changeObject);
-    dumpGameState();
+    console.log("First change created:", changeObject);
+    
+    // Make sure canClick is set to true when we create a change
+    window.canClick = true;
+    console.log("Set canClick to true for day 4");
     
     return changeObject;
   };
@@ -385,7 +290,7 @@ function installGameHandlers() {
   // Override applyChange
   window.applyChange = function(change) {
     if (!change) return;
-    debugLog("Applying change:", change);
+    console.log("Applying change:", change);
     
     // Handle the briefcase change
     if (change.property === 'hasBriefcase' && change.value === false) {
@@ -395,7 +300,11 @@ function installGameHandlers() {
         commuter.element.style.backgroundImage = `url(${spriteBasePath}commuter1_nobriefcase.png)`;
         commuter.config.hasBriefcase = false;
         commuter.config.type = 1;
-        debugLog("Changed to no-briefcase sprite");
+        console.log("Changed to no-briefcase sprite");
+        
+        // Ensure canClick is true
+        window.canClick = true;
+        console.log("Set canClick to true after applying change");
       }
     }
     
@@ -422,24 +331,26 @@ function installGameHandlers() {
           hatElement.style.zIndex = '11';
           commuter.element.appendChild(hatElement);
           commuter.config.hasHat = true;
-          debugLog("Added hat to commuter");
+          console.log("Added hat to commuter");
         } 
         else if (change.value === false && hatExists) {
           // Remove the hat
           hatExists.remove();
           commuter.config.hasHat = false;
-          debugLog("Removed hat from commuter");
+          console.log("Removed hat from commuter");
         }
+        
+        // Ensure canClick is true
+        window.canClick = true;
+        console.log("Set canClick to true after applying change");
       }
     }
-    
-    dumpGameState();
   };
   
   // Override highlightMissedChange
   window.highlightMissedChange = function(change) {
     if (!change) return;
-    debugLog("Highlighting missed change:", change);
+    console.log("Highlighting missed change:", change);
     
     let element = null;
     
@@ -459,7 +370,7 @@ function installGameHandlers() {
       setTimeout(() => {
         element.classList.remove('highlight-pulse');
       }, 1500);
-      debugLog("Applied highlight to commuter");
+      console.log("Applied highlight to commuter");
     }
   };
   
@@ -469,7 +380,7 @@ function installGameHandlers() {
     const commuter = commuterSprites[0];
     if (!commuter) return null;
     
-    debugLog("Selecting random change");
+    console.log("Selecting random change");
     return {
       commuterId: 0,
       id: 'commuter-0',
@@ -483,7 +394,7 @@ function installGameHandlers() {
   // Override handleElementClick to do nothing (our click handler is directly on the element)
   window.handleElementClick = function(event) {
     // Do nothing specific here
-    debugLog("Global handleElementClick called");
+    console.log("Global handleElementClick called");
     
     // Call original if it exists
     if (typeof originalHandleElementClick === 'function') {
@@ -491,14 +402,33 @@ function installGameHandlers() {
     }
   };
   
-  debugLog("Game handlers installed");
+  // Also hook into proceedToNextDay to ensure canClick is true after day changes
+  if (typeof window.proceedToNextDay === 'function') {
+    window.originalProceedToNextDay = window.proceedToNextDay;
+    
+    window.proceedToNextDay = function() {
+      // Call the original function
+      window.originalProceedToNextDay();
+      
+      // After the day change, ensure canClick is set to true if we're on day 4
+      setTimeout(function() {
+        const currentDay = document.getElementById('day')?.textContent;
+        if (currentDay === '4') {
+          console.log("Day 4 detected, ensuring canClick is true");
+          window.canClick = true;
+        }
+      }, 1500);
+    };
+  }
+  
+  console.log("Game handlers installed");
 }
 
 // Fix sprite path if the default doesn't work
 setTimeout(function() {
   const sprite = document.querySelector('.commuter-sprite');
   if (sprite && (!sprite.style.backgroundImage || sprite.style.backgroundImage === '')) {
-    debugLog("Sprite background not loading, trying alternative paths");
+    console.log("Sprite background not loading, trying alternative paths");
     
     // Try different paths
     const paths = [
@@ -524,7 +454,7 @@ setTimeout(function() {
     
     function tryNextPath(index) {
       if (index >= paths.length) {
-        debugLog("All paths failed, using fallback");
+        console.log("All paths failed, using fallback");
         sprite.style.backgroundColor = '#3a6ea5';
         sprite.style.border = '2px solid #b8c8d8';
         return;
@@ -532,7 +462,7 @@ setTimeout(function() {
       
       testPath(paths[index], function(success, path) {
         if (success) {
-          debugLog("Found working path:", path);
+          console.log("Found working path:", path);
           spriteBasePath = path;
           sprite.style.backgroundImage = `url(${path}commuter1.png)`;
         } else {
@@ -545,10 +475,11 @@ setTimeout(function() {
   }
 }, 1000);
 
-// Periodically dump game state
+// Periodically force canClick true on day 4
 setInterval(function() {
   const currentDay = document.getElementById('day')?.textContent;
-  if (currentDay === '4') {
-    dumpGameState();
+  if (currentDay === '4' && window.currentChange && window.canClick === false) {
+    console.log("Forcing canClick to true on day 4");
+    window.canClick = true;
   }
-}, 5000);
+}, 1000);
