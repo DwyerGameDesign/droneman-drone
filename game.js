@@ -44,8 +44,14 @@ function init() {
     // Set initial narrative text
     typewriter.type("everyday the same...");
     
-    // Add train button listener
-    trainButton.addEventListener('click', takeTrain);
+    // Get the train button element with error handling
+    const trainButton = document.getElementById('train-button');
+    // Only add event listener if button exists
+    if (trainButton) {
+        trainButton.addEventListener('click', takeTrain);
+    } else {
+        console.log("Train button not found - continuing without it");
+    }
     
     // Apply initial color stage
     updateColorStage();
@@ -157,8 +163,11 @@ function takeTrain() {
     
     isTransitioning = true;
     
-    // Disable train button during transition
-    trainButton.disabled = true;
+    // Disable train button during transition (if it exists)
+    const trainButton = document.getElementById('train-button');
+    if (trainButton) {
+        trainButton.disabled = true;
+    }
     
     // Check if there's an unfound change to highlight
     if (currentChange && !currentChange.found) {
@@ -251,8 +260,11 @@ function proceedToNextDay() {
                 }, 100);
             }
             
-            // Re-enable train button
-            trainButton.disabled = false;
+            // Re-enable train button if it exists
+            const trainButton = document.getElementById('train-button');
+            if (trainButton) {
+                trainButton.disabled = false;
+            }
             
             isTransitioning = false; // Reset transition flag
         }, GAME_SETTINGS.fadeInDuration);

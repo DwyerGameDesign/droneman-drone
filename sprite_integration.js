@@ -565,3 +565,73 @@ setTimeout(function () {
         tryNextPath(0);
     }
 }, 1000);
+
+// Function to try multiple paths for loading the background image
+function fixTrainPlatformBackground() {
+    // Get the platform background element, or create it if it doesn't exist
+    let platformBackground = document.getElementById('platform-background');
+    if (!platformBackground) {
+        const sceneContainer = document.getElementById('scene-container');
+        if (!sceneContainer) {
+            console.error("Scene container not found");
+            return;
+        }
+        
+        platformBackground = document.createElement('div');
+        platformBackground.id = 'platform-background';
+        platformBackground.className = 'platform-background';
+        
+        // Apply styles
+        platformBackground.style.position = 'absolute';
+        platformBackground.style.top = '0';
+        platformBackground.style.left = '0';
+        platformBackground.style.width = '100%';
+        platformBackground.style.height = '100%';
+        platformBackground.style.zIndex = '1';
+        
+        // Insert at the beginning of the scene container
+        sceneContainer.insertBefore(platformBackground, sceneContainer.firstChild);
+    }
+    
+    // Try multiple paths to find the image
+    const paths = [
+        'assets/sprites/train_platform.png',
+        './assets/sprites/train_platform.png',
+        '../assets/sprites/train_platform.png',
+        '/assets/sprites/train_platform.png',
+        'sprites/train_platform.png',
+        './sprites/train_platform.png',
+        '../sprites/train_platform.png',
+        '/sprites/train_platform.png',
+        'train_platform.png'
+    ];
+    
+    // Function to try loading from each path
+    function tryNextPath(index) {
+        if (index >= paths.length) {
+            console.log("Couldn't find train_platform.png - using fallback");
+            platformBackground.style.backgroundColor = '#2a2a2a';
+            hideOriginalStationElements();
+            return;
+        }
+        
+        const img = new Image();
+        img.onload = function() {
+            console.log("Found train platform image at:", paths[index]);
+            platformBackground.style.backgroundImage = `url(${paths[index]})`;
+            hideOriginalStationElements();
+        };
+        
+        img.onerror = function() {
+            tryNextPath(index + 1);
+        };
+        
+        img.src = paths[index];
+    }
+    
+    // Start trying paths
+    tryNextPath(0);
+}
+
+// Call this function after a delay to ensure the DOM is fully loaded
+setTimeout(fixTrainPlatformBackground, 1000);
