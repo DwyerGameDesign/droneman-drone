@@ -84,10 +84,9 @@ h1 {
 /* Game Scene */
 .scene-container {
     position: relative;
-    width: 800px; /* Fixed width */
-    height: 400px; /* Fixed height */
-    min-height: 400px; /* Minimum height to prevent shrinking */
-    background-color: #2a2a2a;
+    width: 800px;
+    height: 400px;
+    min-height: 400px;
     margin: 20px 0;
     border: 3px solid #3a3a3a;
     overflow: hidden;
@@ -344,16 +343,16 @@ h1 {
 }
 
 /* Color stages */
-.stage-1 { background-color: #2a2a2a; }
-.stage-2 { background-color: #2e2e39; }
-.stage-3 { background-color: #323248; }
-.stage-4 { background-color: #363658; }
-.stage-5 { background-color: #3a3a67; }
-.stage-6 { background-color: #3e3e76; }
-.stage-7 { background-color: #424285; }
-.stage-8 { background-color: #464694; }
-.stage-9 { background-color: #4a4aa3; }
-.stage-10 { background-color: #4e4eb2; }
+.stage-1 { background-color: rgba(42, 42, 42, 0.3); }
+.stage-2 { background-color: rgba(46, 46, 57, 0.3); }
+.stage-3 { background-color: rgba(50, 50, 72, 0.3); }
+.stage-4 { background-color: rgba(54, 54, 88, 0.3); }
+.stage-5 { background-color: rgba(58, 58, 103, 0.3); }
+.stage-6 { background-color: rgba(62, 62, 118, 0.3); }
+.stage-7 { background-color: rgba(66, 66, 133, 0.3); }
+.stage-8 { background-color: rgba(70, 70, 148, 0.3); }
+.stage-9 { background-color: rgba(74, 74, 163, 0.3); }
+.stage-10 { background-color: rgba(78, 78, 178, 0.3); }
 
 /* Mobile adjustments */
 @media (max-width: 600px) {
@@ -427,8 +426,6 @@ h1 {
     border: 2px solid #ccc !important;
 }
 
-/* Add these styles to your styles.css file */
-
 /* Platform background using the sprite */
 .platform-background {
     position: absolute;
@@ -441,6 +438,7 @@ h1 {
     background-position: center;
     background-repeat: no-repeat;
     z-index: 1;
+    pointer-events: none; /* Ensure clicks pass through to elements above */
 }
 
 /* Adjust element positions if needed */
@@ -456,14 +454,12 @@ h1 {
     z-index: 15; /* Adjust pillar z-index as needed */
 }
 
-/* Modify color stages to work with the background image */
-.stage-1 { background-color: rgba(42, 42, 42, 0.3); }
-.stage-2 { background-color: rgba(46, 46, 57, 0.3); }
-.stage-3 { background-color: rgba(50, 50, 72, 0.3); }
-.stage-4 { background-color: rgba(54, 54, 88, 0.3); }
-.stage-5 { background-color: rgba(58, 58, 103, 0.3); }
-.stage-6 { background-color: rgba(62, 62, 118, 0.3); }
-.stage-7 { background-color: rgba(66, 66, 133, 0.3); }
-.stage-8 { background-color: rgba(70, 70, 148, 0.3); }
-.stage-9 { background-color: rgba(74, 74, 163, 0.3); }
-.stage-10 { background-color: rgba(78, 78, 178, 0.3); }
+/* Hide original station elements when using the platform background */
+.ceiling,
+.station-background,
+.window,
+.platform,
+.platform-edge,
+.train {
+    display: none;
+}

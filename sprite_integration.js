@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', function () {
 function initializeSprites() {
     console.log("Initializing simplified sprite system");
 
+    // Set up the train platform background first
+    initializeTrainPlatformBackground();
+
     // Set up the first commuter sprite (with briefcase)
     createInitialCommuter();
 
@@ -431,11 +434,8 @@ function installGameHandlers() {
 }
 
 /**
- * Modification to integrate train_platform.png into the scene
- * Add this code to sprite_integration.js or create a new file
+ * Function to add the train platform background
  */
-
-// Function to add the train platform background
 function initializeTrainPlatformBackground() {
     // Get the scene container
     const sceneContainer = document.getElementById('scene-container');
