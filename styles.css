@@ -211,10 +211,19 @@ h1 {
 
 /* Commuter sprite styling */
 .commuter-sprite {
-    position: absolute;
-    cursor: pointer;
+    display: block !important;
+    width: 36px !important;
+    height: 85px !important;
+    bottom: 80px !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: bottom center !important;
     z-index: 10;
-    transition: transform 0.3s ease;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 /* Accessories styling */
@@ -326,19 +335,19 @@ h1 {
 @keyframes commuter-pulse {
     0% { 
         box-shadow: 0 0 0 0 rgba(233, 203, 95, 0.7);
-        transform: scale(1);
+        transform: scale(1) translateX(-50%);
     }
     30% { 
         box-shadow: 0 0 0 15px rgba(233, 203, 95, 0);
-        transform: scale(1.05);
+        transform: scale(1.05) translateX(-50%);
     }
     60% { 
         box-shadow: 0 0 0 0 rgba(233, 203, 95, 0.7);
-        transform: scale(1);
+        transform: scale(1) translateX(-50%);
     }
     100% { 
         box-shadow: 0 0 0 0 rgba(233, 203, 95, 0);
-        transform: scale(1);
+        transform: scale(1) translateX(-50%);
     }
 }
 
@@ -406,18 +415,6 @@ h1 {
     border-radius: 50%;
     color: white;
     font-size: 14px;
-}
-
-/* Fix for commuter sprites */
-.commuter-sprite {
-    display: block !important;
-    width: 36px !important;
-    height: 85px !important;
-    bottom: 80px !important; /* Adjusted from 120px to 80px to lower the commuter */
-    background-size: contain !important;
-    background-repeat: no-repeat !important;
-    background-position: bottom center !important;
-    z-index: 10; /* Ensure commuters appear above the background */
 }
 
 /* Backup style for commuter if image doesn't load */
