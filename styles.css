@@ -413,10 +413,11 @@ h1 {
     display: block !important;
     width: 36px !important;
     height: 85px !important;
-    bottom: 120px !important;
+    bottom: 80px !important; /* Adjusted from 120px to 80px to lower the commuter */
     background-size: contain !important;
     background-repeat: no-repeat !important;
     background-position: bottom center !important;
+    z-index: 10; /* Ensure commuters appear above the background */
 }
 
 /* Backup style for commuter if image doesn't load */
@@ -441,25 +442,17 @@ h1 {
     pointer-events: none; /* Ensure clicks pass through to elements above */
 }
 
-/* Adjust element positions if needed */
-.commuter-sprite {
-    z-index: 10; /* Ensure commuters appear above the background */
-}
-
-.sign {
-    z-index: 20; /* Ensure the sign appears above the background */
-}
-
-.pillar {
-    z-index: 15; /* Adjust pillar z-index as needed */
-}
-
 /* Hide original station elements when using the platform background */
 .ceiling,
 .station-background,
 .window,
 .platform,
 .platform-edge,
-.train {
+.train,
+.sign,
+.pillar,
+.pillar-1,
+.pillar-2,
+.pillar-3 {
     display: none;
 }

@@ -44,6 +44,12 @@ function init() {
     // Set initial narrative text
     typewriter.type("everyday the same...");
     
+    // Set up train button
+    const trainButton = document.getElementById('train-button');
+    if (trainButton) {
+        trainButton.addEventListener('click', takeTrain);
+    }
+    
     // Apply initial color stage
     updateColorStage();
 }
