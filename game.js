@@ -199,7 +199,7 @@ function proceedToNextDay() {
         if (day === 4) {
             // Use the predefined first change for day 4
             currentChange = createFirstChange();
-            console.log("Day 4: Setting current change:", currentChange);
+            currentChange.found = false;
             
             // Add the current change to the history of all changes
             allChanges.push(currentChange);
@@ -209,7 +209,6 @@ function proceedToNextDay() {
             
             // Enable clicking since there's something to find
             canClick = true;
-            console.log("Day 4: Enabled clicking");
         } else if (day > 4) {
             // Generate random changes after the first one
             currentChange = selectRandomChange();
