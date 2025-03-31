@@ -408,3 +408,14 @@ h1 {
     color: white;
     font-size: 14px;
 }
+
+.commuter-sprite {
+    display: block !important;
+    position: absolute !important;
+    width: 36px !important; 
+    height: 85px !important;
+    z-index: 10 !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: bottom center !important;
+}

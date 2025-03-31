@@ -333,3 +333,213 @@ document.addEventListener('DOMContentLoaded', function () {
         initializeSpriteSystem();
     }, 500);
 });
+
+// Direct fix for sprite display issues - add to end of sprite_integration.js
+
+// Run this fix after a short delay to ensure DOM is ready
+setTimeout(function() {
+    console.log("Running sprite display fix...");
+    
+    // Check if commuters are visible
+    const sprites = document.querySelectorAll('.commuter-sprite');
+    if (sprites.length === 0) {
+        console.log("No commuter sprites found, reinitializing sprite system");
+        initializeSpriteSystem();
+    } else {
+        console.log("Found " + sprites.length + " commuter sprites");
+        
+        // Check if sprites have background images
+        let needsFixing = false;
+        sprites.forEach(function(sprite) {
+            if (!sprite.style.backgroundImage || sprite.style.backgroundImage === '') {
+                needsFixing = true;
+            }
+        });
+        
+        if (needsFixing) {
+            console.log("Sprites found but need fixing");
+            fixSpriteBackgrounds();
+        }
+    }
+}, 1000);
+
+// Function to fix sprite backgrounds
+function fixSpriteBackgrounds() {
+    // Get all commuter sprites
+    const sprites = document.querySelectorAll('.commuter-sprite');
+    
+    // Try each path until one works
+    const possiblePaths = [
+        'assets/sprites/',
+        'sprites/',
+        './sprites/',
+        './assets/sprites/',
+        '../sprites/',
+        '../assets/sprites/',
+        '/'
+    ];
+    
+    // Test which path works
+    function testPaths(callback) {
+        let workingPath = null;
+        let testedCount = 0;
+        
+        possiblePaths.forEach(function(path) {
+            const img = new Image();
+            img.onload = function() {
+                if (!workingPath) {
+                    workingPath = path;
+                    console.log("Found working path: " + path);
+                    callback(path);
+                }
+            };
+            img.onerror = function() {
+                testedCount++;
+                if (testedCount === possiblePaths.length && !workingPath) {
+                    // No paths worked, use fallback
+                    callback(null);
+                }
+            };
+            img.src = path + 'commuter1.png';
+        });
+    }
+    
+    // Apply the working path to all sprites
+    testPaths(function(path) {
+        if (path) {
+            // Update sprite system path
+            if (spriteSystem) {
+                spriteSystem.options.spritesPath = path;
+            }
+            
+            // Fix each sprite
+            sprites.forEach(function(sprite, index) {
+                // Get commuter data
+                const commuterData = commuterSprites[index];
+                if (!commuterData) return;
+                
+                // Get commuter type
+                const commuterType = commuterData.config.type || 0;
+                const filename = 'commuter' + (commuterType + 1) + '.png';
+                
+                // Apply background image
+                sprite.style.backgroundImage = 'url(' + path + filename + ')';
+                sprite.style.backgroundSize = 'contain';
+                sprite.style.backgroundRepeat = 'no-repeat';
+                sprite.style.backgroundPosition = 'bottom center';
+                
+                // Make sure it's visible
+                sprite.style.width = '36px';
+                sprite.style.height = '85px';
+                sprite.style.display = 'block';
+                
+                // Update accessories if needed
+                if (commuterData.config.hasHat) {
+                    const hatElement = sprite.querySelector('.commuter-hat') || document.createElement('div');
+                    hatElement.className = 'commuter-hat';
+                    hatElement.style.position = 'absolute';
+                    hatElement.style.top = '0';
+                    hatElement.style.left = '0';
+                    hatElement.style.width = '100%';
+                    hatElement.style.height = '30%';
+                    hatElement.style.backgroundImage = 'url(' + path + 'hat.png)';
+                    hatElement.style.backgroundSize = 'contain';
+                    hatElement.style.backgroundRepeat = 'no-repeat';
+                    hatElement.style.backgroundPosition = 'top center';
+                    hatElement.style.zIndex = '11';
+                    if (!sprite.contains(hatElement)) {
+                        sprite.appendChild(hatElement);
+                    }
+                }
+                
+                if (commuterData.config.hasBriefcase) {
+                    const briefcaseElement = sprite.querySelector('.commuter-briefcase') || document.createElement('div');
+                    briefcaseElement.className = 'commuter-briefcase';
+                    briefcaseElement.style.position = 'absolute';
+                    briefcaseElement.style.bottom = '30%';
+                    briefcaseElement.style.left = commuterData.config.facingLeft ? '60%' : '-20%';
+                    briefcaseElement.style.width = '40%';
+                    briefcaseElement.style.height = '20%';
+                    briefcaseElement.style.backgroundImage = 'url(' + path + 'briefcase.png)';
+                    briefcaseElement.style.backgroundSize = 'contain';
+                    briefcaseElement.style.backgroundRepeat = 'no-repeat';
+                    briefcaseElement.style.zIndex = '9';
+                    if (!sprite.contains(briefcaseElement)) {
+                        sprite.appendChild(briefcaseElement);
+                    }
+                }
+            });
+            
+            console.log("Sprites fixed with path: " + path);
+        } else {
+            // Create fallback colored sprites
+            sprites.forEach(function(sprite) {
+                sprite.style.backgroundColor = '#3a6ea5';
+                sprite.style.border = '2px solid #b8c8d8';
+                sprite.style.width = '36px';
+                sprite.style.height = '85px';
+                sprite.style.display = 'block';
+            });
+            console.log("No working paths found, using colored fallback sprites");
+        }
+    });
+}
+
+// If there are zero commuters after the game starts, create one
+setTimeout(function() {
+    const sprites = document.querySelectorAll('.commuter-sprite');
+    if (sprites.length === 0) {
+        console.log("No sprites found after delay, forcing commuter creation");
+        
+        // Force create a commuter
+        const sceneContainer = document.getElementById('scene-container');
+        if (sceneContainer) {
+            // Create a simple visible commuter
+            const commuter = document.createElement('div');
+            commuter.className = 'commuter-sprite';
+            commuter.id = 'commuter-0';
+            commuter.style.position = 'absolute';
+            commuter.style.left = '50%';
+            commuter.style.bottom = '120px';
+            commuter.style.transform = 'translateX(-50%)';
+            commuter.style.width = '36px';
+            commuter.style.height = '85px';
+            commuter.style.backgroundColor = '#3a6ea5';
+            commuter.style.border = '2px solid #b8c8d8';
+            commuter.style.zIndex = '10';
+            commuter.style.cursor = 'pointer';
+            
+            // Make it clickable
+            commuter.addEventListener('click', function(event) {
+                if (typeof handleElementClick === 'function') {
+                    handleElementClick(event);
+                }
+            });
+            
+            sceneContainer.appendChild(commuter);
+            
+            // Initialize game variables
+            if (typeof window.commuterSprites === 'undefined') {
+                window.commuterSprites = [];
+            }
+            
+            // Add to commuter sprites array
+            window.commuterSprites.push({
+                id: 'commuter-0',
+                element: commuter,
+                config: {
+                    id: 'commuter-0',
+                    x: sceneContainer.offsetWidth / 2,
+                    y: 0,
+                    type: 0,
+                    variant: 'default',
+                    facingLeft: false,
+                    hasHat: false,
+                    hasBriefcase: false
+                }
+            });
+            
+            console.log("Emergency commuter created");
+        }
+    }
+}, 2000);
