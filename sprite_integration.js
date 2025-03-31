@@ -1,6 +1,7 @@
 /**
  * Drone: The Daily Commute
- * Sprite System Integration with Game Logic - Updated for New Sprite Dimensions
+ * Sprite System Integration with Game Logic
+ * Fixed for better positioning and alignment
  */
 
 // Global variables for sprite system
@@ -16,7 +17,7 @@ function initializeSpriteSystem() {
     spriteSystem = new CommuterSpriteSystem({
         spritesPath: 'assets/sprites/', // Path to the folder containing sprite images
         container: document.getElementById('scene-container'),
-        spriteScale: 0.25 // Scale down the larger sprites
+        spriteScale: 0.18 // Reduced scale to make commuter smaller
     });
 
     // Remove existing commuter elements
@@ -56,7 +57,9 @@ function createInitialCommuter() {
     // Calculate position - center of the platform
     const sceneContainer = document.getElementById('scene-container');
     const platformWidth = sceneContainer.offsetWidth;
-    const platformY = 120; // Bottom position
+
+    // Use a fixed y-position - commuter will stand directly on platform
+    const platformY = 0; // Bottom position is adjusted in the sprite system
 
     // Create first commuter at center (50%)
     const commuterX = platformWidth * (COMMUTER_ADDITION.positions[0] / 100);
@@ -128,7 +131,7 @@ function createNewCommuter(positionIndex) {
     // Calculate position
     const sceneContainer = document.getElementById('scene-container');
     const platformWidth = sceneContainer.offsetWidth;
-    const platformY = 120; // Bottom position
+    const platformY = 0; // Bottom position - will stand on platform
 
     // Get position from config or default to random position
     const position = COMMUTER_ADDITION.positions[positionIndex] || (Math.random() * 80 + 10);

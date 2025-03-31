@@ -1,7 +1,7 @@
 /**
  * Drone: The Daily Commute
  * Sprite System using colorization of single component images
- * Updated for larger sprite dimensions
+ * Fixed for better positioning and alignment
  */
 
 class CommuterSpriteSystem {
@@ -10,7 +10,7 @@ class CommuterSpriteSystem {
         this.options = {
             spritesPath: 'assets/sprites/', // Path to the sprites directory
             container: document.getElementById('scene-container'),
-            spriteScale: 0.25, // Scale of sprites (multiplier) - adjusted for larger sprites
+            spriteScale: 0.18, // Reduced scale to make commuter smaller
             ...options
         };
         
@@ -24,7 +24,7 @@ class CommuterSpriteSystem {
             shirt: 'shirt.png',
             pants: 'pants.png',
             briefcase: 'briefcase.png',
-            shoes: 'shoes.png' // Changed from shoe to shoes to match your note
+            shoes: 'shoes.png'
         };
         
         // Store original sprite dimensions for proper scaling
@@ -58,7 +58,7 @@ class CommuterSpriteSystem {
         const defaultOptions = {
             id: `commuter-${this.commuters.length}`,
             x: 0,
-            y: 0,
+            y: 0, // This will be adjusted to place commuter on platform
             parts: {
                 hat: { 
                     visible: Math.random() > 0.3,
@@ -101,7 +101,11 @@ class CommuterSpriteSystem {
         commuterElement.className = 'commuter-sprite';
         commuterElement.style.position = 'absolute';
         commuterElement.style.left = `${config.x}px`;
-        commuterElement.style.bottom = `${config.y}px`;
+        
+        // Bottom positioning - adjust to make commuter stand on platform
+        const shoesHeight = this.spriteDimensions.shoes.height * scale;
+        commuterElement.style.bottom = `${config.y + shoesHeight/2}px`;
+        
         commuterElement.style.width = `${containerWidth}px`;
         commuterElement.style.height = `${containerHeight}px`;
         commuterElement.style.transform = config.facingLeft ? 'scaleX(-1)' : '';
@@ -184,6 +188,7 @@ class CommuterSpriteSystem {
         const headHeight = this.spriteDimensions.head.height * scale;
         const bodyHeight = this.spriteDimensions.body.height * scale;
         const bodyWidth = this.spriteDimensions.body.width * scale;
+        const pantsHeight = this.spriteDimensions.pants.height * scale;
         
         switch (partName) {
             case 'hat':
@@ -204,14 +209,14 @@ class CommuterSpriteSystem {
                 
             case 'body':
                 // Position body below head
-                partElement.style.top = `${headHeight * 0.8}px`; // Slight overlap with head
+                partElement.style.top = `${headHeight * 0.9}px`; // Slight overlap with head
                 partElement.style.left = '0px';
                 partElement.style.zIndex = '3';
                 break;
                 
             case 'shirt':
                 // Position shirt on top of body (chest area)
-                partElement.style.top = `${headHeight * 0.9}px`; // Slightly higher than coat start
+                partElement.style.top = `${headHeight * 0.95}px`; // Slightly higher than coat start
                 // Center shirt horizontally
                 partElement.style.left = `${(bodyWidth - scaledWidth) / 2}px`;
                 partElement.style.zIndex = '2';
@@ -219,7 +224,7 @@ class CommuterSpriteSystem {
                 
             case 'pants':
                 // Position pants below body
-                partElement.style.top = `${headHeight * 0.8 + bodyHeight * 0.7}px`;
+                partElement.style.top = `${headHeight * 0.9 + bodyHeight * 0.85}px`;
                 // Center pants horizontally
                 partElement.style.left = `${(bodyWidth - scaledWidth) / 2}px`;
                 partElement.style.zIndex = '1';
@@ -233,9 +238,9 @@ class CommuterSpriteSystem {
                 break;
                 
             case 'shoes':
-                // Position shoes at the bottom
-                partElement.style.top = `${headHeight * 0.8 + bodyHeight * 0.7 + this.spriteDimensions.pants.height * scale * 0.9}px`;
-                // Center shoes horizontally
+                // Position shoes at the bottom of pants
+                partElement.style.top = `${headHeight * 0.9 + bodyHeight * 0.85 + pantsHeight * 0.98}px`;
+                // Align shoes with pants (left-aligned)
                 partElement.style.left = `${(bodyWidth - scaledWidth) / 2}px`;
                 partElement.style.zIndex = '0';
                 break;
@@ -345,7 +350,10 @@ class CommuterSpriteSystem {
         }
         
         if ('y' in options) {
-            commuter.element.style.bottom = `${options.y}px`;
+            // Bottom positioning - adjust to make commuter stand on platform
+            const scale = this.options.spriteScale;
+            const shoesHeight = this.spriteDimensions.shoes.height * scale;
+            commuter.element.style.bottom = `${options.y + shoesHeight/2}px`;
             commuter.config.y = options.y;
         }
         
