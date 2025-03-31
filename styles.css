@@ -409,13 +409,20 @@ h1 {
     font-size: 14px;
 }
 
+/* Fix for commuter sprites */
 .commuter-sprite {
     display: block !important;
-    position: absolute !important;
-    width: 36px !important; 
+    width: 36px !important;
     height: 85px !important;
-    z-index: 10 !important;
+    bottom: 120px !important;
     background-size: contain !important;
     background-repeat: no-repeat !important;
     background-position: bottom center !important;
+}
+
+/* Backup style for commuter if image doesn't load */
+.commuter-sprite:not([style*="background-image"]), 
+.commuter-sprite[style*="background-image: url()"] {
+    background-color: #3a6ea5 !important;
+    border: 2px solid #ccc !important;
 }
