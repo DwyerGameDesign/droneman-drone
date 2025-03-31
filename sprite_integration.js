@@ -23,6 +23,18 @@ function initializeSprites() {
   
   // Install custom game function handlers
   installGameHandlers();
+  
+  // Add a listener for the train button to reset canClick
+  const trainButton = document.getElementById('train-button');
+  if (trainButton) {
+    trainButton.addEventListener('click', function() {
+      // We wait for a bit after the train button is clicked before enabling clicking
+      setTimeout(function() {
+        console.log("Enabling clicking after train button press");
+        window.canClick = true;
+      }, 2000); // 2 seconds should be enough time for the day transition
+    });
+  }
 }
 
 /**
@@ -160,6 +172,15 @@ function isClickOnCurrentChange(element) {
  */
 function handleCommuterClick(event) {
   console.log("Commuter clicked");
+  console.log("canClick state:", window.canClick);
+  console.log("isTransitioning state:", window.isTransitioning);
+  console.log("Current day:", document.getElementById('day')?.textContent);
+  
+  // Force canClick to be true if we're on day 4 and there's a currentChange
+  if (document.getElementById('day')?.textContent === '4' && window.currentChange) {
+    console.log("Day 4 with change, forcing canClick to true");
+    window.canClick = true;
+  }
   
   // Get click coordinates
   const clickX = event.clientX;
@@ -241,6 +262,7 @@ function installGameHandlers() {
   const originalHighlightMissedChange = window.highlightMissedChange;
   const originalSelectRandomChange = window.selectRandomChange;
   const originalHandleElementClick = window.handleElementClick;
+  const originalProceedToNextDay = window.proceedToNextDay;
   
   // Override createFirstChange
   window.createFirstChange = function() {
@@ -257,6 +279,11 @@ function installGameHandlers() {
     };
     
     console.log("First change created:", changeObject);
+    
+    // Make sure canClick is set to true when we create a change
+    window.canClick = true;
+    console.log("Set canClick to true for day 4");
+    
     return changeObject;
   };
   
@@ -274,6 +301,10 @@ function installGameHandlers() {
         commuter.config.hasBriefcase = false;
         commuter.config.type = 1;
         console.log("Changed to no-briefcase sprite");
+        
+        // Ensure canClick is true
+        window.canClick = true;
+        console.log("Set canClick to true after applying change");
       }
     }
     
@@ -308,6 +339,10 @@ function installGameHandlers() {
           commuter.config.hasHat = false;
           console.log("Removed hat from commuter");
         }
+        
+        // Ensure canClick is true
+        window.canClick = true;
+        console.log("Set canClick to true after applying change");
       }
     }
   };
@@ -367,6 +402,25 @@ function installGameHandlers() {
     }
   };
   
+  // Also hook into proceedToNextDay to ensure canClick is true after day changes
+  if (typeof window.proceedToNextDay === 'function') {
+    window.originalProceedToNextDay = window.proceedToNextDay;
+    
+    window.proceedToNextDay = function() {
+      // Call the original function
+      window.originalProceedToNextDay();
+      
+      // After the day change, ensure canClick is set to true if we're on day 4
+      setTimeout(function() {
+        const currentDay = document.getElementById('day')?.textContent;
+        if (currentDay === '4') {
+          console.log("Day 4 detected, ensuring canClick is true");
+          window.canClick = true;
+        }
+      }, 1500);
+    };
+  }
+  
   console.log("Game handlers installed");
 }
 
@@ -418,5 +472,14 @@ setTimeout(function() {
     }
     
     tryNextPath(0);
+  }
+}, 1000);
+
+// Periodically force canClick true on day 4
+setInterval(function() {
+  const currentDay = document.getElementById('day')?.textContent;
+  if (currentDay === '4' && window.currentChange && window.canClick === false) {
+    console.log("Forcing canClick to true on day 4");
+    window.canClick = true;
   }
 }, 1000);
