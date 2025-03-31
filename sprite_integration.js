@@ -1,6 +1,6 @@
 /**
  * Drone: The Daily Commute
- * Single Commuter Sprite System
+ * Single Commuter Sprite System - Updated for briefcase change
  * Uses full commuter sprites instead of composing from individual parts
  */
 
@@ -20,6 +20,7 @@ class CommuterSpriteSystem {
         // Define commuter types - each corresponds to a different sprite image
         this.commuterTypes = [
             { id: 'commuter1', filename: 'commuter1.png' },
+            { id: 'commuter1_nobriefcase', filename: 'commuter1_nobriefcase.png' }, // New sprite without briefcase
             { id: 'commuter2', filename: 'commuter2.png' },
             { id: 'commuter3', filename: 'commuter3.png' },
             { id: 'commuter4', filename: 'commuter4.png' },
@@ -49,12 +50,18 @@ class CommuterSpriteSystem {
             id: `commuter-${this.commuters.length}`,
             x: 0,
             y: 0, // This will be adjusted to place commuter on platform
-            type: Math.floor(Math.random() * this.commuterTypes.length), // Random commuter type
+            type: Math.floor(Math.random() * (this.commuterTypes.length - 1)) + 1, // Random type, but not commuter1_nobriefcase (index 1)
             variant: 'default',
             facingLeft: Math.random() > 0.5,
-            hasHat: false, // Will be toggled on later as the first change
+            hasHat: false, // Will be toggled on later as a change
             hasBriefcase: Math.random() > 0.5
         };
+
+        // For the first commuter, ensure it's commuter1 with a briefcase
+        if (this.commuters.length === 0) {
+            defaultOptions.type = 0; // commuter1
+            defaultOptions.hasBriefcase = true; // Has briefcase (visualized in the sprite itself)
+        }
 
         // Merge with provided options
         const config = this._mergeDeep(defaultOptions, options);
@@ -88,7 +95,7 @@ class CommuterSpriteSystem {
         // Add data-debug attribute to help with troubleshooting
         commuterElement.setAttribute('data-debug', `type=${config.type}, path=${imagePath}`);
 
-        // Create accessory elements (hat, briefcase) if needed
+        // Create accessory elements (hat) if needed
         if (config.hasHat) {
             const hatElement = document.createElement('div');
             hatElement.className = 'commuter-hat';
@@ -105,20 +112,7 @@ class CommuterSpriteSystem {
             commuterElement.appendChild(hatElement);
         }
 
-        if (config.hasBriefcase) {
-            const briefcaseElement = document.createElement('div');
-            briefcaseElement.className = 'commuter-briefcase';
-            briefcaseElement.style.position = 'absolute';
-            briefcaseElement.style.bottom = '30%';
-            briefcaseElement.style.left = config.facingLeft ? '60%' : '-20%';
-            briefcaseElement.style.width = '40%';
-            briefcaseElement.style.height = '20%';
-            briefcaseElement.style.backgroundImage = `url(${this.options.spritesPath}briefcase.png)`;
-            briefcaseElement.style.backgroundSize = 'contain';
-            briefcaseElement.style.backgroundRepeat = 'no-repeat';
-            briefcaseElement.style.zIndex = '9';
-            commuterElement.appendChild(briefcaseElement);
-        }
+        // We don't need to add a briefcase element for the first commuter since it's already in the sprite
 
         // Add to container
         if (this.options.container) {
@@ -180,29 +174,17 @@ class CommuterSpriteSystem {
             commuter.config.hasHat = options.hasHat;
         }
 
-        // Update briefcase visibility
+        // Update briefcase (now handled by changing the sprite type)
         if ('hasBriefcase' in options) {
-            const briefcaseElement = commuter.element.querySelector('.commuter-briefcase');
-
-            if (options.hasBriefcase && !briefcaseElement) {
-                // Add briefcase if it doesn't exist
-                const newBriefcaseElement = document.createElement('div');
-                newBriefcaseElement.className = 'commuter-briefcase';
-                newBriefcaseElement.style.position = 'absolute';
-                newBriefcaseElement.style.bottom = '30%';
-                newBriefcaseElement.style.left = commuter.config.facingLeft ? '60%' : '-20%';
-                newBriefcaseElement.style.width = '40%';
-                newBriefcaseElement.style.height = '20%';
-                newBriefcaseElement.style.backgroundImage = `url(${this.options.spritesPath}briefcase.png)`;
-                newBriefcaseElement.style.backgroundSize = 'contain';
-                newBriefcaseElement.style.backgroundRepeat = 'no-repeat';
-                newBriefcaseElement.style.zIndex = '9';
-                commuter.element.appendChild(newBriefcaseElement);
-            } else if (!options.hasBriefcase && briefcaseElement) {
-                // Remove briefcase
-                briefcaseElement.remove();
+            // For commuter1, switch between commuter1 (with briefcase) and commuter1_nobriefcase
+            if (commuter.config.type === 0 || commuter.config.type === 1) {
+                const newType = options.hasBriefcase ? 0 : 1;
+                const commuterType = this.commuterTypes[newType];
+                const imagePath = `${this.options.spritesPath}${commuterType.filename}`;
+                commuter.element.style.backgroundImage = `url(${imagePath})`;
+                commuter.config.type = newType;
             }
-
+            
             commuter.config.hasBriefcase = options.hasBriefcase;
         }
 
@@ -220,13 +202,6 @@ class CommuterSpriteSystem {
         // Update direction
         if ('facingLeft' in options) {
             commuter.element.style.transform = options.facingLeft ? 'scaleX(-1)' : '';
-
-            // Update briefcase position if it exists
-            const briefcaseElement = commuter.element.querySelector('.commuter-briefcase');
-            if (briefcaseElement) {
-                briefcaseElement.style.left = options.facingLeft ? '60%' : '-20%';
-            }
-
             commuter.config.facingLeft = options.facingLeft;
         }
 
@@ -353,15 +328,15 @@ function createInitialCommuter() {
     // Create first commuter at center (50%)
     const commuterX = platformWidth * (COMMUTER_ADDITION.positions[0] / 100);
 
-    // Random commuter type but no hat (hat will be the first change)
+    // Create commuter1 with briefcase
     const commuter = spriteSystem.createCommuter({
         id: `commuter-0`,
         x: commuterX,
         y: platformY,
-        type: Math.floor(Math.random() * 5), // Random commuter type
+        type: 0, // commuter1 (with briefcase)
         facingLeft: Math.random() > 0.5,
-        hasHat: false, // No hat initially (will be added on day 4)
-        hasBriefcase: Math.random() > 0.5
+        hasHat: false, // No hat initially
+        hasBriefcase: true // Has briefcase
     });
 
     // Make commuter clickable for game interaction
@@ -393,12 +368,12 @@ function createNewCommuter(positionIndex) {
     const position = COMMUTER_ADDITION.positions[positionIndex] || (Math.random() * 80 + 10);
     const commuterX = platformWidth * (position / 100);
 
-    // Create commuter with random attributes
+    // Create commuter with random attributes (but not commuter1 or commuter1_nobriefcase)
     const commuter = spriteSystem.createCommuter({
         id: `commuter-${commuterSprites.length}`,
         x: commuterX,
         y: platformY,
-        type: Math.floor(Math.random() * 5), // Random commuter type
+        type: Math.floor(Math.random() * 4) + 2, // Random type from 2-5 (avoiding commuter1 variations)
         facingLeft: Math.random() > 0.5,
         hasHat: Math.random() > 0.3, // Some have hats, some don't
         hasBriefcase: Math.random() > 0.5
@@ -475,7 +450,7 @@ function highlightCommuter(element) {
 }
 
 /**
- * Create the first change (adding a hat on day 4)
+ * Create the first change (removing briefcase on day 4)
  */
 function createFirstChange() {
     if (commuterSprites.length === 0) return null;
@@ -484,12 +459,12 @@ function createFirstChange() {
     const firstCommuter = commuterSprites[0];
     const commuterId = getCommuterIndex(firstCommuter.id);
 
-    // Create a change object - first change is adding a hat
+    // Create a change object - first change is removing the briefcase
     return {
         commuterId: commuterId,
-        type: 'hat',
-        property: 'hasHat',
-        value: true,
+        type: 'briefcase',
+        property: 'hasBriefcase',
+        value: false, // Remove the briefcase
         found: false
     };
 }
@@ -522,10 +497,10 @@ function selectRandomChange() {
 
         case 'type':
             property = 'type';
-            // Change to a different commuter type
+            // Change to a different commuter type, avoiding commuter1 types (0 and 1)
             let newType;
             do {
-                newType = Math.floor(Math.random() * 5);
+                newType = Math.floor(Math.random() * 4) + 2; // Types 2-5
             } while (newType === commuter.config.type);
             value = newType;
             break;
@@ -695,6 +670,8 @@ function fixSpriteBackgrounds() {
                     callback(null);
                 }
             };
+            
+            // Try both commuter1.png and commuter1_nobriefcase.png
             img.src = path + 'commuter1.png';
         });
     }
@@ -715,7 +692,16 @@ function fixSpriteBackgrounds() {
 
                 // Get commuter type
                 const commuterType = commuterData.config.type || 0;
-                const filename = 'commuter' + (commuterType + 1) + '.png';
+                let filename;
+                
+                // Determine filename based on type
+                if (commuterType === 0) {
+                    filename = 'commuter1.png'; // With briefcase
+                } else if (commuterType === 1) {
+                    filename = 'commuter1_nobriefcase.png'; // Without briefcase
+                } else {
+                    filename = 'commuter' + (commuterType) + '.png';
+                }
 
                 // Apply background image
                 sprite.style.backgroundImage = 'url(' + path + filename + ')';
@@ -744,23 +730,6 @@ function fixSpriteBackgrounds() {
                     hatElement.style.zIndex = '11';
                     if (!sprite.contains(hatElement)) {
                         sprite.appendChild(hatElement);
-                    }
-                }
-
-                if (commuterData.config.hasBriefcase) {
-                    const briefcaseElement = sprite.querySelector('.commuter-briefcase') || document.createElement('div');
-                    briefcaseElement.className = 'commuter-briefcase';
-                    briefcaseElement.style.position = 'absolute';
-                    briefcaseElement.style.bottom = '30%';
-                    briefcaseElement.style.left = commuterData.config.facingLeft ? '60%' : '-20%';
-                    briefcaseElement.style.width = '40%';
-                    briefcaseElement.style.height = '20%';
-                    briefcaseElement.style.backgroundImage = 'url(' + path + 'briefcase.png)';
-                    briefcaseElement.style.backgroundSize = 'contain';
-                    briefcaseElement.style.backgroundRepeat = 'no-repeat';
-                    briefcaseElement.style.zIndex = '9';
-                    if (!sprite.contains(briefcaseElement)) {
-                        sprite.appendChild(briefcaseElement);
                     }
                 }
             });
@@ -830,7 +799,7 @@ setTimeout(function () {
                     variant: 'default',
                     facingLeft: false,
                     hasHat: false,
-                    hasBriefcase: false
+                    hasBriefcase: true
                 }
             });
 
@@ -838,38 +807,3 @@ setTimeout(function () {
         }
     }
 }, 2000);
-
-// Debug function to log sprite information
-function debugSprites() {
-    console.log("=== SPRITE DEBUG INFO ===");
-    console.log("Sprite system exists:", typeof spriteSystem !== 'undefined');
-
-    if (typeof spriteSystem !== 'undefined') {
-        console.log("Sprite path:", spriteSystem.options.spritesPath);
-        console.log("Container:", spriteSystem.options.container);
-        console.log("Scale:", spriteSystem.options.spriteScale);
-    }
-
-    console.log("commuterSprites array:", commuterSprites);
-    console.log("Commuter elements in DOM:", document.querySelectorAll('.commuter-sprite').length);
-
-    // Test image loading
-    const testImage = new Image();
-    testImage.onload = function () {
-        console.log("✅ Test image loaded successfully");
-    };
-    testImage.onerror = function () {
-        console.log("❌ Test image failed to load");
-    };
-
-    if (typeof spriteSystem !== 'undefined') {
-        testImage.src = spriteSystem.options.spritesPath + 'commuter1.png';
-    } else {
-        testImage.src = 'assets/sprites/commuter1.png';
-    }
-
-    console.log("=========================");
-}
-
-// Add debug function call with a delay to allow everything to initialize
-setTimeout(debugSprites, 3000);
