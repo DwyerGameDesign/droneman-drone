@@ -1,73 +1,93 @@
 /**
  * Drone: The Daily Commute
- * Sprite Sheet System using predesigned pixel art
+ * Sprite System using colorization of single component images
+ * Updated for larger sprite dimensions
  */
 
 class CommuterSpriteSystem {
     constructor(options = {}) {
         // Default options
         this.options = {
-            spriteSheetPath: 'assets/commuter-sprites.png', // Path to the sprite sheet
+            spritesPath: 'assets/sprites/', // Path to the sprites directory
             container: document.getElementById('scene-container'),
-            spriteScale: 2, // Scale of sprites (multiplier)
+            spriteScale: 0.25, // Scale of sprites (multiplier) - adjusted for larger sprites
             ...options
         };
         
         this.commuters = [];
-        this.spriteSheet = null;
-        this.spriteParts = {
-            head: { x: 0, y: 0, width: 32, height: 32 },
-            body: { x: 32, y: 0, width: 32, height: 48 },
-            leftArm: { x: 64, y: 0, width: 16, height: 48 },
-            rightArm: { x: 80, y: 0, width: 16, height: 48 },
-            leftLeg: { x: 96, y: 0, width: 16, height: 48 },
-            rightLeg: { x: 112, y: 0, width: 16, height: 48 },
-            briefcase: { x: 128, y: 0, width: 32, height: 32 }
+        
+        // Define sprite paths for each component (single image per component)
+        this.spritePaths = {
+            hat: 'hat.png',
+            head: 'head.png',
+            body: 'coat.png',
+            shirt: 'shirt.png',
+            pants: 'pants.png',
+            briefcase: 'briefcase.png',
+            shoes: 'shoes.png' // Changed from shoe to shoes to match your note
         };
         
-        // Load the sprite sheet
-        this.loadSpriteSheet();
+        // Store original sprite dimensions for proper scaling
+        this.spriteDimensions = {
+            hat: { width: 360, height: 144 },
+            head: { width: 288, height: 256 },
+            body: { width: 320, height: 440 },
+            shirt: { width: 300, height: 210 },
+            pants: { width: 280, height: 310 },
+            briefcase: { width: 270, height: 220 },
+            shoes: { width: 310, height: 90 }
+        };
     }
     
     /**
-     * Load the sprite sheet image
-     */
-    loadSpriteSheet() {
-        return new Promise((resolve, reject) => {
-            this.spriteSheet = new Image();
-            this.spriteSheet.src = this.options.spriteSheetPath;
-            
-            this.spriteSheet.onload = () => {
-                console.log('Sprite sheet loaded successfully');
-                resolve(this.spriteSheet);
-            };
-            
-            this.spriteSheet.onerror = (err) => {
-                console.error('Error loading sprite sheet:', err);
-                reject(err);
-            };
-        });
-    }
-    
-    /**
-     * Create a commuter using parts from the sprite sheet
+     * Create a commuter using colorized sprite images
      * @param {Object} options - Configuration for the commuter
      * @returns {Object} - The created commuter object
      */
     createCommuter(options = {}) {
+        // Calculate scaled dimensions for the commuter container
+        const scale = this.options.spriteScale;
+        const containerWidth = this.spriteDimensions.body.width * scale;
+        const containerHeight = (
+            this.spriteDimensions.head.height + 
+            this.spriteDimensions.body.height + 
+            this.spriteDimensions.pants.height
+        ) * scale;
+        
         // Default commuter options
         const defaultOptions = {
             id: `commuter-${this.commuters.length}`,
             x: 0,
             y: 0,
             parts: {
-                head: { visible: true },
-                body: { visible: true },
-                leftArm: { visible: true },
-                rightArm: { visible: true },
-                leftLeg: { visible: true },
-                rightLeg: { visible: true },
-                briefcase: { visible: Math.random() > 0.5 }
+                hat: { 
+                    visible: Math.random() > 0.3,
+                    color: '#000000' // Black
+                },
+                head: { 
+                    visible: true,
+                    color: '#E8BEAC' // Default skin tone
+                },
+                body: { 
+                    visible: true,
+                    color: '#4e392e' // Brown coat
+                },
+                shirt: { 
+                    visible: true,
+                    color: '#FFFFFF' // White
+                },
+                pants: { 
+                    visible: true,
+                    color: '#37322e' // Dark gray
+                },
+                briefcase: { 
+                    visible: Math.random() > 0.5,
+                    color: '#8B4513' // Brown
+                },
+                shoes: { 
+                    visible: true,
+                    color: '#000000' // Black
+                }
             },
             facingLeft: Math.random() > 0.5
         };
@@ -82,8 +102,8 @@ class CommuterSpriteSystem {
         commuterElement.style.position = 'absolute';
         commuterElement.style.left = `${config.x}px`;
         commuterElement.style.bottom = `${config.y}px`;
-        commuterElement.style.width = `${32 * this.options.spriteScale}px`;
-        commuterElement.style.height = `${96 * this.options.spriteScale}px`;
+        commuterElement.style.width = `${containerWidth}px`;
+        commuterElement.style.height = `${containerHeight}px`;
         commuterElement.style.transform = config.facingLeft ? 'scaleX(-1)' : '';
         commuterElement.style.zIndex = '10';
         commuterElement.style.cursor = 'pointer';
@@ -115,58 +135,109 @@ class CommuterSpriteSystem {
     }
     
     /**
-     * Create a single sprite part as a div with background image
+     * Create a single sprite part as a div with background image and color filter
      * @param {string} partName - Name of the part to create
      * @param {Object} partConfig - Configuration for this part
      * @returns {HTMLElement} - The created part element
      */
     _createSpritePart(partName, partConfig) {
-        const spritePart = this.spriteParts[partName];
-        if (!spritePart) return null;
-        
         const partElement = document.createElement('div');
         partElement.className = `commuter-part commuter-${partName}`;
         partElement.style.position = 'absolute';
-        partElement.style.backgroundImage = `url(${this.options.spriteSheetPath})`;
         partElement.style.backgroundRepeat = 'no-repeat';
-        partElement.style.imageRendering = 'pixelated';
+        partElement.style.backgroundSize = 'contain';
         
-        // Set background position based on sprite sheet coordinates
-        partElement.style.backgroundPosition = `-${spritePart.x}px -${spritePart.y}px`;
+        // Get the sprite path
+        let spritePath;
         
-        // Set dimensions based on the sprite part size
-        partElement.style.width = `${spritePart.width * this.options.spriteScale}px`;
-        partElement.style.height = `${spritePart.height * this.options.spriteScale}px`;
+        if (partName === 'leftShoe' || partName === 'rightShoe') {
+            // We don't use these anymore - using the combined shoes sprite
+            return null;
+        } else {
+            spritePath = this.options.spritesPath + this.spritePaths[partName];
+        }
         
-        // Position each part appropriately
+        // Set background image
+        partElement.style.backgroundImage = `url(${spritePath})`;
+        
+        // Apply coloring with CSS filters
+        if (partConfig.color) {
+            this._applyColorFilter(partElement, partConfig.color);
+        }
+        
+        // Get dimensions for this part
+        const dimensions = this.spriteDimensions[partName];
+        if (!dimensions) return null;
+        
+        // Calculate scaled dimensions
+        const scale = this.options.spriteScale;
+        const scaledWidth = dimensions.width * scale;
+        const scaledHeight = dimensions.height * scale;
+        
+        // Set dimensions
+        partElement.style.width = `${scaledWidth}px`;
+        partElement.style.height = `${scaledHeight}px`;
+        
+        // Set position based on part type
+        // These positions are calculated to create a properly stacked character
+        // with the new sprite dimensions
+        const headHeight = this.spriteDimensions.head.height * scale;
+        const bodyHeight = this.spriteDimensions.body.height * scale;
+        const bodyWidth = this.spriteDimensions.body.width * scale;
+        
         switch (partName) {
+            case 'hat':
+                // Position hat on top of head
+                partElement.style.top = `-${this.spriteDimensions.hat.height * scale * 0.7}px`;
+                // Center hat horizontally
+                partElement.style.left = `${(bodyWidth - scaledWidth) / 2}px`;
+                partElement.style.zIndex = '5';
+                break;
+                
             case 'head':
+                // Position head at the top
                 partElement.style.top = '0px';
-                partElement.style.left = '0px';
+                // Center head horizontally
+                partElement.style.left = `${(bodyWidth - scaledWidth) / 2}px`;
+                partElement.style.zIndex = '4';
                 break;
+                
             case 'body':
-                partElement.style.top = `${32 * this.options.spriteScale}px`;
+                // Position body below head
+                partElement.style.top = `${headHeight * 0.8}px`; // Slight overlap with head
                 partElement.style.left = '0px';
+                partElement.style.zIndex = '3';
                 break;
-            case 'leftArm':
-                partElement.style.top = `${32 * this.options.spriteScale}px`;
-                partElement.style.left = `-${16 * this.options.spriteScale}px`;
+                
+            case 'shirt':
+                // Position shirt on top of body (chest area)
+                partElement.style.top = `${headHeight * 0.9}px`; // Slightly higher than coat start
+                // Center shirt horizontally
+                partElement.style.left = `${(bodyWidth - scaledWidth) / 2}px`;
+                partElement.style.zIndex = '2';
                 break;
-            case 'rightArm':
-                partElement.style.top = `${32 * this.options.spriteScale}px`;
-                partElement.style.left = `${32 * this.options.spriteScale}px`;
+                
+            case 'pants':
+                // Position pants below body
+                partElement.style.top = `${headHeight * 0.8 + bodyHeight * 0.7}px`;
+                // Center pants horizontally
+                partElement.style.left = `${(bodyWidth - scaledWidth) / 2}px`;
+                partElement.style.zIndex = '1';
                 break;
-            case 'leftLeg':
-                partElement.style.top = `${80 * this.options.spriteScale}px`;
-                partElement.style.left = '0px';
-                break;
-            case 'rightLeg':
-                partElement.style.top = `${80 * this.options.spriteScale}px`;
-                partElement.style.left = `${16 * this.options.spriteScale}px`;
-                break;
+                
             case 'briefcase':
-                partElement.style.top = `${48 * this.options.spriteScale}px`;
-                partElement.style.left = `-${32 * this.options.spriteScale}px`;
+                // Position briefcase beside the body
+                partElement.style.top = `${headHeight + bodyHeight * 0.4}px`;
+                partElement.style.left = `-${scaledWidth * 0.8}px`; // Beside the body
+                partElement.style.zIndex = '6';
+                break;
+                
+            case 'shoes':
+                // Position shoes at the bottom
+                partElement.style.top = `${headHeight * 0.8 + bodyHeight * 0.7 + this.spriteDimensions.pants.height * scale * 0.9}px`;
+                // Center shoes horizontally
+                partElement.style.left = `${(bodyWidth - scaledWidth) / 2}px`;
+                partElement.style.zIndex = '0';
                 break;
         }
         
@@ -179,6 +250,45 @@ class CommuterSpriteSystem {
     }
     
     /**
+     * Apply color filter to an element using CSS
+     * @param {HTMLElement} element - The element to colorize
+     * @param {string} color - Hex color string
+     */
+    _applyColorFilter(element, color) {
+        // Extract RGB values from hex color
+        const rgb = this._hexToRgb(color);
+        
+        if (!rgb) return;
+        
+        // For white, just use the original image with no filter
+        if (rgb.r === 255 && rgb.g === 255 && rgb.b === 255) {
+            element.style.filter = 'none';
+            return;
+        }
+        
+        // For black, use brightness and contrast
+        if (rgb.r === 0 && rgb.g === 0 && rgb.b === 0) {
+            element.style.filter = 'brightness(0) contrast(1)';
+            return;
+        }
+        
+        // Convert RGB to HSL to get the hue
+        const hsl = this._rgbToHsl(rgb.r, rgb.g, rgb.b);
+        
+        // Apply filter based on HSL
+        // We use a combination of hue-rotate (to change color), saturate (for color intensity),
+        // and brightness (for lightness/darkness)
+        const hueRotate = Math.round(hsl.h * 360);
+        const saturate = Math.round(hsl.s * 100);
+        const brightness = Math.round(hsl.l * 200); // Multiply by 200 to get a good range
+        
+        element.style.filter = `brightness(${brightness}%) saturate(${saturate}%) hue-rotate(${hueRotate}deg)`;
+        
+        // For some browsers, we need to ensure the original image is grayscale for best colorization
+        element.style.mixBlendMode = 'multiply';
+    }
+    
+    /**
      * Update an existing commuter
      * @param {string} id - ID of the commuter to update
      * @param {Object} options - New configuration options
@@ -187,17 +297,64 @@ class CommuterSpriteSystem {
         const commuter = this.commuters.find(c => c.id === id);
         if (!commuter) return null;
         
-        // Remove from DOM
-        if (commuter.element.parentNode) {
-            commuter.element.parentNode.removeChild(commuter.element);
+        // Check if we need to update individual parts
+        if (options.parts) {
+            for (const partName in options.parts) {
+                const partConfig = options.parts[partName];
+                const partSelector = `.commuter-${partName}`;
+                let partElement = commuter.element.querySelector(partSelector);
+                
+                // Handle visibility changes
+                if ('visible' in partConfig) {
+                    if (partConfig.visible) {
+                        // Create part if it doesn't exist
+                        if (!partElement) {
+                            const newPartConfig = {
+                                ...commuter.config.parts[partName],
+                                ...partConfig
+                            };
+                            partElement = this._createSpritePart(partName, newPartConfig);
+                            commuter.element.appendChild(partElement);
+                        }
+                        // Update config
+                        commuter.config.parts[partName].visible = true;
+                    } else if (partElement) {
+                        // Remove part if it exists
+                        partElement.remove();
+                        commuter.config.parts[partName].visible = false;
+                    }
+                }
+                
+                // Handle color changes
+                if (partElement && 'color' in partConfig) {
+                    this._applyColorFilter(partElement, partConfig.color);
+                    commuter.config.parts[partName].color = partConfig.color;
+                }
+                
+                // Apply any custom styles
+                if (partElement && partConfig.styles) {
+                    Object.assign(partElement.style, partConfig.styles);
+                }
+            }
         }
         
-        // Remove from our array
-        this.commuters = this.commuters.filter(c => c.id !== id);
+        // Update other commuter properties
+        if ('x' in options) {
+            commuter.element.style.left = `${options.x}px`;
+            commuter.config.x = options.x;
+        }
         
-        // Create a new commuter with updated options
-        const updatedConfig = this._mergeDeep(commuter.config, options);
-        return this.createCommuter(updatedConfig);
+        if ('y' in options) {
+            commuter.element.style.bottom = `${options.y}px`;
+            commuter.config.y = options.y;
+        }
+        
+        if ('facingLeft' in options) {
+            commuter.element.style.transform = options.facingLeft ? 'scaleX(-1)' : '';
+            commuter.config.facingLeft = options.facingLeft;
+        }
+        
+        return commuter;
     }
     
     /**
@@ -216,38 +373,79 @@ class CommuterSpriteSystem {
     }
     
     /**
-     * Create multiple commuters at once
-     * @param {number} count - Number of commuters to create
-     * @param {Object} baseOptions - Base options for all commuters
-     * @returns {Array} - Array of created commuters
+     * Remove a commuter from the scene
+     * @param {string} id - ID of the commuter to remove
      */
-    createCrowd(count, baseOptions = {}) {
-        const crowd = [];
-        const containerWidth = this.options.container ? this.options.container.offsetWidth : 800;
-        const spacing = containerWidth / (count + 1);
+    removeCommuter(id) {
+        const commuter = this.commuters.find(c => c.id === id);
+        if (commuter) {
+            if (commuter.element.parentNode) {
+                commuter.element.parentNode.removeChild(commuter.element);
+            }
+            this.commuters = this.commuters.filter(c => c.id !== id);
+        }
+    }
+    
+    /**
+     * Convert hex color to RGB object
+     * @param {string} hex - Hex color string (e.g., "#ff0000")
+     * @returns {Object|null} - RGB object or null if invalid
+     */
+    _hexToRgb(hex) {
+        // Remove # if present
+        hex = hex.replace(/^#/, '');
         
-        for (let i = 0; i < count; i++) {
-            const options = {
-                ...baseOptions,
-                id: `commuter-${this.commuters.length}`,
-                x: spacing * (i + 1),
-                facingLeft: Math.random() > 0.5,
-                parts: {
-                    head: { visible: true },
-                    body: { visible: true },
-                    leftArm: { visible: true },
-                    rightArm: { visible: true },
-                    leftLeg: { visible: true },
-                    rightLeg: { visible: true },
-                    briefcase: { visible: Math.random() > 0.5 }
-                }
-            };
-            
-            const commuter = this.createCommuter(options);
-            crowd.push(commuter);
+        // Parse different formats
+        let r, g, b;
+        if (hex.length === 3) {
+            // #RGB format
+            r = parseInt(hex.charAt(0) + hex.charAt(0), 16);
+            g = parseInt(hex.charAt(1) + hex.charAt(1), 16);
+            b = parseInt(hex.charAt(2) + hex.charAt(2), 16);
+        } else if (hex.length === 6) {
+            // #RRGGBB format
+            r = parseInt(hex.substring(0, 2), 16);
+            g = parseInt(hex.substring(2, 4), 16);
+            b = parseInt(hex.substring(4, 6), 16);
+        } else {
+            return null;
         }
         
-        return crowd;
+        return { r, g, b };
+    }
+    
+    /**
+     * Convert RGB to HSL
+     * @param {number} r - Red (0-255)
+     * @param {number} g - Green (0-255)
+     * @param {number} b - Blue (0-255)
+     * @returns {Object} - HSL object with h, s, l properties (0-1)
+     */
+    _rgbToHsl(r, g, b) {
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+        
+        if (max === min) {
+            h = s = 0; // achromatic
+        } else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            
+            h /= 6;
+        }
+        
+        return { h, s, l };
     }
     
     /**
