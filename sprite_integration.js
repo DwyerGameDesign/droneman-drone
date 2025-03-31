@@ -186,22 +186,37 @@ function handleCommuterClick(event) {
   const clickX = event.clientX;
   const clickY = event.clientY;
   
-  // Make sure the game allows clicking
-  if (typeof window.canClick === 'undefined' || !window.canClick) {
-    console.log("Clicking not allowed right now");
+  // Check if we're transitioning
+  if (window.isTransitioning) {
+    console.log("Game is transitioning");
+    return;
+  }
+  
+  // Check if there's a change to find and if clicking is allowed
+  const isChangePresent = window.currentChange !== null;
+  const isClickingAllowed = window.canClick === true;
+  
+  // Only show "everyday the same" when there's no change or clicking isn't allowed
+  if (!isChangePresent) {
+    console.log("No change to find");
     showPopupMessage("everyday the same", clickX, clickY);
     return;
   }
   
-  if (window.isTransitioning) {
-    console.log("Game is transitioning");
-    showPopupMessage("everyday the same", clickX, clickY);
+  if (!isClickingAllowed) {
+    console.log("Clicking not allowed right now");
     return;
   }
   
   // Check if this is the current change to find
   if (isClickOnCurrentChange(event.target)) {
     console.log("Correct commuter clicked!");
+    
+    // Highlight the commuter
+    event.target.classList.add('highlight-pulse');
+    setTimeout(() => {
+      event.target.classList.remove('highlight-pulse');
+    }, 1500);
     
     // Increase awareness
     if (typeof window.increaseAwareness === 'function' && window.GAME_SETTINGS) {
@@ -229,19 +244,10 @@ function handleCommuterClick(event) {
     // Mark change as found
     window.currentChange.found = true;
     
-    // Highlight the commuter
-    event.target.classList.add('highlight-pulse');
-    setTimeout(() => {
-      event.target.classList.remove('highlight-pulse');
-    }, 1500);
-    
     console.log("Change found and processed");
   } else {
     // Wrong commuter or no change to find
     console.log("Wrong commuter clicked or no change to find");
-    
-    // Show the "everyday the same" popup
-    showPopupMessage("everyday the same", clickX, clickY);
     
     // Show message
     if (typeof window.showMessage === 'function') {
@@ -472,14 +478,5 @@ setTimeout(function() {
     }
     
     tryNextPath(0);
-  }
-}, 1000);
-
-// Periodically force canClick true on day 4
-setInterval(function() {
-  const currentDay = document.getElementById('day')?.textContent;
-  if (currentDay === '4' && window.currentChange && window.canClick === false) {
-    console.log("Forcing canClick to true on day 4");
-    window.canClick = true;
   }
 }, 1000);
