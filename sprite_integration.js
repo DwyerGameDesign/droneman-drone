@@ -82,19 +82,68 @@ function createInitialCommuter() {
 }
 
 /**
+ * Show a popup message at the click location
+ */
+function showPopupMessage(text, x, y) {
+  // Find or create the popup element
+  let popup = document.getElementById('popup-message');
+  
+  if (!popup) {
+    popup = document.createElement('div');
+    popup.id = 'popup-message';
+    document.body.appendChild(popup);
+    
+    // Style the popup
+    popup.style.position = 'absolute';
+    popup.style.padding = '8px 12px';
+    popup.style.backgroundColor = 'rgba(20, 20, 20, 0.8)';
+    popup.style.color = '#d4d4c8';
+    popup.style.borderRadius = '5px';
+    popup.style.fontSize = '14px';
+    popup.style.fontFamily = "'Courier New', monospace";
+    popup.style.zIndex = '1000';
+    popup.style.pointerEvents = 'none'; // Let clicks pass through
+    popup.style.transition = 'opacity 0.5s ease';
+  }
+  
+  // Set the text and position
+  popup.textContent = text;
+  popup.style.left = `${x}px`;
+  popup.style.top = `${y}px`;
+  popup.style.opacity = '1';
+  
+  // Show and then fade out
+  clearTimeout(popup.fadeTimeout);
+  popup.style.display = 'block';
+  
+  popup.fadeTimeout = setTimeout(() => {
+    popup.style.opacity = '0';
+    setTimeout(() => {
+      popup.style.display = 'none';
+    }, 500);
+  }, 2000);
+}
+
+/**
  * Handle clicks on the commuter
  */
 function handleCommuterClick(event) {
   console.log("Commuter clicked");
   
+  // Get click coordinates
+  const clickX = event.clientX;
+  const clickY = event.clientY;
+  
   // Make sure the game allows clicking
   if (typeof window.canClick === 'undefined' || !window.canClick) {
     console.log("Clicking not allowed right now");
+    showPopupMessage("everyday the same", clickX, clickY);
     return;
   }
   
   if (window.isTransitioning) {
     console.log("Game is transitioning");
+    showPopupMessage("everyday the same", clickX, clickY);
     return;
   }
   
@@ -139,6 +188,9 @@ function handleCommuterClick(event) {
     // Wrong commuter or no change to find
     console.log("Wrong commuter clicked or no change to find");
     console.log("currentChange:", window.currentChange);
+    
+    // Show the "everyday the same" popup
+    showPopupMessage("everyday the same", clickX, clickY);
     
     // Show message
     if (typeof window.showMessage === 'function') {
