@@ -1,85 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Drone: The Daily Commute</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <div class="game-container">
         <h1>DRONE: THE DAILY COMMUTE</h1>
-        
+
         <div class="hud">
             <div class="day-counter">Day: <span id="day">1</span></div>
             <div id="awareness-container" class="awareness-container">
                 <!-- Awareness meter will be added here by JavaScript -->
             </div>
         </div>
-        
+
         <div class="narrative-text" id="narrative-text">
             everyday the same...
         </div>
-        
+
         <div class="scene-container" id="scene-container">
             <div class="fade-overlay" id="fade-overlay"></div>
-            
-            <!-- Station structure -->
-            <div class="ceiling">
-                <div class="light light-1"></div>
-                <div class="light light-2"></div>
-                <div class="light light-3"></div>
-                <div class="light light-4"></div>
-                <div class="light light-5"></div>
-            </div>
-            
-            <div class="station-background"></div>
-            
-            <div class="window" style="left: 15%;"></div>
-            <div class="window" style="left: 25%;"></div>
-            <div class="window" style="left: 35%;"></div>
-            <div class="window" style="left: 45%;"></div>
-            <div class="window" style="left: 55%;"></div>
-            <div class="window" style="left: 65%;"></div>
-            <div class="window" style="left: 75%;"></div>
-            <div class="window" style="left: 85%;"></div>
-            
+
+            <!-- The platform background will be inserted here by JavaScript -->
+
+            <!-- Keep only interactive elements -->
             <div class="sign" id="sign">PLATFORM 3</div>
-            
-            <!-- Pillars -->
+
+            <!-- Keep pillars for depth -->
             <div class="pillar pillar-1"></div>
             <div class="pillar pillar-2"></div>
             <div class="pillar pillar-3"></div>
-            
-            <!-- Train -->
-            <div class="train">
-                <div class="train-window" style="left: 10%;"></div>
-                <div class="train-window" style="left: 25%;"></div>
-                <div class="train-window" style="left: 40%;"></div>
-                <div class="train-window" style="left: 55%;"></div>
-                <div class="train-window" style="left: 70%;"></div>
-            </div>
-            
-            <div class="platform-edge"></div>
-            <div class="platform"></div>
-            
+
             <!-- Commuters will be added dynamically by the sprite system -->
-            
+
             <div class="thought-bubble" id="thought-bubble">
                 Something's different today...
             </div>
-            
+
             <div class="message" id="message"></div>
         </div>
-        
-        <button class="train-button" id="train-button">Take the 6:40 Train</button>
-    </div>
 
-    <script src="typewriter.js"></script>
-    <script src="awareness_meter.js"></script>
-    <script src="config.js"></script>
-    <script src="game.js"></script>
-    <script src="sprite_integration.js"></script>
-    <script src="extensions.js"></script>  
+        <script src="typewriter.js"></script>
+        <script src="awareness_meter.js"></script>
+        <script src="config.js"></script>
+        <script src="game.js"></script>
+        <script src="sprite_integration.js"></script>
+        <script src="extensions.js"></script>
 </body>
+
 </html>
