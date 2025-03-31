@@ -85,15 +85,30 @@ function createInitialCommuter() {
  * Handle clicks on the commuter
  */
 function handleCommuterClick(event) {
+  console.log("Commuter clicked");
+  
   // Make sure the game allows clicking
-  if (!window.canClick || window.isTransitioning) return;
+  if (typeof window.canClick === 'undefined' || !window.canClick) {
+    console.log("Clicking not allowed right now");
+    return;
+  }
+  
+  if (window.isTransitioning) {
+    console.log("Game is transitioning");
+    return;
+  }
   
   // Check if this is the current change to find
-  if (window.currentChange && window.currentChange.commuterId === 0) {
+  if (window.currentChange && (window.currentChange.commuterId === 0 || window.currentChange.id === 'commuter-0')) {
     console.log("Correct commuter clicked!");
     
     // Increase awareness
-    window.increaseAwareness(window.GAME_SETTINGS.baseAwarenessGain);
+    if (typeof window.increaseAwareness === 'function' && window.GAME_SETTINGS) {
+      window.increaseAwareness(window.GAME_SETTINGS.baseAwarenessGain);
+      console.log("Awareness increased");
+    } else {
+      console.error("increaseAwareness function or GAME_SETTINGS not available");
+    }
     
     // Disable further clicking
     window.canClick = false;
@@ -101,11 +116,13 @@ function handleCommuterClick(event) {
     // Show thought bubble
     if (typeof window.showThoughtBubble === 'function') {
       window.showThoughtBubble();
+      console.log("Showing thought bubble");
     }
     
     // Update narrative text
     if (typeof window.updateNarrativeText === 'function') {
       window.updateNarrativeText();
+      console.log("Updating narrative text");
     }
     
     // Mark change as found
@@ -116,9 +133,12 @@ function handleCommuterClick(event) {
     setTimeout(() => {
       event.target.classList.remove('highlight-pulse');
     }, 1500);
+    
+    console.log("Change found and processed");
   } else {
     // Wrong commuter or no change to find
-    console.log("Wrong commuter clicked");
+    console.log("Wrong commuter clicked or no change to find");
+    console.log("currentChange:", window.currentChange);
     
     // Show message
     if (typeof window.showMessage === 'function') {
@@ -131,11 +151,21 @@ function handleCommuterClick(event) {
  * Install custom game function handlers
  */
 function installGameHandlers() {
+  console.log("Installing game handlers");
+  
+  // Keep original functions as backup
+  const originalCreateFirstChange = window.createFirstChange;
+  const originalApplyChange = window.applyChange;
+  const originalHighlightMissedChange = window.highlightMissedChange;
+  const originalSelectRandomChange = window.selectRandomChange;
+  const originalHandleElementClick = window.handleElementClick;
+  
   // Override createFirstChange
   window.createFirstChange = function() {
     console.log("Creating first change: removing briefcase");
     
-    return {
+    // Create the change object
+    const changeObject = {
       commuterId: 0,
       id: 'commuter-0',
       type: 'briefcase',
@@ -143,6 +173,9 @@ function installGameHandlers() {
       value: false,
       found: false
     };
+    
+    console.log("First change created:", changeObject);
+    return changeObject;
   };
   
   // Override applyChange
@@ -158,6 +191,7 @@ function installGameHandlers() {
         commuter.element.style.backgroundImage = `url(${spriteBasePath}commuter1_nobriefcase.png)`;
         commuter.config.hasBriefcase = false;
         commuter.config.type = 1;
+        console.log("Changed to no-briefcase sprite");
       }
     }
   };
@@ -165,6 +199,7 @@ function installGameHandlers() {
   // Override highlightMissedChange
   window.highlightMissedChange = function(change) {
     if (!change) return;
+    console.log("Highlighting missed change:", change);
     
     const commuter = commuterSprites[change.commuterId];
     if (commuter && commuter.element) {
@@ -172,6 +207,7 @@ function installGameHandlers() {
       setTimeout(() => {
         commuter.element.classList.remove('highlight-pulse');
       }, 1500);
+      console.log("Applied highlight to commuter");
     }
   };
   
@@ -181,6 +217,7 @@ function installGameHandlers() {
     const commuter = commuterSprites[0];
     if (!commuter) return null;
     
+    console.log("Selecting random change");
     return {
       commuterId: 0,
       id: 'commuter-0',
@@ -189,6 +226,17 @@ function installGameHandlers() {
       value: !commuter.config.hasHat,
       found: false
     };
+  };
+  
+  // Override handleElementClick to do nothing (our click handler is directly on the element)
+  window.handleElementClick = function(event) {
+    // Do nothing specific here
+    console.log("Global handleElementClick called");
+    
+    // Call original if it exists
+    if (typeof originalHandleElementClick === 'function') {
+      originalHandleElementClick(event);
+    }
   };
   
   console.log("Game handlers installed");
