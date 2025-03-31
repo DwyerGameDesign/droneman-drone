@@ -451,8 +451,9 @@ function highlightCommuter(element) {
 
 /**
  * Create the first change (removing briefcase on day 4)
+ * Note: This function is not directly used, but kept for reference
  */
-function createFirstChange() {
+function createFirstChangeHelper() {
     if (commuterSprites.length === 0) return null;
 
     // Get the first commuter
@@ -471,8 +472,9 @@ function createFirstChange() {
 
 /**
  * Select a random element to change on a commuter
+ * Note: This function is not directly used, but kept for reference
  */
-function selectRandomChange() {
+function selectRandomChangeHelper() {
     if (commuterSprites.length === 0) return null;
 
     // Select a random commuter
@@ -529,8 +531,9 @@ function selectRandomChange() {
 
 /**
  * Apply the selected change to a commuter
+ * Note: This function is not directly used, but kept for reference
  */
-function applyChange(change) {
+function applyChangeHelper(change) {
     if (!change) return;
 
     // Find the commuter by ID
@@ -557,17 +560,93 @@ function overrideGameFunctions() {
 
     // Override createFirstChange function
     window.createFirstChange = function () {
-        return createFirstChange();
+        // Create the first change (removing briefcase on day 4)
+        if (commuterSprites.length === 0) return null;
+
+        // Get the first commuter
+        const firstCommuter = commuterSprites[0];
+        const commuterId = getCommuterIndex(firstCommuter.id);
+
+        // Create a change object - first change is removing the briefcase
+        return {
+            commuterId: commuterId,
+            type: 'briefcase',
+            property: 'hasBriefcase',
+            value: false, // Remove the briefcase
+            found: false
+        };
     };
 
     // Override selectRandomChange function
     window.selectRandomChange = function () {
-        return selectRandomChange();
+        if (commuterSprites.length === 0) return null;
+
+        // Select a random commuter
+        const commuterIndex = Math.floor(Math.random() * commuterSprites.length);
+        const commuter = commuterSprites[commuterIndex];
+
+        // Pick a random change type
+        const changeTypes = ['hat', 'type', 'briefcase', 'direction'];
+        const changeType = changeTypes[Math.floor(Math.random() * changeTypes.length)];
+
+        // Default change properties
+        let property = '';
+        let value = null;
+
+        // Customize change based on type
+        switch (changeType) {
+            case 'hat':
+                property = 'hasHat';
+                // Toggle hat visibility
+                value = !commuter.config.hasHat;
+                break;
+
+            case 'type':
+                property = 'type';
+                // Change to a different commuter type, avoiding commuter1 types (0 and 1)
+                let newType;
+                do {
+                    newType = Math.floor(Math.random() * 4) + 2; // Types 2-5
+                } while (newType === commuter.config.type);
+                value = newType;
+                break;
+
+            case 'briefcase':
+                property = 'hasBriefcase';
+                // Toggle briefcase visibility
+                value = !commuter.config.hasBriefcase;
+                break;
+
+            case 'direction':
+                property = 'facingLeft';
+                // Toggle direction
+                value = !commuter.config.facingLeft;
+                break;
+        }
+
+        return {
+            commuterId: getCommuterIndex(commuter.id),
+            type: changeType,
+            property: property,
+            value: value,
+            found: false
+        };
     };
 
     // Override applyChange function
     window.applyChange = function (change) {
-        applyChange(change);
+        if (!change) return;
+
+        // Find the commuter by ID
+        const commuter = commuterSprites[change.commuterId];
+        if (!commuter) return;
+
+        // Create options object for updating the commuter
+        const updateOptions = {};
+        updateOptions[change.property] = change.value;
+
+        // Update the commuter
+        spriteSystem.updateCommuter(commuter.id, updateOptions);
     };
 
     // Override highlightMissedChange function
