@@ -4,7 +4,7 @@
  */
 
 // Global variables
-let spriteBasePath = 'assets/sprites/';
+const spriteBasePath = 'assets/sprites/';
 
 /**
  * Initialize the sprite system
