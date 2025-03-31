@@ -125,6 +125,37 @@ function showPopupMessage(text, x, y) {
 }
 
 /**
+ * Check if a click should be considered a valid click on the current change
+ */
+function isClickOnCurrentChange(element) {
+  // No current change
+  if (!window.currentChange) {
+    console.log("No current change to find");
+    return false;
+  }
+  
+  // Check if this commuter matches the current change
+  const matchesById = element.id === window.currentChange.id;
+  const matchesByCommuterId = element.id === `commuter-${window.currentChange.commuterId}`;
+  
+  // Get the commuter index from the element id
+  const commuterIdMatch = element.id.match(/commuter-(\d+)/);
+  const commuterIndex = commuterIdMatch ? parseInt(commuterIdMatch[1]) : -1;
+  const matchesByIndex = commuterIndex === window.currentChange.commuterId;
+  
+  // Log detailed information about the match attempt
+  console.log("Current change:", window.currentChange);
+  console.log("Element ID:", element.id);
+  console.log("Matches by ID:", matchesById);
+  console.log("Matches by commuterId:", matchesByCommuterId);
+  console.log("Commuter index from element:", commuterIndex);
+  console.log("Matches by index:", matchesByIndex);
+  
+  // Return true if any of the matching conditions are met
+  return matchesById || matchesByCommuterId || matchesByIndex;
+}
+
+/**
  * Handle clicks on the commuter
  */
 function handleCommuterClick(event) {
@@ -148,7 +179,7 @@ function handleCommuterClick(event) {
   }
   
   // Check if this is the current change to find
-  if (window.currentChange && (window.currentChange.commuterId === 0 || window.currentChange.id === 'commuter-0')) {
+  if (isClickOnCurrentChange(event.target)) {
     console.log("Correct commuter clicked!");
     
     // Increase awareness
@@ -187,7 +218,6 @@ function handleCommuterClick(event) {
   } else {
     // Wrong commuter or no change to find
     console.log("Wrong commuter clicked or no change to find");
-    console.log("currentChange:", window.currentChange);
     
     // Show the "everyday the same" popup
     showPopupMessage("everyday the same", clickX, clickY);
@@ -235,7 +265,7 @@ function installGameHandlers() {
     if (!change) return;
     console.log("Applying change:", change);
     
-    // Only handle the briefcase change
+    // Handle the briefcase change
     if (change.property === 'hasBriefcase' && change.value === false) {
       const commuter = commuterSprites[change.commuterId];
       if (commuter && commuter.element) {
@@ -246,6 +276,40 @@ function installGameHandlers() {
         console.log("Changed to no-briefcase sprite");
       }
     }
+    
+    // Handle other changes in future days
+    else if (change.property === 'hasHat') {
+      const commuter = commuterSprites[change.commuterId];
+      if (commuter && commuter.element) {
+        // Add or remove hat
+        const hatExists = commuter.element.querySelector('.commuter-hat');
+        
+        if (change.value === true && !hatExists) {
+          // Add a hat
+          const hatElement = document.createElement('div');
+          hatElement.className = 'commuter-hat';
+          hatElement.style.position = 'absolute';
+          hatElement.style.top = '0';
+          hatElement.style.left = '0';
+          hatElement.style.width = '100%';
+          hatElement.style.height = '30%';
+          hatElement.style.backgroundImage = `url(${spriteBasePath}hat.png)`;
+          hatElement.style.backgroundSize = 'contain';
+          hatElement.style.backgroundRepeat = 'no-repeat';
+          hatElement.style.backgroundPosition = 'top center';
+          hatElement.style.zIndex = '11';
+          commuter.element.appendChild(hatElement);
+          commuter.config.hasHat = true;
+          console.log("Added hat to commuter");
+        } 
+        else if (change.value === false && hatExists) {
+          // Remove the hat
+          hatExists.remove();
+          commuter.config.hasHat = false;
+          console.log("Removed hat from commuter");
+        }
+      }
+    }
   };
   
   // Override highlightMissedChange
@@ -253,11 +317,23 @@ function installGameHandlers() {
     if (!change) return;
     console.log("Highlighting missed change:", change);
     
-    const commuter = commuterSprites[change.commuterId];
-    if (commuter && commuter.element) {
-      commuter.element.classList.add('highlight-pulse');
+    let element = null;
+    
+    // Find the element to highlight
+    if (change.id) {
+      element = document.getElementById(change.id);
+    } else if (typeof change.commuterId === 'number') {
+      const commuter = commuterSprites[change.commuterId];
+      if (commuter && commuter.element) {
+        element = commuter.element;
+      }
+    }
+    
+    // Apply the highlight
+    if (element) {
+      element.classList.add('highlight-pulse');
       setTimeout(() => {
-        commuter.element.classList.remove('highlight-pulse');
+        element.classList.remove('highlight-pulse');
       }, 1500);
       console.log("Applied highlight to commuter");
     }
