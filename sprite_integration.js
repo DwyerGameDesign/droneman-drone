@@ -3,14 +3,11 @@
  * Sprite Integration - Handles commuter sprites and changes
  */
 
-// Wrap everything in an IIFE to avoid global scope pollution
-(function() {
-    const SPRITE_BASE_PATH = 'assets/sprites/';
+window.DroneGame = window.DroneGame || {};
+window.DroneGame.SpriteSystem = {
+    SPRITE_BASE_PATH: 'assets/sprites/',
     
-    /**
-     * Initialize the sprite system
-     */
-    function initializeSprites() {
+    initializeSprites: function() {
         console.log("Initializing simplified sprite system");
         
         const sceneContainer = document.getElementById('scene-container');
@@ -22,24 +19,21 @@
         commuter.className = 'commuter-sprite';
         
         // Set initial sprite (with briefcase)
-        commuter.style.backgroundImage = `url(${SPRITE_BASE_PATH}commuter1.png)`;
+        commuter.style.backgroundImage = `url(${this.SPRITE_BASE_PATH}commuter1.png)`;
         
         // Add to scene
         sceneContainer.appendChild(commuter);
         
         // Add click handler
-        commuter.addEventListener('click', handleCommuterClick);
+        commuter.addEventListener('click', this.handleCommuterClick.bind(this));
         
         console.log("Initial commuter created");
         
         // Install game handlers
-        installGameHandlers();
-    }
+        this.installGameHandlers();
+    },
     
-    /**
-     * Create the first change (day 4 - briefcase disappears)
-     */
-    function createFirstChange() {
+    createFirstChange: function() {
         const change = {
             type: 'briefcase',
             property: 'hasBriefcase',
@@ -49,12 +43,9 @@
         };
         console.log("Created first change:", change);
         return change;
-    }
+    },
     
-    /**
-     * Apply the selected change to the commuter
-     */
-    function applyChange(change) {
+    applyChange: function(change) {
         console.log('Applying change:', change);
         
         if (change.type === 'briefcase') {
@@ -62,17 +53,14 @@
             if (commuter) {
                 // Change the sprite image based on briefcase state
                 commuter.style.backgroundImage = change.value ? 
-                    `url(${SPRITE_BASE_PATH}commuter1.png)` : 
-                    `url(${SPRITE_BASE_PATH}commuter1_nobriefcase.png)`;
+                    `url(${this.SPRITE_BASE_PATH}commuter1.png)` : 
+                    `url(${this.SPRITE_BASE_PATH}commuter1_nobriefcase.png)`;
                 console.log("Changed commuter sprite");
             }
         }
-    }
+    },
     
-    /**
-     * Handle commuter click events
-     */
-    function handleCommuterClick(event) {
+    handleCommuterClick: function(event) {
         console.log("Commuter clicked");
         
         // Only process clicks when allowed
@@ -117,12 +105,9 @@
             console.log("No change to find or wrong commuter");
             window.showMessage("I didn't notice anything different there", 1500);
         }
-    }
+    },
     
-    /**
-     * Highlight a missed change before transitioning
-     */
-    function highlightMissedChange(change) {
+    highlightMissedChange: function(change) {
         if (change && change.type === 'briefcase') {
             const commuter = document.getElementById('commuter-0');
             if (commuter) {
@@ -130,18 +115,15 @@
                 window.showMessage("You missed the change! The briefcase disappeared.", 2000);
             }
         }
-    }
+    },
     
-    /**
-     * Install game handlers
-     */
-    function installGameHandlers() {
+    installGameHandlers: function() {
         console.log("Installing game handlers");
         
         // Override the necessary game.js functions
-        window.createFirstChange = createFirstChange;
-        window.applyChange = applyChange;
-        window.highlightMissedChange = highlightMissedChange;
+        window.createFirstChange = this.createFirstChange.bind(this);
+        window.applyChange = this.applyChange.bind(this);
+        window.highlightMissedChange = this.highlightMissedChange.bind(this);
         
         // Add a listener for the train button to reset canClick
         const trainButton = document.getElementById('train-button');
@@ -157,9 +139,11 @@
         
         console.log("Game handlers installed");
     }
-    
-    // Initialize when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(initializeSprites, 500);
-    });
-})();
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        window.DroneGame.SpriteSystem.initializeSprites();
+    }, 500);
+});
