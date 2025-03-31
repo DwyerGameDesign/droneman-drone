@@ -296,8 +296,8 @@ function initializeSpriteSystem() {
     // Add the first commuter only
     createInitialCommuter();
 
-    // Override game functions to work with sprites
-    overrideGameFunctions();
+    // Install our custom game function handlers
+    installCustomHandlers();
 }
 
 /**
@@ -450,117 +450,16 @@ function highlightCommuter(element) {
 }
 
 /**
- * Create the first change (removing briefcase on day 4)
- * Note: This function is not directly used, but kept for reference
+ * Install custom handlers for game functions
  */
-function createFirstChangeHelper() {
-    if (commuterSprites.length === 0) return null;
-
-    // Get the first commuter
-    const firstCommuter = commuterSprites[0];
-    const commuterId = getCommuterIndex(firstCommuter.id);
-
-    // Create a change object - first change is removing the briefcase
-    return {
-        commuterId: commuterId,
-        type: 'briefcase',
-        property: 'hasBriefcase',
-        value: false, // Remove the briefcase
-        found: false
-    };
-}
-
-/**
- * Select a random element to change on a commuter
- * Note: This function is not directly used, but kept for reference
- */
-function selectRandomChangeHelper() {
-    if (commuterSprites.length === 0) return null;
-
-    // Select a random commuter
-    const commuterIndex = Math.floor(Math.random() * commuterSprites.length);
-    const commuter = commuterSprites[commuterIndex];
-
-    // Pick a random change type
-    const changeTypes = ['hat', 'type', 'briefcase', 'direction'];
-    const changeType = changeTypes[Math.floor(Math.random() * changeTypes.length)];
-
-    // Default change properties
-    let property = '';
-    let value = null;
-
-    // Customize change based on type
-    switch (changeType) {
-        case 'hat':
-            property = 'hasHat';
-            // Toggle hat visibility
-            value = !commuter.config.hasHat;
-            break;
-
-        case 'type':
-            property = 'type';
-            // Change to a different commuter type, avoiding commuter1 types (0 and 1)
-            let newType;
-            do {
-                newType = Math.floor(Math.random() * 4) + 2; // Types 2-5
-            } while (newType === commuter.config.type);
-            value = newType;
-            break;
-
-        case 'briefcase':
-            property = 'hasBriefcase';
-            // Toggle briefcase visibility
-            value = !commuter.config.hasBriefcase;
-            break;
-
-        case 'direction':
-            property = 'facingLeft';
-            // Toggle direction
-            value = !commuter.config.facingLeft;
-            break;
-    }
-
-    return {
-        commuterId: getCommuterIndex(commuter.id),
-        type: changeType,
-        property: property,
-        value: value,
-        found: false
-    };
-}
-
-/**
- * Apply the selected change to a commuter
- * Note: This function is not directly used, but kept for reference
- */
-function applyChangeHelper(change) {
-    if (!change) return;
-
-    // Find the commuter by ID
-    const commuter = commuterSprites[change.commuterId];
-    if (!commuter) return;
-
-    // Create options object for updating the commuter
-    const updateOptions = {};
-    updateOptions[change.property] = change.value;
-
-    // Update the commuter
-    spriteSystem.updateCommuter(commuter.id, updateOptions);
-}
-
-/**
- * Override game functions to work with sprite system
- */
-function overrideGameFunctions() {
-    // Store original functions
-    const originalCreateFirstChange = window.createFirstChange;
-    const originalSelectRandomChange = window.selectRandomChange;
-    const originalApplyChange = window.applyChange;
-    const originalHighlightMissedChange = window.highlightMissedChange;
-
-    // Override createFirstChange function
-    window.createFirstChange = function () {
-        // Create the first change (removing briefcase on day 4)
+function installCustomHandlers() {
+    // Store reference to original functions (if they exist)
+    const originalHandleElementClick = window.handleElementClick;
+    
+    // Custom handlers for game functions
+    
+    // Override game's createFirstChange function
+    window.createFirstChange = function() {
         if (commuterSprites.length === 0) return null;
 
         // Get the first commuter
@@ -576,9 +475,9 @@ function overrideGameFunctions() {
             found: false
         };
     };
-
-    // Override selectRandomChange function
-    window.selectRandomChange = function () {
+    
+    // Override game's selectRandomChange function
+    window.selectRandomChange = function() {
         if (commuterSprites.length === 0) return null;
 
         // Select a random commuter
@@ -632,9 +531,9 @@ function overrideGameFunctions() {
             found: false
         };
     };
-
-    // Override applyChange function
-    window.applyChange = function (change) {
+    
+    // Override game's applyChange function
+    window.applyChange = function(change) {
         if (!change) return;
 
         // Find the commuter by ID
@@ -648,9 +547,9 @@ function overrideGameFunctions() {
         // Update the commuter
         spriteSystem.updateCommuter(commuter.id, updateOptions);
     };
-
-    // Override highlightMissedChange function
-    window.highlightMissedChange = function (change) {
+    
+    // Override game's highlightMissedChange function
+    window.highlightMissedChange = function(change) {
         if (!change) return;
 
         // Find the commuter element
@@ -660,6 +559,13 @@ function overrideGameFunctions() {
             highlightCommuter(commuter.element);
         }
     };
+    
+    // Override or set handleElementClick if it's not already defined
+    if (!window.handleElementClick) {
+        window.handleElementClick = function(event) {
+            // Do nothing special - the sprite clicks are handled separately
+        };
+    }
 }
 
 /**
@@ -750,7 +656,7 @@ function fixSpriteBackgrounds() {
                 }
             };
             
-            // Try both commuter1.png and commuter1_nobriefcase.png
+            // Try commuter1.png
             img.src = path + 'commuter1.png';
         });
     }
