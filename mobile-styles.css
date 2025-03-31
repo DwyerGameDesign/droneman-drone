@@ -1,6 +1,6 @@
 /**
  * Drone: The Daily Commute
- * Mobile-specific styles
+ * Mobile-specific styles - Updated for single sprite approach
  */
 
 /* Base mobile styles */
@@ -74,24 +74,9 @@
         min-height: 400px;
     }
     
-    /* People positioning is even more spread out horizontally in portrait */
-    #person1 { left: 8%; }
-    #person2 { left: 22%; }
-    #person3 { left: 36%; }
-    #person4 { left: 50%; }
-    #person5 { left: 64%; }
-    #person6 { left: 78%; }
-    #player { left: 92%; }
-    
-    /* Make elements more visible on mobile */
-    .person {
-        transform: scale(1.2);
-    }
-    
-    /* Increase tap target sizes for mobile */
-    .accessory, .pants, .left-shoe, .right-shoe {
-        min-width: 18px;
-        min-height: 18px;
+    /* Commuter sprite adjustments for mobile */
+    .commuter-sprite {
+        transform: scale(0.8); /* Slightly smaller on mobile */
     }
     
     /* Train button takes more width */
@@ -135,21 +120,18 @@
     .awareness-meter {
         height: 12px;
     }
+    
+    /* Even smaller commuters for small screens */
+    .commuter-sprite {
+        transform: scale(0.7);
+    }
 }
 
 /* Specific optimizations for very narrow screens */
 @media (max-width: 360px) {
-    .person {
-        transform: scale(1); /* Smaller characters */
+    .commuter-sprite {
+        transform: scale(0.6); /* Smaller on very narrow screens */
     }
-    
-    #person1 { left: 5%; }
-    #person2 { left: 20%; }
-    #person3 { left: 35%; }
-    #person4 { left: 50%; }
-    #person5 { left: 65%; }
-    #person6 { left: 80%; }
-    #player { left: 95%; }
     
     .hud {
         font-size: 14px;

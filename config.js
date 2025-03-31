@@ -1,6 +1,6 @@
 /**
  * Drone: The Daily Commute
- * Configuration file
+ * Configuration file - Simplified for single sprite approach
  */
 
 // Song lyrics from the album that appear at certain days
@@ -18,44 +18,10 @@ const SONG_LYRICS = [
     { day: 100, text: "Drone no more, I'm my own man" }
 ];
 
-// Commuter appearance settings
-const COMMUTER_APPEARANCE = {
-    hats: [
-        { visible: true, color: '#000000' }, // Black
-        { visible: true, color: '#8B4513' }, // Brown
-        { visible: true, color: '#000080' }  // Navy
-    ],
-    coats: [
-        '#4e392e', // Brown
-        '#2e2e40', // Navy
-        '#5a5a5a'  // Gray
-    ],
-    shirts: [
-        '#FFFFFF', // White
-        '#E6E6FA', // Lavender
-        '#E0FFFF'  // Light Cyan
-    ],
-    pants: [
-        '#37322e', // Dark gray
-        '#000000'  // Black
-    ],
-    shoes: [
-        '#000000', // Black
-        '#8B4513', // Brown
-        '#2F4F4F'  // Dark Slate Gray
-    ],
-    briefcases: [
-        { visible: true, color: '#8B4513' }, // Brown
-        { visible: true, color: '#000000' }, // Black
-        { visible: true, color: '#D2B48C' }, // Tan
-        { visible: false, color: null }      // No briefcase
-    ]
-};
-
 // First change configuration (hat appears on day 4)
 const FIRST_CHANGE = {
     type: 'hat',
-    property: 'visible',
+    property: 'hasHat',
     value: true,
     commuterId: 0 // This will be the first commuter
 };
@@ -115,8 +81,8 @@ const THOUGHTS = {
 // Game settings
 const GAME_SETTINGS = {
     // Faster transition timing
-    fadeOutDuration: 300,  // How long the fade out animation takes (ms) - MADE FASTER
-    fadeInDuration: 300,   // How long the fade in animation takes (ms) - MADE FASTER
+    fadeOutDuration: 300,  // How long the fade out animation takes (ms)
+    fadeInDuration: 300,   // How long the fade in animation takes (ms)
     waitDuration: 200,     // How long to wait between fade out and fade in (ms)
     
     // Highlight a missed change

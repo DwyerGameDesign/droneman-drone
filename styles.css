@@ -1,4 +1,4 @@
-/* Drone: The Daily Commute - Main Styles */
+/* Drone: The Daily Commute - Main Styles - Updated for full sprite commuters */
 
 /* Base styling for pixelated rendering */
 html {
@@ -172,29 +172,29 @@ h1 {
     z-index: 6;
 }
 
-/* Adjust platform to accommodate larger characters */
+/* Adjust platform to accommodate sprites */
 .platform {
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 120px; /* Increased to accommodate larger characters */
+    height: 120px;
     background-color: #c5c2b2;
     z-index: 2;
 }
 
 .platform-edge {
     position: absolute;
-    bottom: 120px; /* Adjusted to match new platform height */
+    bottom: 120px;
     width: 100%;
     height: 20px;
     background-color: #878680;
     z-index: 2;
 }
 
-/* Adjust train position for larger characters */
+/* Adjust train position */
 .train {
     position: absolute;
-    bottom: 140px; /* Adjusted based on new platform edge position */
+    bottom: 140px;
     width: 100%;
     height: 150px;
     background-color: #576065;
@@ -210,117 +210,23 @@ h1 {
     border: 4px solid #383d42;
 }
 
-/* Characters - 50% larger */
-.person {
+/* Commuter sprite styling */
+.commuter-sprite {
     position: absolute;
-    bottom: 120px; /* Adjusted to sit on top of the platform */
-    width: 30px; /* 50% wider */
-    height: 75px; /* 50% taller */
     cursor: pointer;
-    z-index: 4;
-    image-rendering: pixelated;
-    transform: scale(1.5); /* Makes everything 50% larger */
-    transform-origin: bottom center; /* Scale from bottom center */
+    z-index: 10;
+    transition: transform 0.3s ease;
 }
 
-.head {
-    position: absolute;
-    top: 0;
-    left: 7.5px; /* Adjusted for wider body */
-    width: 15px; /* 50% wider */
-    height: 15px; /* 50% taller */
-    background-color: #8a7159;
-    transition: background-color 0.5s;
+/* Accessories styling */
+.commuter-hat, .commuter-briefcase {
+    pointer-events: none; /* Make sure clicks pass through to the main sprite */
 }
-
-.body {
-    position: absolute;
-    top: 15px; /* Adjusted for taller head */
-    left: 0;
-    width: 30px; /* 50% wider */
-    height: 45px; /* 50% taller */
-    background-color: #4e392e; /* Default brown */
-    transition: background-color 0.5s, width 0.5s;
-}
-
-.left-leg, .right-leg {
-    position: absolute;
-    top: 60px; /* Adjusted for taller body */
-    width: 7.5px; /* 50% wider */
-    height: 12px; /* 50% taller */
-    background-color: #37322e; /* Default dark gray */
-    transition: background-color 0.5s;
-}
-
-.left-leg { left: 6px; } /* Adjusted for wider body */
-.right-leg { left: 16.5px; } /* Adjusted for wider body */
-
-.left-shoe, .right-shoe {
-    position: absolute;
-    top: 72px; /* Adjusted for taller legs */
-    width: 7.5px; /* 50% wider */
-    height: 3px; /* 50% taller */
-    background-color: #232323;
-    transition: background-color 0.5s;
-}
-
-.left-shoe { left: 6px; } /* Adjusted for wider body */
-.right-shoe { left: 16.5px; } /* Adjusted for wider body */
-
-/* Modified hat to look more like a top hat with better visibility */
-.hat {
-    position: absolute;
-    top: -9px; /* Taller and sits higher on the head */
-    left: 4.5px; /* Adjusted for wider head */
-    width: 21px; /* 50% wider */
-    height: 9px; /* Made taller for top hat look */
-    background-color: #000000; /* Default black */
-    visibility: hidden;
-    transition: visibility 0.3s, background-color 0.5s;
-    border-radius: 2px 2px 0 0; /* Rounded top */
-    z-index: 5; /* Ensure hat appears above head */
-}
-
-/* Top hat brim effect */
-.hat:after {
-    content: '';
-    position: absolute;
-    bottom: -1.5px;
-    left: -3px;
-    width: 27px; /* Wider than the hat */
-    height: 1.5px;
-    background-color: inherit; /* Same color as hat */
-    border-radius: 1px;
-}
-
-/* Modified bag with better visibility */
-.bag {
-    position: absolute;
-    top: 37.5px; /* Adjusted for taller body */
-    left: -12px; /* Adjusted outward */
-    width: 9px; /* 50% wider */
-    height: 15px; /* 50% taller */
-    background-color: #8B4513; /* Default brown */
-    visibility: hidden;
-    transition: visibility 0.3s, background-color 0.5s;
-    z-index: 4;
-    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Add shadow for depth */
-}
-
-/* Character positions - spread out for better visibility */
-#person1 { left: 12%; }
-#person2 { left: 22%; }
-#person3 { left: 32%; }
-#person4 { left: 42%; }
-#person5 { left: 52%; }
-#person6 { left: 62%; }
-#person7 { left: 72%; }
-#player { left: 82%; }
 
 /* Pillars - adjusted for taller platform */
 .pillar {
     position: absolute;
-    bottom: 120px; /* Adjusted to match platform height */
+    bottom: 120px;
     width: 15px;
     height: 170px;
     background-color: #483830;
@@ -413,26 +319,28 @@ h1 {
     opacity: 1;
 }
 
-/* Enhanced highlight for elements - now goldish/yellow */
-.highlight {
-    animation: blink 0.8s 2;
-}
-
-@keyframes blink {
-    0% { box-shadow: 0 0 0 3px rgba(233, 203, 95, 0); }
-    50% { box-shadow: 0 0 0 3px rgba(233, 203, 95, 0.8); }
-    100% { box-shadow: 0 0 0 3px rgba(233, 203, 95, 0); }
-}
-
-/* Enhanced highlight for missed changes */
+/* Enhanced highlight for commuter elements */
 .highlight-pulse {
-    animation: pulse 0.8s 2;
+    animation: commuter-pulse 1.5s 1;
 }
 
-@keyframes pulse {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.1); opacity: 0.8; }
-    100% { transform: scale(1); opacity: 1; }
+@keyframes commuter-pulse {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(233, 203, 95, 0.7);
+        transform: scale(1);
+    }
+    30% { 
+        box-shadow: 0 0 0 15px rgba(233, 203, 95, 0);
+        transform: scale(1.05);
+    }
+    60% { 
+        box-shadow: 0 0 0 0 rgba(233, 203, 95, 0.7);
+        transform: scale(1);
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(233, 203, 95, 0);
+        transform: scale(1);
+    }
 }
 
 /* Color stages */
@@ -453,8 +361,8 @@ h1 {
         height: 350px;
     }
     
-    .person {
-        transform: scale(1.5);
+    .commuter-sprite {
+        transform: scale(0.8); /* Slightly smaller on mobile */
     }
     
     .train-button {
@@ -463,36 +371,40 @@ h1 {
     }
 }
 
-/* Enhanced highlight effect for commuter elements */
-.highlight-pulse {
-    animation: commuter-pulse 1.5s 1;
-  }
-  
-  @keyframes commuter-pulse {
-    0% { 
-      box-shadow: 0 0 0 0 rgba(233, 203, 95, 0.7);
-      transform: scale(1);
-    }
-    30% { 
-      box-shadow: 0 0 0 15px rgba(233, 203, 95, 0);
-      transform: scale(1.05);
-    }
-    60% { 
-      box-shadow: 0 0 0 0 rgba(233, 203, 95, 0.7);
-      transform: scale(1);
-    }
-    100% { 
-      box-shadow: 0 0 0 0 rgba(233, 203, 95, 0);
-      transform: scale(1);
-    }
-  }
-  
-  /* Adjust the commuter sprite container for proper highlighting */
-  .commuter-sprite {
-    transition: transform 0.3s ease;
-  }
-  
-  /* Ensure transitions for color changes are smooth */
-  .commuter-part {
-    transition: filter 0.5s ease;
-  }
+/* Style for the awareness meter */
+.awareness-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.awareness-meter {
+    width: 200px;
+    height: 15px;
+    background-color: #3a3a3a;
+    border: 2px solid #666;
+    border-radius: 3px;
+    overflow: hidden;
+    display: flex;
+}
+
+.awareness-segment {
+    flex: 1;
+    height: 100%;
+    margin: 0 1px;
+    background-color: #3a3a3a;
+    transition: background-color 0.8s ease-in-out;
+}
+
+/* Style enhancement for the awareness icon */
+.awareness-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background-color: #4e4eb2;
+    border-radius: 50%;
+    color: white;
+    font-size: 14px;
+}

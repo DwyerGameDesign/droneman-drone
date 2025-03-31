@@ -1,79 +1,100 @@
-# Drone: The Daily Commute
+# Drone: The Daily Commute - Single Sprite Approach
 
-A browser-based game inspired by the song "Drone" from the concept album. The game puts you in the shoes of a commuter taking the same train every day, gradually becoming more aware of your surroundings and breaking free from monotony.
+This is an updated version of the game that uses full commuter sprites instead of composing characters from individual parts. This approach is simpler, more performant, and easier to maintain.
 
-## Game Overview
+## Sprite Setup Instructions
 
-In "Drone: The Daily Commute," you:
-1. Take the 6:40 train each day by clicking the button
-2. Find what's different in today's commute by spotting and clicking on the change
-3. Increase your Awareness with each discovery
-4. Watch as the environment gradually transforms with your growing Awareness
-5. Break free from the routine when you reach 100% Awareness
+### 1. Prepare Your Sprite Files
 
-## File Structure
+Place the following image files in the `assets/sprites/` directory:
 
-- `index.html` - The main HTML structure of the game
-- `styles.css` - All styling and visual effects
-- `config.js` - Game settings, song lyrics, and changeable elements configuration
-- `game.js` - Main game logic and functionality
+- `commuter1.png` through `commuter5.png` - Full commuter sprites (5 different commuter types)
+- `hat.png` - Hat accessory to overlay on commuters
+- `briefcase.png` - Briefcase accessory to overlay on commuters
 
-## How to Install
+### 2. Recommended Sprite Dimensions
 
-1. Download all files to a directory on your computer
-2. Open `index.html` in a web browser
+The game is designed to work with sprites of the following dimensions:
 
-No server or special software is required to run the game.
+- **Full commuter sprites**: 392 × 922 pixels
+- **Hat accessory**: ~200 × 150 pixels (positioned at top of commuter)
+- **Briefcase accessory**: ~150 × 120 pixels (positioned at side of commuter)
 
-## How to Customize
+### 3. File Structure
 
-### Adding New Changeable Elements
+Make sure your files are organized like this:
 
-To add new elements that can change:
+```
+/ (root directory)
+├── assets/
+│   └── sprites/
+│       ├── commuter1.png
+│       ├── commuter2.png
+│       ├── commuter3.png
+│       ├── commuter4.png
+│       ├── commuter5.png
+│       ├── hat.png
+│       └── briefcase.png
+├── awareness_meter.js
+├── config.js
+├── extensions.js
+├── game.js
+├── index.html
+├── SingleCommuterSpriteSystem.js
+├── sprite_integration.js
+├── styles.css
+└── typewriter.js
+```
 
-1. Create the HTML elements in `index.html`
-2. Add their IDs to the appropriate array in `CHANGEABLE_ELEMENTS` in `config.js`
-3. Add any necessary CSS in `styles.css`
-4. If needed, add a new category type in `config.js` and handle it in the `selectRandomChange()` function in `game.js`
+## Key Changes from Previous Version
 
-### Changing Game Settings
+1. **Simplified Sprite System**: Uses complete sprites instead of composing them from parts
+2. **More Performant**: Fewer DOM elements and less complex layout calculations
+3. **Easier to Update**: Add new commuter types by simply adding new image files
+4. **More Flexible**: Accessories are overlaid on commuters instead of being part of the commuter
 
-Modify the `GAME_SETTINGS` object in `config.js` to customize:
+## Updating the Game
 
-- Transition timing (fade durations)
-- Awareness gain per correct guess
-- Win conditions
-- Color stages and their thresholds
+### Adding New Commuter Types
 
-### Customizing Visuals
+To add a new commuter type:
 
-- Edit the CSS classes in `styles.css` to change the appearance of any game element
-- Modify the background color stages by editing the `.stage-X` classes in `styles.css`
-- Add new character elements or scene objects by adding them to `index.html` and styling them appropriately
+1. Add a new sprite image (e.g., `commuter6.png`) to the `assets/sprites/` directory
+2. Update the `commuterTypes` array in `SingleCommuterSpriteSystem.js`:
 
-### Adding More Lyrics and Thoughts
+```javascript
+this.commuterTypes = [
+    { id: 'commuter1', filename: 'commuter1.png' },
+    { id: 'commuter2', filename: 'commuter2.png' },
+    { id: 'commuter3', filename: 'commuter3.png' },
+    { id: 'commuter4', filename: 'commuter4.png' },
+    { id: 'commuter5', filename: 'commuter5.png' },
+    { id: 'commuter6', filename: 'commuter6.png' } // New commuter type
+];
+```
 
-- Add more song lyrics by editing the `SONG_LYRICS` array in `config.js`
-- Add or modify thoughts in the `THOUGHTS` object in `config.js`
+3. Update any random selection logic in `sprite_integration.js` to include the new type
 
-## Extending the Game
+### Adding New Accessory Types
 
-As your Awareness increases in the game, you might want to add more complex changes and interactions:
+To add a new accessory type:
 
-1. **New Types of Changes**: Add changes to colors, positions, or character expressions
-2. **Environmental Elements**: Add weather effects, time of day changes, or background elements
-3. **Interactive Elements**: Add clickable items that provide bonus awareness or special effects
-4. **Sound Effects**: Add train sounds, ambient noise, or music
-5. **Advanced Gameplay Mechanics**: Add a soul energy system to purchase upgrades
+1. Add a new accessory image (e.g., `umbrella.png`) to the `assets/sprites/` directory
+2. Update the `createCommuter` and `updateCommuter` methods in `SingleCommuterSpriteSystem.js` to support the new accessory
+3. Add the new accessory to the change types in `selectRandomChange` in `sprite_integration.js`
 
-## Inspired by the Song "Drone"
+## Adjusting Sprite Scaling
 
-This game is inspired by the song "Drone" from the concept album, with themes of:
-- Breaking free from monotony
-- Gradual awakening to one's surroundings
-- The journey from "drone" to individual
-- Recognizing patterns and making changes
+If your sprites are different sizes, adjust the scale factor in the sprite system:
 
-## Credits
+1. Open `sprite_integration.js`
+2. Find the `initializeSpriteSystem` function
+3. Change the `spriteScale` value to fit your needs:
 
-This game was created based on the concept album "Drone Man," particularly the song "Drone," which follows a person's journey of awakening during their daily train commute.
+```javascript
+spriteSystem = new CommuterSpriteSystem({
+    spritesPath: 'assets/sprites/',
+    container: document.getElementById('scene-container'),
+    spriteScale: 0.18 // Adjust this value as needed
+});
+```

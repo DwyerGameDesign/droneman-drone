@@ -1,6 +1,6 @@
 /**
  * Drone: The Daily Commute
- * Mobile-specific utilities and enhancements
+ * Mobile-specific utilities and enhancements - Updated for single sprite approach
  */
 
 // Check if we're on a mobile device
@@ -41,8 +41,8 @@ function initMobileOptimizations() {
  * Make tap targets larger and more accessible
  */
 function enhanceTapTargets() {
-    // Increase clickable area for elements
-    document.querySelectorAll('.person, .accessory, .pants, .left-shoe, .right-shoe').forEach(el => {
+    // Increase clickable area for commuter sprites
+    document.querySelectorAll('.commuter-sprite').forEach(el => {
         // Add an invisible larger hitbox
         el.style.position = 'relative';
         
@@ -72,7 +72,7 @@ function enhanceTapTargets() {
  * Add visual feedback for touch interactions
  */
 function addTouchFeedback() {
-    document.querySelectorAll('.person, .accessory, .pants, .left-shoe, .right-shoe, .train-button, .hint-button').forEach(el => {
+    document.querySelectorAll('.commuter-sprite, .train-button, .hint-button').forEach(el => {
         el.addEventListener('touchstart', function() {
             this.style.opacity = '0.7';
         });
@@ -91,30 +91,76 @@ function addTouchFeedback() {
  * Setup the hint system for mobile users
  */
 function setupHintSystem() {
+    // Check if hint button exists
     const hintButton = document.getElementById('hint-button');
-    if (hintButton) {
-        hintButton.addEventListener('click', function() {
-            if (!currentChange) return;
-            
-            // Provide a simple hint based on the type of change
-            const element = document.getElementById(currentChange.id);
-            if (element) {
-                let hintText = "Look for a change in ";
+    if (!hintButton) {
+        // Create a hint button if it doesn't exist
+        const mobileControls = document.querySelector('.mobile-controls');
+        if (!mobileControls) {
+            // Create mobile controls container if it doesn't exist
+            const gameContainer = document.querySelector('.game-container');
+            if (gameContainer) {
+                const newMobileControls = document.createElement('div');
+                newMobileControls.className = 'mobile-controls';
+                gameContainer.appendChild(newMobileControls);
                 
-                // Determine specific hint based on change type
-                if (currentChange.type.includes('hat')) {
-                    hintText += "someone's hat";
-                } else if (currentChange.type.includes('bag')) {
-                    hintText += "someone's bag";
-                } else if (currentChange.type.includes('torso')) {
-                    hintText += "someone's shirt";
-                } else if (currentChange.type.includes('pants')) {
-                    hintText += "someone's pants";
-                } else if (currentChange.type.includes('shoe')) {
-                    hintText += "someone's shoes";
-                } else {
+                // Create hint button
+                const newHintButton = document.createElement('button');
+                newHintButton.id = 'hint-button';
+                newHintButton.className = 'hint-button';
+                newHintButton.textContent = 'Need a Hint?';
+                newMobileControls.appendChild(newHintButton);
+                
+                // Setup hint button
+                setupHintButtonListener(newHintButton);
+            }
+        } else {
+            // Add hint button to existing mobile controls
+            const newHintButton = document.createElement('button');
+            newHintButton.id = 'hint-button';
+            newHintButton.className = 'hint-button';
+            newHintButton.textContent = 'Need a Hint?';
+            mobileControls.appendChild(newHintButton);
+            
+            // Setup hint button
+            setupHintButtonListener(newHintButton);
+        }
+    } else {
+        // Setup existing hint button
+        setupHintButtonListener(hintButton);
+    }
+}
+
+/**
+ * Set up click listener for hint button
+ */
+function setupHintButtonListener(hintButton) {
+    hintButton.addEventListener('click', function() {
+        if (!currentChange) return;
+        
+        // Provide a simple hint based on the type of change
+        let hintText = "Look for a change in ";
+        
+        // Determine specific hint based on change type
+        switch (currentChange.type) {
+            case 'hat':
+                hintText += "someone's hat";
+                break;
+            case 'briefcase':
+                hintText += "someone's briefcase";
+                break;
+            case 'type':
+                hintText += "someone's appearance";
+                break;
+            case 'direction':
+                hintText += "which way someone is facing";
+                break;
+            default:
+                // Get the commuter element
+                const commuter = commuterSprites[currentChange.commuterId];
+                if (commuter && commuter.element) {
                     // Determine which quadrant the change is in
-                    const rect = element.getBoundingClientRect();
+                    const rect = commuter.element.getBoundingClientRect();
                     const sceneRect = document.getElementById('scene-container').getBoundingClientRect();
                     
                     const isTop = rect.top < (sceneRect.top + sceneRect.height / 2);
@@ -125,17 +171,16 @@ function setupHintSystem() {
                     
                     hintText += `the ${location} area`;
                 }
-                
-                showMessage(hintText, 2000);
-                
-                // Disable hint button temporarily
-                this.disabled = true;
-                setTimeout(() => {
-                    this.disabled = false;
-                }, 5000);
-            }
-        });
-    }
+        }
+        
+        showMessage(hintText, 2000);
+        
+        // Disable hint button temporarily
+        this.disabled = true;
+        setTimeout(() => {
+            this.disabled = false;
+        }, 5000);
+    });
 }
 
 /**
@@ -158,52 +203,26 @@ function handleOrientationChange() {
  * Adjust elements based on current orientation
  */
 function adjustForOrientation() {
-    if (isPortrait) {
-        // Portrait-specific adjustments
-        document.querySelectorAll('.window').forEach(window => {
-            window.style.height = '50px';
-        });
-        
-        // Adjust person positions for portrait layout
-        const positions = {
-            'person1': '8%',
-            'person2': '22%',
-            'person3': '36%', 
-            'person4': '50%',
-            'person5': '64%',
-            'person6': '78%',
-            'player': '92%'
-        };
-        
-        Object.keys(positions).forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.style.left = positions[id];
-            }
-        });
-    } else {
-        // Landscape-specific adjustments
-        document.querySelectorAll('.window').forEach(window => {
-            window.style.height = '60px';
-        });
-        
-        // Reset to original positions if needed
-        const originalPositions = {
-            'person1': '10%',
-            'person2': '20%',
-            'person3': '30%', 
-            'person4': '40%',
-            'person5': '50%',
-            'person6': '60%',
-            'player': '75%'
-        };
-        
-        Object.keys(originalPositions).forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.style.left = originalPositions[id];
-            }
-        });
+    // Adjust station elements
+    document.querySelectorAll('.window').forEach(window => {
+        window.style.height = isPortrait ? '50px' : '60px';
+    });
+    
+    // Adjust commuter sizes
+    document.querySelectorAll('.commuter-sprite').forEach(sprite => {
+        sprite.style.transform = `scale(${isPortrait ? 0.8 : 1})`;
+    });
+    
+    // Adjust platform height if needed
+    const platform = document.querySelector('.platform');
+    if (platform) {
+        platform.style.height = isPortrait ? '100px' : '120px';
+    }
+    
+    // Adjust train position
+    const train = document.querySelector('.train');
+    if (train) {
+        train.style.bottom = isPortrait ? '120px' : '140px';
     }
 }
 

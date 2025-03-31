@@ -5,51 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Drone: The Daily Commute</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        /* Additional inline styles to ensure fixed width */
-        html, body {
-            min-width: 820px; /* Slightly larger than game width to account for padding */
-            overflow-x: hidden;
-        }
-        
-        /* Style for the awareness meter */
-        .awareness-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .awareness-meter {
-            width: 200px;
-            height: 15px;
-            background-color: #3a3a3a;
-            border: 2px solid #666;
-            border-radius: 3px;
-            overflow: hidden;
-            display: flex;
-        }
-        
-        .awareness-segment {
-            flex: 1;
-            height: 100%;
-            margin: 0 1px;
-            background-color: #3a3a3a;
-            transition: background-color 0.8s ease-in-out;
-        }
-        
-        /* Style enhancement for the awareness icon */
-        .awareness-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 24px;
-            height: 24px;
-            background-color: #4e4eb2;
-            border-radius: 50%;
-            color: white;
-            font-size: 14px;
-        }
-    </style>
 </head>
 <body>
     <div class="game-container">
@@ -124,7 +79,7 @@
     <script src="awareness_meter.js"></script>
     <script src="config.js"></script>
     <script src="game.js"></script>
-    <script src="commuter_sprite_system.js"></script>
+    <script src="single_commuter_sprite_system.js"></script>
     <script src="sprite_integration.js"></script>
     <script src="extensions.js"></script>    
 </body>

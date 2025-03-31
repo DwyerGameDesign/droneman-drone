@@ -1,6 +1,6 @@
 /**
  * Drone: The Daily Commute
- * Main game logic
+ * Main game logic - Updated for single sprite approach
  */
 
 // Game state
@@ -132,6 +132,7 @@ function handleSegmentFilled(segmentNumber) {
     console.log(`Segment ${segmentNumber} filled!`);
     
     // Add a new commuter when we have enough awareness
+    // This function is defined in sprite_integration.js
     if (typeof addNewCommuter === 'function') {
         addNewCommuter(segmentNumber);
     }
@@ -259,51 +260,44 @@ function proceedToNextDay() {
 }
 
 /**
- * Create the first change - uses predefined commuter change from config
+ * Create the first change - stub to be implemented by sprite_integration.js
  */
 function createFirstChange() {
-    return {
-        commuterId: FIRST_CHANGE.commuterId,
-        type: FIRST_CHANGE.type,
-        property: FIRST_CHANGE.property,
-        value: FIRST_CHANGE.value
-    };
-}
-
-/**
- * Function to highlight missed changes
- * This is a stub that will be overridden by sprite_integration.js
- */
-function highlightMissedChange(change) {
-    console.log('Highlighting missed change:', change);
-    // Implementation provided by sprite_integration.js
-}
-
-/**
- * Select a random element to change
- * This is a stub that will be overridden by sprite_integration.js
- */
-function selectRandomChange() {
-    console.log('Selecting random change');
-    // Implementation provided by sprite_integration.js
+    // This will be overridden by sprite_integration.js
+    console.log('Creating first change');
     return null;
 }
 
 /**
- * Apply the selected change to the element
- * This is a stub that will be overridden by sprite_integration.js
+ * Function to highlight missed changes - stub to be implemented by sprite_integration.js
  */
-function applyChange(change) {
-    console.log('Applying change:', change);
-    // Implementation provided by sprite_integration.js
+function highlightMissedChange(change) {
+    console.log('Highlighting missed change:', change);
+    // This will be overridden by sprite_integration.js
 }
 
 /**
- * Handle clicks on scene elements
- * This is a stub that will be overridden by sprite_integration.js
+ * Select a random element to change - stub to be implemented by sprite_integration.js
+ */
+function selectRandomChange() {
+    console.log('Selecting random change');
+    // This will be overridden by sprite_integration.js
+    return null;
+}
+
+/**
+ * Apply the selected change - stub to be implemented by sprite_integration.js
+ */
+function applyChange(change) {
+    console.log('Applying change:', change);
+    // This will be overridden by sprite_integration.js
+}
+
+/**
+ * Handle element clicks - stub to be implemented by sprite_integration.js
  */
 function handleElementClick(event) {
-    // Implementation provided by sprite_integration.js
+    // This will be overridden by sprite_integration.js
 }
 
 /**
