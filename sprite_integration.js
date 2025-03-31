@@ -5,7 +5,6 @@
 
 // Global variables
 let spriteBasePath = 'assets/sprites/';
-let currentChange = null;
 
 /**
  * Initialize the sprite system
@@ -41,13 +40,15 @@ function initializeSprites() {
  * Create the first change (day 4 - briefcase disappears)
  */
 function createFirstChange() {
-    return {
+    const change = {
         type: 'briefcase',
         property: 'hasBriefcase',
         value: false,
-        commuterId: 0, // First commuter
+        commuterId: 0,
         found: false
     };
+    console.log("Created first change:", change);
+    return change;
 }
 
 /**
@@ -63,6 +64,7 @@ function applyChange(change) {
             commuter.style.backgroundImage = change.value ? 
                 `url(${spriteBasePath}commuter1.png)` : 
                 `url(${spriteBasePath}commuter1_nobriefcase.png)`;
+            console.log("Changed commuter sprite");
         }
     }
 }
@@ -71,14 +73,26 @@ function applyChange(change) {
  * Handle commuter click events
  */
 function handleCommuterClick(event) {
+    console.log("Commuter clicked");
+    
     // Only process clicks when allowed
-    if (!window.canClick) return;
+    if (!window.canClick) {
+        console.log("Clicks not allowed");
+        return;
+    }
     
     const commuter = event.target.closest('.commuter-sprite');
-    if (!commuter) return;
+    if (!commuter) {
+        console.log("No commuter found in click target");
+        return;
+    }
+    
+    console.log("Current change:", window.currentChange);
     
     // Check if this is the commuter with the current change
     if (window.currentChange && commuter.id === 'commuter-0') {
+        console.log("Correct commuter clicked!");
+        
         // Mark change as found
         window.currentChange.found = true;
         
@@ -99,6 +113,9 @@ function handleCommuterClick(event) {
         setTimeout(() => {
             commuter.classList.remove('highlight-pulse');
         }, 1500);
+    } else {
+        console.log("No change to find or wrong commuter");
+        window.showMessage("I didn't notice anything different there", 1500);
     }
 }
 
@@ -106,7 +123,7 @@ function handleCommuterClick(event) {
  * Highlight a missed change before transitioning
  */
 function highlightMissedChange(change) {
-    if (change.type === 'briefcase') {
+    if (change && change.type === 'briefcase') {
         const commuter = document.getElementById('commuter-0');
         if (commuter) {
             commuter.classList.add('highlight-pulse');
@@ -125,6 +142,18 @@ function installGameHandlers() {
     window.createFirstChange = createFirstChange;
     window.applyChange = applyChange;
     window.highlightMissedChange = highlightMissedChange;
+    
+    // Add a listener for the train button to reset canClick
+    const trainButton = document.getElementById('train-button');
+    if (trainButton) {
+        trainButton.addEventListener('click', function() {
+            // We wait for a bit after the train button is clicked before enabling clicking
+            setTimeout(function() {
+                console.log("Enabling clicking after train button press");
+                window.canClick = true;
+            }, 2000); // 2 seconds should be enough time for the day transition
+        });
+    }
     
     console.log("Game handlers installed");
 }
