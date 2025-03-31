@@ -44,15 +44,6 @@ function init() {
     // Set initial narrative text
     typewriter.type("everyday the same...");
     
-    // Get the train button element with error handling
-    const trainButton = document.getElementById('train-button');
-    // Only add event listener if button exists
-    if (trainButton) {
-        trainButton.addEventListener('click', takeTrain);
-    } else {
-        console.log("Train button not found - continuing without it");
-    }
-    
     // Apply initial color stage
     updateColorStage();
 }
