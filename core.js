@@ -91,6 +91,7 @@ async function init() {
         return;
     }
 
+    // Initialize core components
     initTypewriter();
     createAwarenessMeter();
     initializeTrainPlatformBackground();
@@ -101,7 +102,13 @@ async function init() {
     
     // Use ui namespace
     window.ui.updateAwarenessDisplay();
-    gameState.typewriter.type("everyday the same...");
+    
+    // Set initial narrative text after typewriter is initialized
+    if (gameState.typewriter) {
+        gameState.typewriter.type("everyday the same...");
+    } else {
+        gameState.elements.narrativeText.textContent = "everyday the same...";
+    }
     
     if (gameState.elements.trainButton) {
         gameState.elements.trainButton.addEventListener('click', takeTrain);
@@ -117,34 +124,34 @@ async function init() {
 function initTypewriter() {
     // Create a new Typewriter instance
     if (typeof Typewriter !== 'undefined') {
-        typewriter = new Typewriter(narrativeText, {
+        gameState.typewriter = new Typewriter(gameState.elements.narrativeText, {
             speed: 40,
             delay: 0,
             cursor: ''
         });
     } else {
         // Fallback for when the Typewriter class is not available
-        typewriter = {
+        gameState.typewriter = {
             type: function (text) {
-                narrativeText.textContent = text;
+                gameState.elements.narrativeText.textContent = text;
                 return this;
             },
             stop: function () {
                 // Do nothing
             }
         };
-
+        
         // Try to load the Typewriter script dynamically
         const script = document.createElement('script');
         script.src = 'typewriter.js';
         script.onload = function () {
             // Once loaded, create a proper Typewriter instance
-            typewriter = new Typewriter(narrativeText, {
+            gameState.typewriter = new Typewriter(gameState.elements.narrativeText, {
                 speed: 40,
                 delay: 0,
                 cursor: ''
             });
-            typewriter.type(narrativeText.textContent);
+            gameState.typewriter.type(gameState.elements.narrativeText.textContent);
         };
         document.head.appendChild(script);
     }
