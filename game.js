@@ -102,7 +102,7 @@ function initTypewriter() {
         typewriter = new Typewriter(narrativeText, {
             speed: 40,
             delay: 0,
-            cursor: '|'
+            cursor: ''
         });
     } else {
         // Fallback for when the Typewriter class is not available
@@ -124,7 +124,7 @@ function initTypewriter() {
             typewriter = new Typewriter(narrativeText, {
                 speed: 40,
                 delay: 0,
-                cursor: '|'
+                cursor: ''
             });
             typewriter.type(narrativeText.textContent);
         };
@@ -273,50 +273,31 @@ async function detectCommuterVariations() {
     for (let i = 1; i <= MAX_COMMUTERS; i++) {
         commuterVariations[`commuter${i}`] = [];
 
-        // Check for variations (a, b, c, etc.)
-        const letters = ['a', 'b', 'c', 'd', 'e', 'f'];
-
-        // Basic variation is the commuter with no suffix
+        // Check for base commuter first
         const baseImage = new Image();
         baseImage.src = `assets/sprites/commuter${i}.png`;
 
-        // Check if main version exists
         try {
             await imageExists(baseImage);
             commuterVariations[`commuter${i}`].push(`commuter${i}.png`);
+            
+            // Only check for variations if base commuter exists
+            const letters = ['a', 'b', 'c', 'd', 'e', 'f'];
+            
+            // Check letter variations
+            for (const letter of letters) {
+                const variantImage = new Image();
+                variantImage.src = `assets/sprites/commuter${i}_${letter}.png`;
+                try {
+                    await imageExists(variantImage);
+                    commuterVariations[`commuter${i}`].push(`commuter${i}_${letter}.png`);
+                } catch (error) {
+                    // Silently skip non-existent variations
+                }
+            }
         } catch (error) {
-            // If base doesn't exist, skip this commuter
+            // If base commuter doesn't exist, skip all variations
             continue;
-        }
-
-        // Check for letter variations
-        for (const letter of letters) {
-            const variantImage = new Image();
-            variantImage.src = `assets/sprites/commuter${i}_${letter}.png`;
-
-            try {
-                await imageExists(variantImage);
-                commuterVariations[`commuter${i}`].push(`commuter${i}_${letter}.png`);
-            } catch (error) {
-                // Silently skip non-existent variations
-            }
-        }
-
-        // Also check for old-style variations like with/without briefcase
-        const oldStyleVariants = [
-            'nobriefcase', 'hat', 'glasses', 'phone', 'coffee'
-        ];
-
-        for (const variant of oldStyleVariants) {
-            const variantImage = new Image();
-            variantImage.src = `assets/sprites/commuter${i}_${variant}.png`;
-
-            try {
-                await imageExists(variantImage);
-                commuterVariations[`commuter${i}`].push(`commuter${i}_${variant}.png`);
-            } catch (error) {
-                // Silently skip non-existent variations
-            }
         }
     }
 
@@ -579,6 +560,15 @@ function proceedToNextDay() {
             // Re-enable train button
             if (trainButton) {
                 trainButton.disabled = false;
+            }
+
+            // Update narrative text with typewriter effect
+            if (typewriter) {
+                typewriter.stop();
+                narrativeText.textContent = '';
+                setTimeout(() => {
+                    updateNarrativeText();
+                }, 100);
             }
 
             isTransitioning = false; // Reset transition flag
