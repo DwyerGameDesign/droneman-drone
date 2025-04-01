@@ -272,6 +272,48 @@ function showThoughtBubble() {
     }, 3000);
 }
 
+/**
+ * Game completion
+ */
+function gameComplete() {
+    const sceneContainer = gameState.elements.sceneContainer;
+    const trainButton = gameState.elements.trainButton;
+    
+    sceneContainer.classList.add('completion');
+
+    setTimeout(() => {
+        const completionMessage = document.createElement('div');
+        completionMessage.className = 'completion-message';
+        completionMessage.innerHTML = `
+            <h2>DRONE NO MORE</h2>
+            <p>You've reached 100% awareness and broken free from the daily grind.</p>
+            <p>Days on the train: ${gameState.day}</p>
+            <p>Changes found: ${gameState.changesFound}</p>
+        `;
+
+        // Style the completion message
+        Object.assign(completionMessage.style, {
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            color: '#d4d4c8',
+            padding: '20px',
+            textAlign: 'center',
+            zIndex: '1000',
+            borderRadius: '5px'
+        });
+
+        sceneContainer.appendChild(completionMessage);
+        updateTypewriterText("DRONE NO MORE, I'M MY OWN MAN. You've broken free from the cycle.");
+
+        if (trainButton) {
+            trainButton.disabled = true;
+        }
+    }, 2000);
+}
+
 // Export UI functions to window object
 window.ui = {
     updateAwarenessDisplay,

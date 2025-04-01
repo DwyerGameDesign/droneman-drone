@@ -85,6 +85,12 @@ window.core = {
 async function init() {
     console.log("Initializing Drone: The Daily Commute");
 
+    // Wait for UI module to be available
+    if (!window.ui) {
+        console.error("UI module not loaded yet");
+        return;
+    }
+
     initTypewriter();
     createAwarenessMeter();
     initializeTrainPlatformBackground();
@@ -94,14 +100,14 @@ async function init() {
     commuters.addInitialCommuter();
     
     // Use ui namespace
-    ui.updateAwarenessDisplay();
+    window.ui.updateAwarenessDisplay();
     gameState.typewriter.type("everyday the same...");
     
     if (gameState.elements.trainButton) {
         gameState.elements.trainButton.addEventListener('click', takeTrain);
     }
     
-    ui.updateColorStage();
+    window.ui.updateColorStage();
     setupMobileSupport();
 }
 
