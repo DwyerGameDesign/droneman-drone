@@ -100,8 +100,8 @@ h1 {
     cursor: pointer;
     z-index: 10;
     display: block !important;
-    width: 36px;
-    height: 85px;
+    width: 144px;
+    height: 340px;
     transform: translateX(-50%);
     background-size: contain !important;
     background-repeat: no-repeat !important;
