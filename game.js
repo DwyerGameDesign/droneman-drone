@@ -282,18 +282,14 @@ async function detectCommuterVariations() {
             commuterVariations[`commuter${i}`].push(`commuter${i}.png`);
             
             // Only check for variations if base commuter exists
-            const letters = ['a', 'b', 'c', 'd', 'e', 'f'];
-            
-            // Check letter variations
-            for (const letter of letters) {
-                const variantImage = new Image();
-                variantImage.src = `assets/sprites/commuter${i}_${letter}.png`;
-                try {
-                    await imageExists(variantImage);
-                    commuterVariations[`commuter${i}`].push(`commuter${i}_${letter}.png`);
-                } catch (error) {
-                    // Silently skip non-existent variations
-                }
+            // Only check for 'a' variation as that's the only one we know exists
+            const variantImage = new Image();
+            variantImage.src = `assets/sprites/commuter${i}_a.png`;
+            try {
+                await imageExists(variantImage);
+                commuterVariations[`commuter${i}`].push(`commuter${i}_a.png`);
+            } catch (error) {
+                // Silently skip non-existent variations
             }
         } catch (error) {
             // If base commuter doesn't exist, skip all variations
@@ -781,7 +777,15 @@ function decreaseAwareness(amount) {
 function checkForLyrics() {
     const lyricForToday = SONG_LYRICS.find(lyric => lyric.day === day);
     if (lyricForToday) {
-        updateTypewriterText(`"${lyricForToday.text}"`);
+        if (typewriter) {
+            typewriter.stop();
+            narrativeText.textContent = '';
+            setTimeout(() => {
+                typewriter.type(`"${lyricForToday.text}"`);
+            }, 100);
+        } else {
+            narrativeText.textContent = `"${lyricForToday.text}"`;
+        }
     }
 }
 
@@ -792,7 +796,15 @@ function updateNarrativeText() {
     const lyricForToday = SONG_LYRICS.find(lyric => lyric.day === day);
     
     if (lyricForToday) {
-        updateTypewriterText(`"${lyricForToday.text}"`);
+        if (typewriter) {
+            typewriter.stop();
+            narrativeText.textContent = '';
+            setTimeout(() => {
+                typewriter.type(`"${lyricForToday.text}"`);
+            }, 100);
+        } else {
+            narrativeText.textContent = `"${lyricForToday.text}"`;
+        }
     } else {
         let newText = "";
         if (awareness < 25) {
@@ -804,7 +816,16 @@ function updateNarrativeText() {
         } else {
             newText = "The world is more vibrant now. You're breaking free.";
         }
-        updateTypewriterText(newText);
+        
+        if (typewriter) {
+            typewriter.stop();
+            narrativeText.textContent = '';
+            setTimeout(() => {
+                typewriter.type(newText);
+            }, 100);
+        } else {
+            narrativeText.textContent = newText;
+        }
     }
 }
 
