@@ -366,8 +366,8 @@ function addCommuter() {
     commuterElement.style.position = 'absolute';
     commuterElement.style.left = `${xPos}px`;
     commuterElement.style.bottom = `${yPos}px`;
-    commuterElement.style.width = '36px';
-    commuterElement.style.height = '85px';
+    commuterElement.style.width = '72px';  // Doubled from 36px
+    commuterElement.style.height = '170px'; // Doubled from 85px
     commuterElement.style.transform = 'translateX(-50%)';
 
     // Use the first variation as default
