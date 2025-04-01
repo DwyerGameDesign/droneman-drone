@@ -75,8 +75,7 @@ window.core = {
     increaseAwareness,
     decreaseAwareness,
     setupMobileSupport,
-    enhanceTouchTargets,
-    showHint
+    enhanceTouchTargets
 };
 
 /**
@@ -294,53 +293,53 @@ function takeTrain() {
  */
 function proceedToNextDay() {
     // Fade out
-    sceneContainer.classList.add('fading');
+    gameState.elements.sceneContainer.classList.add('fading');
 
     setTimeout(() => {
         // Increment day
-        day++;
-        dayDisplay.textContent = day;
+        gameState.day++;
+        gameState.elements.dayDisplay.textContent = gameState.day;
 
         // Reset current change
-        currentChange = null;
+        gameState.currentChange = null;
 
         // Determine number of changes for today
         const changesToCreate = determineChangesForDay();
 
         // Create new change
-        if (day === 4) {
+        if (gameState.day === 4) {
             // First change is on day 4
-            createFirstChange();
-        } else if (day > 4) {
+            commuters.createFirstChange();
+        } else if (gameState.day > 4) {
             // For later days, create random changes
-            createRandomChange(changesToCreate);
+            commuters.createRandomChange(changesToCreate);
         }
 
         // Enable clicking since there's something to find (if day >= 4)
-        canClick = day >= 4;
+        gameState.canClick = gameState.day >= 4;
 
         // Check for lyrics or special day text
-        checkForLyrics();
+        window.ui.checkForLyrics();
 
         // Fade back in
         setTimeout(() => {
-            sceneContainer.classList.remove('fading');
+            gameState.elements.sceneContainer.classList.remove('fading');
 
             // Re-enable train button
-            if (trainButton) {
-                trainButton.disabled = false;
+            if (gameState.elements.trainButton) {
+                gameState.elements.trainButton.disabled = false;
             }
 
             // Update narrative text with typewriter effect
-            if (typewriter) {
-                typewriter.stop();
-                narrativeText.textContent = '';
+            if (gameState.typewriter) {
+                gameState.typewriter.stop();
+                gameState.elements.narrativeText.textContent = '';
                 setTimeout(() => {
-                    updateNarrativeText();
+                    window.ui.updateNarrativeText();
                 }, 100);
             }
 
-            isTransitioning = false; // Reset transition flag
+            gameState.isTransitioning = false; // Reset transition flag
         }, 500); // Fade in duration
     }, 500); // Fade out duration
 }

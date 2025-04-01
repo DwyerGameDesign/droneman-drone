@@ -314,6 +314,46 @@ function gameComplete() {
     }, 2000);
 }
 
+/**
+ * Show a hint to help the player
+ */
+function showHint() {
+    // Only provide hint if there is an active change
+    if (!gameState.currentChange) {
+        showMessage("No changes to find yet. Take the train!", 1500);
+        return;
+    }
+
+    // Find the commuter for the current change
+    const commuter = commuters.allCommuters.find(c => c.id === gameState.currentChange.commuterId);
+
+    if (commuter && commuter.element && !gameState.currentChange.found) {
+        // Determine which quadrant the change is in
+        const rect = commuter.element.getBoundingClientRect();
+        const sceneRect = gameState.elements.sceneContainer.getBoundingClientRect();
+
+        const isTop = rect.top < (sceneRect.top + sceneRect.height / 2);
+        const isLeft = rect.left < (sceneRect.left + sceneRect.width / 2);
+
+        let location = isTop ? 'top' : 'bottom';
+        location += isLeft ? ' left' : ' right';
+
+        // Show hint message
+        showMessage(`Look for a change in the ${location} area`, 2000);
+
+        // Disable hint button temporarily
+        const hintButton = document.getElementById('hint-button');
+        if (hintButton) {
+            hintButton.disabled = true;
+            setTimeout(() => {
+                hintButton.disabled = false;
+            }, 5000);
+        }
+    } else {
+        showMessage("No unfound changes left today", 1500);
+    }
+}
+
 // Export UI functions to window object
 window.ui = {
     updateAwarenessDisplay,
@@ -325,5 +365,6 @@ window.ui = {
     showSegmentNarrative,
     updateTypewriterText,
     checkForLyrics,
-    gameComplete
+    gameComplete,
+    showHint
 };
