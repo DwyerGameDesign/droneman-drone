@@ -18,21 +18,6 @@ let allCommuters = [];
 let activeCommuters = 0;
 let commuterVariations = {};
 
-// Game constants
-const SONG_LYRICS = [
-    { day: 5, text: "Every day the same, rolling to a paycheck" },
-    { day: 10, text: "6:40 train, drink my 40 on the way back" },
-    { day: 15, text: "Soul's nearly drained, gotta be a way out" },
-    { day: 20, text: "Signal in my brain, stopping me with self-doubt" },
-    { day: 30, text: "Drone no more, I'm clean and free" },
-    { day: 40, text: "The Man ain't got his grip on me" },
-    { day: 50, text: "Drone no more, I'm my own man" },
-    { day: 60, text: "Gotta engineer a plan" },
-    { day: 75, text: "Time for a change, bell's ringing louder" },
-    { day: 90, text: "No one left to blame, 'cause I'm my biggest doubter" },
-    { day: 100, text: "Drone no more, I'm my own man" }
-];
-
 // Configurable game settings
 const PROGRESSION_CONFIG = {
     initialChangesPerDay: 1,

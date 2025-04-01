@@ -39,8 +39,10 @@ const colorSystem = {
             this.updateColors(e.detail.awareness);
         });
         
-        // Initial update
-        this.updateColors(awareness);
+        // Initial update - wait for awareness to be defined
+        setTimeout(() => {
+            this.updateColors(awareness);
+        }, 0);
     },
     
     /**
