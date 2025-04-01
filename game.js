@@ -284,9 +284,7 @@ async function detectCommuterVariations() {
         try {
             await imageExists(baseImage);
             commuterVariations[`commuter${i}`].push(`commuter${i}.png`);
-            console.log(`Found base sprite: commuter${i}.png`);
         } catch (error) {
-            console.log(`Base sprite commuter${i}.png not found`);
             // If base doesn't exist, skip this commuter
             continue;
         }
@@ -299,9 +297,8 @@ async function detectCommuterVariations() {
             try {
                 await imageExists(variantImage);
                 commuterVariations[`commuter${i}`].push(`commuter${i}_${letter}.png`);
-                console.log(`Found variant: commuter${i}_${letter}.png`);
             } catch (error) {
-                // This variation doesn't exist, that's okay
+                // Silently skip non-existent variations
             }
         }
 
@@ -317,14 +314,14 @@ async function detectCommuterVariations() {
             try {
                 await imageExists(variantImage);
                 commuterVariations[`commuter${i}`].push(`commuter${i}_${variant}.png`);
-                console.log(`Found legacy variant: commuter${i}_${variant}.png`);
             } catch (error) {
-                // This variation doesn't exist, that's okay
+                // Silently skip non-existent variations
             }
         }
     }
 
-    console.log("Detected variations:", commuterVariations);
+    // Log final summary of found variations
+    console.log("Commuter variations detection complete. Found variations:", commuterVariations);
 }
 
 /**
