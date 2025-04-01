@@ -18,6 +18,21 @@ let allCommuters = [];
 let activeCommuters = 0;
 let commuterVariations = {};
 
+// Game constants
+const SONG_LYRICS = [
+    { day: 5, text: "Every day the same, rolling to a paycheck" },
+    { day: 10, text: "6:40 train, drink my 40 on the way back" },
+    { day: 15, text: "Soul's nearly drained, gotta be a way out" },
+    { day: 20, text: "Signal in my brain, stopping me with self-doubt" },
+    { day: 30, text: "Drone no more, I'm clean and free" },
+    { day: 40, text: "The Man ain't got his grip on me" },
+    { day: 50, text: "Drone no more, I'm my own man" },
+    { day: 60, text: "Gotta engineer a plan" },
+    { day: 75, text: "Time for a change, bell's ringing louder" },
+    { day: 90, text: "No one left to blame, 'cause I'm my biggest doubter" },
+    { day: 100, text: "Drone no more, I'm my own man" }
+];
+
 // Configurable game settings
 const PROGRESSION_CONFIG = {
     initialChangesPerDay: 1,
@@ -48,7 +63,6 @@ const sceneContainer = document.getElementById('scene-container');
 const trainButton = document.getElementById('train-button');
 const dayDisplay = document.getElementById('day');
 const narrativeText = document.getElementById('narrative-text');
-const fadeOverlay = document.getElementById('fade-overlay');
 const message = document.getElementById('message');
 const thoughtBubble = document.getElementById('thought-bubble');
 
@@ -793,73 +807,22 @@ function decreaseAwareness(amount) {
  * Check for lyrics for the current day
  */
 function checkForLyrics() {
-    // Define song lyrics that appear on certain days
-    const SONG_LYRICS = [
-        { day: 5, text: "Every day the same, rolling to a paycheck" },
-        { day: 10, text: "6:40 train, drink my 40 on the way back" },
-        { day: 15, text: "Soul's nearly drained, gotta be a way out" },
-        { day: 20, text: "Signal in my brain, stopping me with self-doubt" },
-        { day: 30, text: "Drone no more, I'm clean and free" },
-        { day: 40, text: "The Man ain't got his grip on me" },
-        { day: 50, text: "Drone no more, I'm my own man" },
-        { day: 60, text: "Gotta engineer a plan" },
-        { day: 75, text: "Time for a change, bell's ringing louder" },
-        { day: 90, text: "No one left to blame, 'cause I'm my biggest doubter" },
-        { day: 100, text: "Drone no more, I'm my own man" }
-    ];
-
-    // Check if there's a lyric for the current day
     const lyricForToday = SONG_LYRICS.find(lyric => lyric.day === day);
-
     if (lyricForToday) {
-        narrativeText.textContent = `"${lyricForToday.text}"`;
-
-        // Use typewriter effect
-        if (typewriter) {
-            typewriter.stop();
-            setTimeout(() => {
-                typewriter.type(narrativeText.textContent);
-            }, 100);
-        }
+        updateTypewriterText(`"${lyricForToday.text}"`);
     }
 }
 
 /**
  * Update the narrative text based on the current awareness
- * Only called when a change is found
  */
 function updateNarrativeText() {
-    // Check if there's a lyric for the current day
-    const SONG_LYRICS = [
-        { day: 5, text: "Every day the same, rolling to a paycheck" },
-        { day: 10, text: "6:40 train, drink my 40 on the way back" },
-        { day: 15, text: "Soul's nearly drained, gotta be a way out" },
-        { day: 20, text: "Signal in my brain, stopping me with self-doubt" },
-        { day: 30, text: "Drone no more, I'm clean and free" },
-        { day: 40, text: "The Man ain't got his grip on me" },
-        { day: 50, text: "Drone no more, I'm my own man" },
-        { day: 60, text: "Gotta engineer a plan" },
-        { day: 75, text: "Time for a change, bell's ringing louder" },
-        { day: 90, text: "No one left to blame, 'cause I'm my biggest doubter" },
-        { day: 100, text: "Drone no more, I'm my own man" }
-    ];
-
     const lyricForToday = SONG_LYRICS.find(lyric => lyric.day === day);
-
+    
     if (lyricForToday) {
-        narrativeText.textContent = `"${lyricForToday.text}"`;
-
-        // Restart the typewriter with this text
-        if (typewriter) {
-            typewriter.stop();
-            setTimeout(() => {
-                typewriter.type(narrativeText.textContent);
-            }, 100);
-        }
+        updateTypewriterText(`"${lyricForToday.text}"`);
     } else {
-        // Choose narrative based on awareness level
         let newText = "";
-
         if (awareness < 25) {
             newText = "The routine continues, but something feels different today.";
         } else if (awareness < 50) {
@@ -869,16 +832,7 @@ function updateNarrativeText() {
         } else {
             newText = "The world is more vibrant now. You're breaking free.";
         }
-
-        narrativeText.textContent = newText;
-
-        // Restart the typewriter with this text
-        if (typewriter) {
-            typewriter.stop();
-            setTimeout(() => {
-                typewriter.type(newText);
-            }, 100);
-        }
+        updateTypewriterText(newText);
     }
 }
 
@@ -1036,10 +990,8 @@ function showPopupMessage(text, x, y) {
  * Game completion
  */
 function gameComplete() {
-    // Additional game completion effects
     sceneContainer.classList.add('completion');
 
-    // Display final message
     setTimeout(() => {
         const completionMessage = document.createElement('div');
         completionMessage.className = 'completion-message';
@@ -1051,32 +1003,22 @@ function gameComplete() {
         `;
 
         // Style the completion message
-        completionMessage.style.position = 'absolute';
-        completionMessage.style.top = '50%';
-        completionMessage.style.left = '50%';
-        completionMessage.style.transform = 'translate(-50%, -50%)';
-        completionMessage.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-        completionMessage.style.color = '#d4d4c8';
-        completionMessage.style.padding = '20px';
-        completionMessage.style.textAlign = 'center';
-        completionMessage.style.zIndex = '1000';
-        completionMessage.style.borderRadius = '5px';
+        Object.assign(completionMessage.style, {
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            color: '#d4d4c8',
+            padding: '20px',
+            textAlign: 'center',
+            zIndex: '1000',
+            borderRadius: '5px'
+        });
 
-        // Add to scene
         sceneContainer.appendChild(completionMessage);
+        updateTypewriterText("DRONE NO MORE, I'M MY OWN MAN. You've broken free from the cycle.");
 
-        // Update narrative
-        narrativeText.textContent = "DRONE NO MORE, I'M MY OWN MAN. You've broken free from the cycle.";
-
-        // Use typewriter for final message
-        if (typewriter) {
-            typewriter.stop();
-            setTimeout(() => {
-                typewriter.type(narrativeText.textContent);
-            }, 100);
-        }
-
-        // Disable train button
         if (trainButton) {
             trainButton.disabled = true;
         }
@@ -1098,7 +1040,6 @@ function setupMobileSupport() {
             const mobileControls = document.createElement('div');
             mobileControls.className = 'mobile-controls';
 
-            // Add hint button for mobile users
             const hintButton = document.createElement('button');
             hintButton.id = 'hint-button';
             hintButton.className = 'hint-button';
@@ -1109,7 +1050,6 @@ function setupMobileSupport() {
             gameContainer.appendChild(mobileControls);
         }
 
-        // Enhance touch targets
         enhanceTouchTargets();
     }
 }
@@ -1118,21 +1058,23 @@ function setupMobileSupport() {
  * Make touch targets larger for mobile devices
  */
 function enhanceTouchTargets() {
-    // Increase clickable area for commuter sprites
+    const touchAreaSize = 20; // Size of the touch area in pixels
+    const touchAreaStyle = {
+        position: 'absolute',
+        top: `-${touchAreaSize}px`,
+        left: `-${touchAreaSize}px`,
+        right: `-${touchAreaSize}px`,
+        bottom: `-${touchAreaSize}px`,
+        zIndex: '10'
+    };
+
     document.querySelectorAll('.commuter-sprite').forEach(el => {
-        // Only add touch area if it doesn't already exist
         if (!el.querySelector('.touch-area')) {
             const touchArea = document.createElement('div');
             touchArea.className = 'touch-area';
-            touchArea.style.position = 'absolute';
-            touchArea.style.top = '-10px';
-            touchArea.style.left = '-10px';
-            touchArea.style.right = '-10px';
-            touchArea.style.bottom = '-10px';
-            touchArea.style.zIndex = '10';
+            Object.assign(touchArea.style, touchAreaStyle);
 
-            // Pass clicks through to the original element
-            touchArea.addEventListener('click', function (e) {
+            touchArea.addEventListener('click', e => {
                 e.stopPropagation();
                 el.click();
             });
