@@ -276,9 +276,6 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
             gameState.elements.trainButton.style.display = 'none';
         }
 
-        // Show narrative about noticing someone new
-        window.ui.showSegmentNarrative(segmentNumber);
-
         // Add a new commuter immediately but make it invisible
         const newCommuter = commuters.addCommuter();
         if (newCommuter) {
@@ -289,22 +286,29 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
 
         // Play the segment completion effect
         if (window.shaderEffects && window.shaderEffects.playEffect) {
-            // Start fading in the new commuter immediately
-            if (newCommuter) {
-                setTimeout(() => {
-                    newCommuter.element.style.opacity = '1';
-                }, 100);
-            }
-
-            // Play the shader effect
+            // Start the shader effect
             window.shaderEffects.playEffect('wave', () => {
-                // Show train button again
+                // Shader effect is done, show train button again
                 if (gameState.elements.trainButton) {
                     gameState.elements.trainButton.style.display = 'block';
                 }
             });
+
+            // Show narrative text immediately after shader starts
+            window.ui.showSegmentNarrative(segmentNumber);
+
+            // Start fading in the new commuter after a short delay
+            if (newCommuter) {
+                setTimeout(() => {
+                    newCommuter.element.style.opacity = '1';
+                }, 300);
+            }
         } else {
             // Fallback if shader effects aren't available
+            // Show narrative text
+            window.ui.showSegmentNarrative(segmentNumber);
+
+            // Fade in the new commuter
             if (newCommuter) {
                 newCommuter.element.style.opacity = '1';
                 // Highlight the new commuter
