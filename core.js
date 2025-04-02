@@ -81,44 +81,60 @@ window.core = {
 /**
  * Initialize the game
  */
-async function init() {
+function init() {
     console.log("Initializing Drone: The Daily Commute");
 
-    // Wait for UI module to be available
-    if (!window.ui) {
-        console.error("UI module not loaded yet");
-        return;
-    }
+    // Initialize game state
+    gameState.day = 1;
+    gameState.awareness = 0;
+    gameState.canClick = false;  // Start with clicking disabled
+    gameState.currentChange = null;
+    gameState.isTransitioning = false;
+    gameState.currentSegment = 0;
+    gameState.changesFound = 0;
+    gameState.progressToNextSegment = 0;
 
-    // Initialize core components
-    initTypewriter();
-    createAwarenessMeter();
-    initializeTrainPlatformBackground();
-    
-    // Use commuters namespace
-    await commuters.detectCommuterVariations();
+    // Initialize UI elements
+    gameState.elements = {
+        sceneContainer: document.getElementById('scene-container'),
+        trainButton: document.getElementById('train-button'),
+        dayDisplay: document.getElementById('day'),
+        narrativeText: document.getElementById('narrative-text'),
+        message: document.getElementById('message'),
+        thoughtBubble: document.getElementById('thought-bubble')
+    };
+
+    // Initialize typewriter
+    gameState.typewriter = new Typewriter(gameState.elements.narrativeText, {
+        typingSpeed: 30,
+        deleteSpeed: 10,
+        pauseFor: 2000
+    });
+
+    // Initialize awareness meter
+    gameState.awarenessMeter = new AwarenessMeter('awareness-meter');
+
+    // Add event listeners
+    gameState.elements.trainButton.addEventListener('click', takeTrain);
+    gameState.elements.sceneContainer.addEventListener('click', handleSceneClick);
+
+    // Initialize commuters
+    commuters.detectCommuterVariations();
     commuters.addInitialCommuter();
-    
-    // Use ui namespace
-    window.ui.updateAwarenessDisplay();
-    
-    // Set initial narrative text after typewriter is initialized
-    if (gameState.typewriter) {
-        gameState.typewriter.type("everyday the same...");
-    } else {
-        gameState.elements.narrativeText.textContent = "everyday the same...";
-    }
-    
-    if (gameState.elements.trainButton) {
-        gameState.elements.trainButton.addEventListener('click', takeTrain);
-    }
-    
-    window.ui.updateColorStage();
-    setupMobileSupport();
-    
-    // Initialize doober and shader systems
-    initVisualFeedbackSystems();
+
+    // Initialize doober system
+    window.dooberSystem.init();
+
+    // Initialize shader effects
+    window.shaderEffects.init();
+
+    // Set initial narrative text
+    window.ui.updateNarrativeText();
+
+    // Enable clicking if we're on day 4 or later
+    gameState.canClick = gameState.day >= 4;
 }
+
 /**
  * Initialize the typewriter for narrative text
  */

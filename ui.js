@@ -64,43 +64,48 @@ function checkForLyrics() {
 }
 
 /**
- * Update the narrative text based on the current awareness
+ * Update the narrative text based on the current day
  */
 function updateNarrativeText() {
-    const lyricForToday = SONG_LYRICS.find(lyric => lyric.day === day);
-    
-    if (lyricForToday) {
-        if (typewriter) {
-            typewriter.stop();
-            narrativeText.textContent = '';
-            setTimeout(() => {
-                typewriter.type(`"${lyricForToday.text}"`);
-            }, 100);
-        } else {
-            narrativeText.textContent = `"${lyricForToday.text}"`;
-        }
-    } else {
-        let newText = "";
-        if (awareness < 25) {
-            newText = "The routine continues, but something feels different today.";
-        } else if (awareness < 50) {
-            newText = "You're starting to notice the world around you more clearly.";
-        } else if (awareness < 75) {
-            newText = "The grip is loosening. Each day you feel more alive.";
-        } else {
-            newText = "The world is more vibrant now. You're breaking free.";
-        }
-        
-        if (typewriter) {
-            typewriter.stop();
-            narrativeText.textContent = '';
-            setTimeout(() => {
-                typewriter.type(newText);
-            }, 100);
-        } else {
-            narrativeText.textContent = newText;
-        }
+    if (!gameState.typewriter) return;
+
+    let text = "";
+    switch (gameState.day) {
+        case 1:
+            text = "Another day, another commute...";
+            break;
+        case 2:
+            text = "The station feels different today...";
+            break;
+        case 3:
+            text = "Something's not quite right...";
+            break;
+        case 4:
+            text = "Wait... did that commuter just change?";
+            break;
+        case 5:
+            text = "I need to pay more attention...";
+            break;
+        case 6:
+            text = "The changes are becoming more obvious...";
+            break;
+        case 7:
+            text = "I'm starting to notice patterns...";
+            break;
+        case 8:
+            text = "The world is shifting around me...";
+            break;
+        case 9:
+            text = "I can see the changes clearly now...";
+            break;
+        case 10:
+            text = "The veil is lifting...";
+            break;
+        default:
+            text = "The world keeps changing...";
     }
+
+    gameState.typewriter.type(text);
 }
 
 /**
