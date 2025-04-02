@@ -281,28 +281,33 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
         if (newCommuter) {
             console.log(`Added commuter ${newCommuter.type} for segment ${segmentNumber}`);
             newCommuter.element.style.opacity = '0';
-            newCommuter.element.style.transition = 'opacity 0.5s ease-in-out';
+            // Add the new-commuter class for the animation
+            newCommuter.element.classList.add('new-commuter');
         }
 
         // Play the segment completion effect
         if (window.shaderEffects && window.shaderEffects.playEffect) {
-            // Start the shader effect
-            window.shaderEffects.playEffect('wave', () => {
-                // Shader effect is done, show train button again
-                if (gameState.elements.trainButton) {
-                    gameState.elements.trainButton.style.display = 'block';
-                }
-            });
+            // Start the shader effect after doobers finish (450ms)
+            setTimeout(() => {
+                window.shaderEffects.playEffect('wave', () => {
+                    // Shader effect is done, show train button again
+                    if (gameState.elements.trainButton) {
+                        gameState.elements.trainButton.style.display = 'block';
+                    }
+                });
 
-            // Show narrative text immediately after shader starts
-            window.ui.showSegmentNarrative(segmentNumber);
-
-            // Start fading in the new commuter after a short delay
-            if (newCommuter) {
+                // Show narrative text after shader starts (200ms)
                 setTimeout(() => {
-                    newCommuter.element.style.opacity = '1';
-                }, 300);
-            }
+                    window.ui.showSegmentNarrative(segmentNumber);
+
+                    // Start fading in the new commuter after narrative starts (300ms)
+                    if (newCommuter) {
+                        setTimeout(() => {
+                            newCommuter.element.style.opacity = '1';
+                        }, 300);
+                    }
+                }, 200);
+            }, 450);
         } else {
             // Fallback if shader effects aren't available
             // Show narrative text
