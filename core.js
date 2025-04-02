@@ -276,14 +276,6 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
             gameState.elements.trainButton.style.display = 'none';
         }
 
-        // Add a new commuter immediately but make it invisible
-        const newCommuter = commuters.addCommuter();
-        if (newCommuter) {
-            console.log(`Added commuter ${newCommuter.type} for segment ${segmentNumber}`);
-            // Add the new-commuter class for the animation
-            newCommuter.element.classList.add('new-commuter');
-        }
-
         // Play the segment completion effect
         if (window.shaderEffects && window.shaderEffects.playEffect) {
             // Start the shader effect after doobers finish (450ms)
@@ -299,12 +291,15 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
                 setTimeout(() => {
                     window.ui.showSegmentNarrative(segmentNumber);
 
-                    // Start the new commuter animation after narrative starts (300ms)
-                    if (newCommuter) {
-                        setTimeout(() => {
-                            // The animation will start automatically due to the new-commuter class
-                        }, 300);
-                    }
+                    // Add and animate the new commuter after narrative starts (300ms)
+                    setTimeout(() => {
+                        const newCommuter = commuters.addCommuter();
+                        if (newCommuter) {
+                            console.log(`Added commuter ${newCommuter.type} for segment ${segmentNumber}`);
+                            // Add the new-commuter class for the animation
+                            newCommuter.element.classList.add('new-commuter');
+                        }
+                    }, 300);
                 }, 200);
             }, 450);
         } else {
@@ -312,9 +307,11 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
             // Show narrative text
             window.ui.showSegmentNarrative(segmentNumber);
 
-            // Start the new commuter animation
+            // Add the new commuter
+            const newCommuter = commuters.addCommuter();
             if (newCommuter) {
-                // The animation will start automatically due to the new-commuter class
+                // Add the new-commuter class for the animation
+                newCommuter.element.classList.add('new-commuter');
                 // Highlight the new commuter
                 commuters.highlightElement(newCommuter.element);
             }
