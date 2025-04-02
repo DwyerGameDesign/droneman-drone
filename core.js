@@ -104,6 +104,9 @@ function init() {
         thoughtBubble: document.getElementById('thought-bubble')
     };
 
+    // Initialize train platform background
+    initializeTrainPlatformBackground();
+
     // Initialize typewriter
     gameState.typewriter = new Typewriter(gameState.elements.narrativeText, {
         typingSpeed: 30,
@@ -132,6 +135,9 @@ function init() {
 
     // Enable clicking if we're on day 4 or later
     gameState.canClick = gameState.day >= 4;
+
+    // Set up mobile support
+    setupMobileSupport();
 }
 
 /**
