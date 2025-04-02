@@ -109,39 +109,46 @@ function updateNarrativeText() {
 }
 
 /**
- * Show a thought bubble with text based on awareness level
- */
-/**
- * Show segment narrative text
+ * Show narrative text when a segment is filled
  */
 function showSegmentNarrative(segmentNumber) {
-    // Define narratives for each segment
-    const narratives = [
-        "The routine continues. Same faces, same train. But something feels different today.",
-        "You're starting to notice the world around you more clearly. The routine is still there, but you're waking up.",
-        "The grip is loosening. Each day you feel more conscious, more alive. The routine can be broken.",
-        "The world is more vibrant now. The daily commute is becoming a journey of choice, not necessity.",
-        "Colors appear more vivid. Details you never noticed before demand your attention.",
-        "Time seems to flow differently now. You're present in each moment.",
-        "Other commuters begin to appear as individuals, not a faceless crowd.",
-        "The train no longer feels like a prison. It's merely a vehicle, and you control where it takes you.",
-        "DRONE NO MORE, I'M MY OWN PERSON. You've broken free from the cycle."
-    ];
+    if (!gameState.typewriter) return;
 
-    // Get the narrative for this segment (0-indexed array)
-    const narrative = narratives[segmentNumber - 1] ||
-        "Your awareness continues to grow...";
-
-    // Update the narrative display
-    if (typewriter) {
-        typewriter.stop();
-        narrativeText.textContent = '';
-        setTimeout(() => {
-            typewriter.type(narrative);
-        }, 100);
-    } else {
-        narrativeText.textContent = narrative;
+    let text = "";
+    switch (segmentNumber) {
+        case 1:
+            text = "I notice someone new on the platform...";
+            break;
+        case 2:
+            text = "Another person stands out from the crowd...";
+            break;
+        case 3:
+            text = "I'm starting to recognize faces in the crowd...";
+            break;
+        case 4:
+            text = "The commuters are becoming more distinct...";
+            break;
+        case 5:
+            text = "I can see more details in each person now...";
+            break;
+        case 6:
+            text = "The world is becoming more vibrant...";
+            break;
+        case 7:
+            text = "I'm seeing connections between people...";
+            break;
+        case 8:
+            text = "The veil is lifting, I can see clearly now...";
+            break;
+        default:
+            text = "Something feels different about the crowd...";
     }
+
+    gameState.typewriter.stop();
+    gameState.elements.narrativeText.textContent = '';
+    setTimeout(() => {
+        gameState.typewriter.type(text);
+    }, 100);
 }
 
 /**
@@ -401,5 +408,6 @@ window.ui = {
     updateTypewriterText,
     checkForLyrics,
     gameComplete,
-    showSegmentConnectionNarrative  // Add this new function to the exports
+    showSegmentConnectionNarrative,
+    showHint
 };

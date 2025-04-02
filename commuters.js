@@ -201,37 +201,36 @@ function handleCommuterClick(event) {
         }
 
         // Increment changes found counter
-        changesFound++;
+        gameState.changesFound++;
 
-        // Calculate awareness gain based on current difficulty
-        const currentDifficulty = Math.max(1, currentSegment);
-
-        // Adjust awareness gain based on the difficulty
-        // Higher difficulty = less awareness gain per change
-        const adjustedGain = Math.max(
-            5,
-            Math.round(PROGRESSION_CONFIG.awarenessGainPerChange / currentDifficulty)
-        );
+        // Calculate awareness gain based on difficulty
+        const baseGain = PROGRESSION_CONFIG.awarenessGainPerChange;
+        const difficultyMultiplier = 1 + (gameState.day - 4) * 0.1; // 10% increase per day
+        const awarenessGain = Math.floor(baseGain * difficultyMultiplier);
 
         // Increase awareness
-        increaseAwareness(adjustedGain);
+        increaseAwareness(awarenessGain);
 
         // Increment progress to next segment
-        progressToNextSegment++;
+        gameState.progressToNextSegment++;
 
-        // Show thought bubble
-        showThoughtBubble();
+        // Check if we've filled the current segment
+        const changesNeeded = PROGRESSION_CONFIG.changesToFillSegment[gameState.currentSegment];
+        if (gameState.progressToNextSegment >= changesNeeded) {
+            // Segment filled, handle transition
+            handleSegmentFilled(gameState.currentSegment + 1, gameState.currentSegment);
+        }
 
         // Disable further clicking until next day
         gameState.canClick = false;
 
         // Update narrative text
-        updateNarrativeText();
+        window.ui.updateNarrativeText();
     } else {
         console.log("Wrong commuter clicked or no change to find");
 
         // Show message
-        showMessage("I didn't notice anything different there", 1500);
+        window.ui.showMessage("I didn't notice anything different there", 1500);
     }
 }
 

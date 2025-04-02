@@ -125,10 +125,14 @@ async function init() {
     commuters.addInitialCommuter();
 
     // Initialize doober system
-    window.dooberSystem.init();
+    if (window.dooberSystem && window.dooberSystem.init) {
+        window.dooberSystem.init();
+    }
 
     // Initialize shader effects
-    window.shaderEffects.init();
+    if (window.shaderEffects && window.shaderEffects.init) {
+        window.shaderEffects.init();
+    }
 
     // Set initial narrative text
     window.ui.updateNarrativeText();
@@ -252,18 +256,18 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
     // If this is a new segment (not just updating the display)
     if (segmentNumber > previousSegmentNumber) {
         // Update current segment
-        currentSegment = segmentNumber;
+        gameState.currentSegment = segmentNumber;
 
         // Reset progress to next segment
-        progressToNextSegment = 0;
+        gameState.progressToNextSegment = 0;
 
         // Hide train button temporarily
-        if (trainButton) {
-            trainButton.style.display = 'none';
+        if (gameState.elements.trainButton) {
+            gameState.elements.trainButton.style.display = 'none';
         }
 
         // Show narrative about noticing someone new
-        window.ui.showSegmentConnectionNarrative(segmentNumber);
+        window.ui.showSegmentNarrative(segmentNumber);
 
         // Play the segment completion effect and add a new commuter when done
         if (window.shaderEffects && window.shaderEffects.playEffect) {
@@ -280,8 +284,8 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
                 }
                 
                 // Show train button again
-                if (trainButton) {
-                    trainButton.style.display = 'block';
+                if (gameState.elements.trainButton) {
+                    gameState.elements.trainButton.style.display = 'block';
                 }
             });
         } else {
@@ -290,12 +294,12 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
             if (newCommuter) {
                 console.log(`Added commuter ${newCommuter.type} for segment ${segmentNumber}`);
                 // Highlight the new commuter
-                highlightElement(newCommuter.element);
+                commuters.highlightElement(newCommuter.element);
             }
             
             // Show train button again
-            if (trainButton) {
-                trainButton.style.display = 'block';
+            if (gameState.elements.trainButton) {
+                gameState.elements.trainButton.style.display = 'block';
             }
         }
     }
