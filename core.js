@@ -116,7 +116,6 @@ function init() {
 
     // Add event listeners
     gameState.elements.trainButton.addEventListener('click', takeTrain);
-    gameState.elements.sceneContainer.addEventListener('click', handleSceneClick);
 
     // Initialize commuters
     commuters.detectCommuterVariations();
