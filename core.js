@@ -280,7 +280,6 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
         const newCommuter = commuters.addCommuter();
         if (newCommuter) {
             console.log(`Added commuter ${newCommuter.type} for segment ${segmentNumber}`);
-            newCommuter.element.style.opacity = '0';
             // Add the new-commuter class for the animation
             newCommuter.element.classList.add('new-commuter');
         }
@@ -300,10 +299,10 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
                 setTimeout(() => {
                     window.ui.showSegmentNarrative(segmentNumber);
 
-                    // Start fading in the new commuter after narrative starts (300ms)
+                    // Start the new commuter animation after narrative starts (300ms)
                     if (newCommuter) {
                         setTimeout(() => {
-                            newCommuter.element.style.opacity = '1';
+                            // The animation will start automatically due to the new-commuter class
                         }, 300);
                     }
                 }, 200);
@@ -313,9 +312,9 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
             // Show narrative text
             window.ui.showSegmentNarrative(segmentNumber);
 
-            // Fade in the new commuter
+            // Start the new commuter animation
             if (newCommuter) {
-                newCommuter.element.style.opacity = '1';
+                // The animation will start automatically due to the new-commuter class
                 // Highlight the new commuter
                 commuters.highlightElement(newCommuter.element);
             }
