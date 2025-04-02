@@ -272,6 +272,36 @@ function showThoughtBubble() {
     }, 3000);
 }
 
+function showSegmentConnectionNarrative(segmentNumber) {
+    // Define narratives about noticing someone new
+    const narratives = [
+        "Wait... who's that? I don't think I've seen them before. Something about them draws my attention.",
+        "A new face on the platform. They seem different from the usual crowd. I feel a strange connection.",
+        "Another commuter appears. There's something familiar about them, like we've met in a dream.",
+        "Someone new joins the platform. Our eyes meet briefly, and I feel a spark of recognition.",
+        "I notice another person waiting for the train. Something about their presence feels significant.",
+        "A stranger appears, but somehow they don't feel like a stranger. It's as if I was meant to notice them.",
+        "Another commuter materializes on the platform. I feel drawn to them in a way I can't explain.",
+        "Someone new is waiting for the train. They seem to radiate an awareness I'm only beginning to understand.",
+        "A new face emerges from the crowd. Something about them resonates with my awakening consciousness."
+    ];
+
+    // Get the narrative for this segment (0-indexed array)
+    const narrative = narratives[(segmentNumber - 1) % narratives.length] ||
+        "Another commuter appears, and they seem different from the others...";
+
+    // Update the narrative display
+    if (typewriter) {
+        typewriter.stop();
+        narrativeText.textContent = '';
+        setTimeout(() => {
+            typewriter.type(narrative);
+        }, 100);
+    } else {
+        narrativeText.textContent = narrative;
+    }
+}
+
 /**
  * Game completion
  */
@@ -366,5 +396,5 @@ window.ui = {
     updateTypewriterText,
     checkForLyrics,
     gameComplete,
-    showHint
+    showSegmentConnectionNarrative  // Add this new function to the exports
 };

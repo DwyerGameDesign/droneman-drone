@@ -194,6 +194,11 @@ function handleCommuterClick(event) {
 
         // Highlight the commuter
         highlightElement(commuterElement);
+        
+        // Add doober animation to awareness meter
+        if (window.dooberSystem && window.dooberSystem.animate) {
+            window.dooberSystem.animate(commuterElement);
+        }
 
         // Increment changes found counter
         changesFound++;

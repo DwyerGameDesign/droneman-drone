@@ -115,8 +115,10 @@ async function init() {
     
     window.ui.updateColorStage();
     setupMobileSupport();
+    
+    // Initialize doober and shader systems
+    initVisualFeedbackSystems();
 }
-
 /**
  * Initialize the typewriter for narrative text
  */
@@ -153,6 +155,25 @@ function initTypewriter() {
             gameState.typewriter.type(gameState.elements.narrativeText.textContent);
         };
         document.head.appendChild(script);
+    }
+}
+
+/**
+ * Initialize visual feedback systems (doober and shader effects)
+ */
+function initVisualFeedbackSystems() {
+    // Initialize doober system
+    if (typeof window.dooberSystem !== 'undefined' && window.dooberSystem.init) {
+        window.dooberSystem.init();
+    } else {
+        console.warn("Doober system not available. Make sure doober.js is included.");
+    }
+    
+    // Initialize shader effects
+    if (typeof window.shaderEffects !== 'undefined' && window.shaderEffects.init) {
+        window.shaderEffects.init();
+    } else {
+        console.warn("Shader effects not available. Make sure shader-effects.js is included.");
     }
 }
 
@@ -215,16 +236,46 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
         // Reset progress to next segment
         progressToNextSegment = 0;
 
-        // Show narrative for this segment
-        showSegmentNarrative(segmentNumber);
+        // Hide train button temporarily
+        if (trainButton) {
+            trainButton.style.display = 'none';
+        }
 
-        // Add a new commuter if available
-        const newCommuter = addCommuter();
-        if (newCommuter) {
-            console.log(`Added commuter ${newCommuter.type} for segment ${segmentNumber}`);
+        // Show narrative about noticing someone new
+        window.ui.showSegmentConnectionNarrative(segmentNumber);
 
-            // Highlight the new commuter
-            highlightElement(newCommuter.element);
+        // Play the segment completion effect and add a new commuter when done
+        if (window.shaderEffects && window.shaderEffects.playEffect) {
+            window.shaderEffects.playEffect('wave', () => {
+                // Add a new commuter if available
+                const newCommuter = commuters.addCommuter();
+                if (newCommuter) {
+                    console.log(`Added commuter ${newCommuter.type} for segment ${segmentNumber}`);
+
+                    // Animate the new commuter's entrance
+                    if (window.shaderEffects.animateNewCommuter) {
+                        window.shaderEffects.animateNewCommuter(newCommuter.element);
+                    }
+                }
+                
+                // Show train button again
+                if (trainButton) {
+                    trainButton.style.display = 'block';
+                }
+            });
+        } else {
+            // Fallback if shader effects aren't available
+            const newCommuter = commuters.addCommuter();
+            if (newCommuter) {
+                console.log(`Added commuter ${newCommuter.type} for segment ${segmentNumber}`);
+                // Highlight the new commuter
+                highlightElement(newCommuter.element);
+            }
+            
+            // Show train button again
+            if (trainButton) {
+                trainButton.style.display = 'block';
+            }
         }
     }
 }
