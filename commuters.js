@@ -91,12 +91,12 @@ function addInitialCommuter() {
  * Add a new commuter to the scene
  */
 function addCommuter() {
+    // Check if we've reached the maximum number of commuters
     if (activeCommuters >= MAX_COMMUTERS) {
         console.log("Maximum number of commuters reached");
         return null;
     }
 
-    // Determine which commuter type to add (commuter1, commuter2, etc.)
     const commuterIndex = activeCommuters + 1;
     const commuterType = `commuter${commuterIndex}`;
 
@@ -117,8 +117,8 @@ function addCommuter() {
     commuterElement.dataset.commuterType = commuterType;
 
     // Calculate actual position
-    const containerWidth = sceneContainer.offsetWidth;
-    const containerHeight = sceneContainer.offsetHeight;
+    const containerWidth = gameState.elements.sceneContainer.offsetWidth;
+    const containerHeight = gameState.elements.sceneContainer.offsetHeight;
     const xPos = (position[0] / 100) * containerWidth;
     const yPos = (position[1] / 100) * containerHeight;
 
@@ -138,7 +138,7 @@ function addCommuter() {
     commuterElement.style.cursor = 'pointer';
 
     // Add to DOM
-    sceneContainer.appendChild(commuterElement);
+    gameState.elements.sceneContainer.appendChild(commuterElement);
 
     // Add click handler
     commuterElement.addEventListener('click', handleCommuterClick);
