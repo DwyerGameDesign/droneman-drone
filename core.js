@@ -279,23 +279,25 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
         // Show narrative about noticing someone new
         window.ui.showSegmentNarrative(segmentNumber);
 
-        // Play the segment completion effect and add a new commuter when done
+        // Add a new commuter immediately but make it invisible
+        const newCommuter = commuters.addCommuter();
+        if (newCommuter) {
+            console.log(`Added commuter ${newCommuter.type} for segment ${segmentNumber}`);
+            newCommuter.element.style.opacity = '0';
+            newCommuter.element.style.transition = 'opacity 0.5s ease-in-out';
+        }
+
+        // Play the segment completion effect
         if (window.shaderEffects && window.shaderEffects.playEffect) {
-            // Add a new commuter immediately but make it invisible
-            const newCommuter = commuters.addCommuter();
+            // Start fading in the new commuter immediately
             if (newCommuter) {
-                console.log(`Added commuter ${newCommuter.type} for segment ${segmentNumber}`);
-                newCommuter.element.style.opacity = '0';
+                setTimeout(() => {
+                    newCommuter.element.style.opacity = '1';
+                }, 100);
             }
 
             // Play the shader effect
             window.shaderEffects.playEffect('wave', () => {
-                // Fade in the new commuter
-                if (newCommuter) {
-                    newCommuter.element.style.transition = 'opacity 0.5s ease-in-out';
-                    newCommuter.element.style.opacity = '1';
-                }
-                
                 // Show train button again
                 if (gameState.elements.trainButton) {
                     gameState.elements.trainButton.style.display = 'block';
@@ -303,9 +305,8 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
             });
         } else {
             // Fallback if shader effects aren't available
-            const newCommuter = commuters.addCommuter();
             if (newCommuter) {
-                console.log(`Added commuter ${newCommuter.type} for segment ${segmentNumber}`);
+                newCommuter.element.style.opacity = '1';
                 // Highlight the new commuter
                 commuters.highlightElement(newCommuter.element);
             }
