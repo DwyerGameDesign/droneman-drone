@@ -81,7 +81,7 @@ window.core = {
 /**
  * Initialize the game
  */
-function init() {
+async function init() {
     console.log("Initializing Drone: The Daily Commute");
 
     // Initialize game state
@@ -120,8 +120,8 @@ function init() {
     // Add event listeners
     gameState.elements.trainButton.addEventListener('click', takeTrain);
 
-    // Initialize commuters
-    commuters.detectCommuterVariations();
+    // Initialize commuters - wait for variations to be detected
+    await commuters.detectCommuterVariations();
     commuters.addInitialCommuter();
 
     // Initialize doober system
