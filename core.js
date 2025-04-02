@@ -310,20 +310,20 @@ function initializeTrainPlatformBackground() {
  */
 function takeTrain() {
     // Prevent multiple clicks during transition
-    if (isTransitioning) return;
+    if (gameState.isTransitioning) return;
 
     console.log("Taking the train");
-    isTransitioning = true;
+    gameState.isTransitioning = true;
 
     // Disable train button during transition
-    if (trainButton) {
-        trainButton.disabled = true;
+    if (gameState.elements.trainButton) {
+        gameState.elements.trainButton.disabled = true;
     }
 
     // Check if there's an unfound change to highlight
-    if (currentChange && !currentChange.found) {
+    if (gameState.currentChange && !gameState.currentChange.found) {
         // Highlight missed change
-        highlightMissedChange();
+        commuters.highlightMissedChange();
 
         // Apply awareness penalty
         const penalty = PROGRESSION_CONFIG.awarenessPenalty;
