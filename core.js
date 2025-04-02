@@ -299,9 +299,9 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
                             // Add the new-commuter class for the animation
                             newCommuter.element.classList.add('new-commuter');
                         }
-                    }, 300);
+                    }, 600);
                 }, 200);
-            }, 450);
+            }, 600);
         } else {
             // Fallback if shader effects aren't available
             // Show narrative text
