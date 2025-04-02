@@ -279,37 +279,27 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
         // Show narrative about noticing someone new
         window.ui.showSegmentNarrative(segmentNumber);
 
-        // Add fade overlay
-        const fadeOverlay = document.getElementById('fade-overlay');
-        if (fadeOverlay) {
-            fadeOverlay.style.opacity = '1';
-        }
-
         // Play the segment completion effect and add a new commuter when done
         if (window.shaderEffects && window.shaderEffects.playEffect) {
-            window.shaderEffects.playEffect('wave', () => {
-                // Add a new commuter if available
-                const newCommuter = commuters.addCommuter();
-                if (newCommuter) {
-                    console.log(`Added commuter ${newCommuter.type} for segment ${segmentNumber}`);
+            // Add a new commuter immediately but make it invisible
+            const newCommuter = commuters.addCommuter();
+            if (newCommuter) {
+                console.log(`Added commuter ${newCommuter.type} for segment ${segmentNumber}`);
+                newCommuter.element.style.opacity = '0';
+            }
 
-                    // Animate the new commuter's entrance
-                    if (window.shaderEffects.animateNewCommuter) {
-                        window.shaderEffects.animateNewCommuter(newCommuter.element);
-                    }
+            // Play the shader effect
+            window.shaderEffects.playEffect('wave', () => {
+                // Fade in the new commuter
+                if (newCommuter) {
+                    newCommuter.element.style.transition = 'opacity 0.5s ease-in-out';
+                    newCommuter.element.style.opacity = '1';
                 }
                 
-                // Fade back in
-                setTimeout(() => {
-                    if (fadeOverlay) {
-                        fadeOverlay.style.opacity = '0';
-                    }
-                    
-                    // Show train button again
-                    if (gameState.elements.trainButton) {
-                        gameState.elements.trainButton.style.display = 'block';
-                    }
-                }, 500);
+                // Show train button again
+                if (gameState.elements.trainButton) {
+                    gameState.elements.trainButton.style.display = 'block';
+                }
             });
         } else {
             // Fallback if shader effects aren't available
@@ -320,17 +310,10 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
                 commuters.highlightElement(newCommuter.element);
             }
             
-            // Fade back in
-            setTimeout(() => {
-                if (fadeOverlay) {
-                    fadeOverlay.style.opacity = '0';
-                }
-                
-                // Show train button again
-                if (gameState.elements.trainButton) {
-                    gameState.elements.trainButton.style.display = 'block';
-                }
-            }, 500);
+            // Show train button again
+            if (gameState.elements.trainButton) {
+                gameState.elements.trainButton.style.display = 'block';
+            }
         }
     }
 }
@@ -476,24 +459,30 @@ function determineChangesForDay() {
  * Increase awareness level
  */
 function increaseAwareness(amount) {
-    awareness += amount;
+    // Calculate new awareness
+    gameState.awareness = Math.min(100, gameState.awareness + amount);
 
-    updateAwarenessDisplay();
+    // Update meter if available
+    if (gameState.awarenessMeter) {
+        gameState.awarenessMeter.update(gameState.awareness);
+    }
+
+    // Update color stage
     updateColorStage();
 
     // Emit event
     const event = new CustomEvent('awarenessChanged', {
         detail: {
-            awareness: awareness,
+            awareness: gameState.awareness,
             change: amount
         }
     });
     document.dispatchEvent(event);
 
-    console.log(`Awareness increased by ${amount} to ${awareness}`);
+    console.log(`Awareness increased by ${amount} to ${gameState.awareness}`);
 
     // Check for game completion
-    if (awareness >= 100) {
+    if (gameState.awareness >= 100) {
         gameComplete();
     }
 }
@@ -503,22 +492,26 @@ function increaseAwareness(amount) {
  */
 function decreaseAwareness(amount) {
     // Calculate new awareness
-    awareness = Math.max(0, awareness - amount);
+    gameState.awareness = Math.max(0, gameState.awareness - amount);
 
     // Update meter if available
-    updateAwarenessDisplay();
+    if (gameState.awarenessMeter) {
+        gameState.awarenessMeter.update(gameState.awareness);
+    }
+
+    // Update color stage
     updateColorStage();
 
     // Emit event
     const event = new CustomEvent('awarenessChanged', {
         detail: {
-            awareness: awareness,
+            awareness: gameState.awareness,
             change: -amount
         }
     });
     document.dispatchEvent(event);
 
-    console.log(`Awareness decreased by ${amount} to ${awareness}`);
+    console.log(`Awareness decreased by ${amount} to ${gameState.awareness}`);
 }
 
 /**
