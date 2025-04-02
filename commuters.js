@@ -164,7 +164,7 @@ function addCommuter() {
 }
 
 /**
- * Handle clicks on commuters
+ * Handle commuter click events
  */
 function handleCommuterClick(event) {
     const commuterElement = event.currentTarget;
@@ -173,24 +173,24 @@ function handleCommuterClick(event) {
     console.log(`Clicked commuter: ${commuterId}`);
 
     // Check if we're transitioning
-    if (isTransitioning) {
+    if (gameState.isTransitioning) {
         console.log("Game is transitioning");
         return;
     }
 
     // Check if clicking is allowed
-    if (!canClick) {
+    if (!gameState.canClick) {
         console.log("Clicking not allowed right now");
-        showPopupMessage("everyday the same", event.clientX, event.clientY);
+        window.ui.showPopupMessage("everyday the same", event.clientX, event.clientY);
         return;
     }
 
     // Check if this is the current change
-    if (currentChange && currentChange.commuterId === commuterId) {
+    if (gameState.currentChange && gameState.currentChange.commuterId === commuterId) {
         console.log("Correct commuter clicked!");
 
         // Mark as found
-        currentChange.found = true;
+        gameState.currentChange.found = true;
 
         // Highlight the commuter
         highlightElement(commuterElement);
@@ -223,7 +223,7 @@ function handleCommuterClick(event) {
         showThoughtBubble();
 
         // Disable further clicking until next day
-        canClick = false;
+        gameState.canClick = false;
 
         // Update narrative text
         updateNarrativeText();
@@ -262,7 +262,7 @@ function createFirstChange() {
     applyVariation(firstCommuter, newVariation);
 
     // Create change object
-    currentChange = {
+    gameState.currentChange = {
         commuterId: firstCommuter.id,
         fromVariation: currentVariation,
         toVariation: newVariation,
@@ -305,7 +305,7 @@ function createRandomChange(count = 1) {
     applyVariation(commuter, newVariation);
 
     // Create change object
-    currentChange = {
+    gameState.currentChange = {
         commuterId: commuter.id,
         fromVariation: currentVariation,
         toVariation: newVariation,
@@ -347,10 +347,10 @@ function highlightElement(element) {
  * Highlight missed change at the end of a day
  */
 function highlightMissedChange() {
-    if (!currentChange) return;
+    if (!gameState.currentChange) return;
 
     // Find the commuter
-    const commuter = allCommuters.find(c => c.id === currentChange.commuterId);
+    const commuter = allCommuters.find(c => c.id === gameState.currentChange.commuterId);
 
     if (commuter && commuter.element) {
         // Add missed highlight class
@@ -368,15 +368,15 @@ function highlightMissedChange() {
  */
 function showHint() {
     // Only provide hint if there is an active change
-    if (!currentChange) {
+    if (!gameState.currentChange) {
         showMessage("No changes to find yet. Take the train!", 1500);
         return;
     }
 
     // Find the commuter for the current change
-    const commuter = allCommuters.find(c => c.id === currentChange.commuterId);
+    const commuter = allCommuters.find(c => c.id === gameState.currentChange.commuterId);
 
-    if (commuter && commuter.element && !currentChange.found) {
+    if (commuter && commuter.element && !gameState.currentChange.found) {
         // Determine which quadrant the change is in
         const rect = commuter.element.getBoundingClientRect();
         const sceneRect = sceneContainer.getBoundingClientRect();
