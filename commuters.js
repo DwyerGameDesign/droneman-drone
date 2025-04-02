@@ -268,6 +268,9 @@ function createFirstChange() {
         toVariation: newVariation,
         found: false
     };
+
+    // Enable clicking since this is day 4 and we have a change to find
+    gameState.canClick = true;
 }
 
 /**
