@@ -203,12 +203,28 @@ h1 {
     background-color: black;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.5s; /* Faster fade transition */
+    transition: opacity 0.5s ease-in-out;
     z-index: 100;
 }
 
 .scene-container.fading .fade-overlay {
     opacity: 1;
+}
+
+/* New commuter entrance animation */
+@keyframes new-commuter-entrance {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.new-commuter {
+    animation: new-commuter-entrance 1s ease-out forwards;
 }
 
 /* Highlight effects for commuters */

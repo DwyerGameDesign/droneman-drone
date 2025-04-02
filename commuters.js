@@ -197,7 +197,10 @@ function handleCommuterClick(event) {
         
         // Add doober animation to awareness meter
         if (window.dooberSystem && window.dooberSystem.animate) {
-            window.dooberSystem.animate(commuterElement);
+            const awarenessContainer = document.getElementById('awareness-container');
+            if (awarenessContainer) {
+                window.dooberSystem.animate(commuterElement, awarenessContainer);
+            }
         }
 
         // Increment changes found counter
@@ -209,7 +212,7 @@ function handleCommuterClick(event) {
         const awarenessGain = Math.floor(baseGain * difficultyMultiplier);
 
         // Increase awareness
-        increaseAwareness(awarenessGain);
+        window.core.increaseAwareness(awarenessGain);
 
         // Increment progress to next segment
         gameState.progressToNextSegment++;
@@ -218,7 +221,7 @@ function handleCommuterClick(event) {
         const changesNeeded = PROGRESSION_CONFIG.changesToFillSegment[gameState.currentSegment];
         if (gameState.progressToNextSegment >= changesNeeded) {
             // Segment filled, handle transition
-            handleSegmentFilled(gameState.currentSegment + 1, gameState.currentSegment);
+            window.core.handleSegmentFilled(gameState.currentSegment + 1, gameState.currentSegment);
         }
 
         // Disable further clicking until next day
@@ -228,8 +231,6 @@ function handleCommuterClick(event) {
         window.ui.updateNarrativeText();
     } else {
         console.log("Wrong commuter clicked or no change to find");
-
-        // Show message
         window.ui.showMessage("I didn't notice anything different there", 1500);
     }
 }

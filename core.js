@@ -115,7 +115,17 @@ async function init() {
     });
 
     // Initialize awareness meter
-    gameState.awarenessMeter = new AwarenessMeter('awareness-meter');
+    gameState.awarenessMeter = new AwarenessMeter({
+        container: document.getElementById('awareness-container'),
+        maxLevel: 100,
+        segmentSize: 20,
+        meterWidth: 200,
+        meterHeight: 15,
+        activeColor: '#4e4eb2',
+        inactiveColor: '#3a3a3a',
+        borderColor: '#666',
+        onSegmentFilled: handleSegmentFilled
+    });
 
     // Add event listeners
     gameState.elements.trainButton.addEventListener('click', takeTrain);
@@ -269,6 +279,12 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
         // Show narrative about noticing someone new
         window.ui.showSegmentNarrative(segmentNumber);
 
+        // Add fade overlay
+        const fadeOverlay = document.getElementById('fade-overlay');
+        if (fadeOverlay) {
+            fadeOverlay.style.opacity = '1';
+        }
+
         // Play the segment completion effect and add a new commuter when done
         if (window.shaderEffects && window.shaderEffects.playEffect) {
             window.shaderEffects.playEffect('wave', () => {
@@ -283,10 +299,17 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
                     }
                 }
                 
-                // Show train button again
-                if (gameState.elements.trainButton) {
-                    gameState.elements.trainButton.style.display = 'block';
-                }
+                // Fade back in
+                setTimeout(() => {
+                    if (fadeOverlay) {
+                        fadeOverlay.style.opacity = '0';
+                    }
+                    
+                    // Show train button again
+                    if (gameState.elements.trainButton) {
+                        gameState.elements.trainButton.style.display = 'block';
+                    }
+                }, 500);
             });
         } else {
             // Fallback if shader effects aren't available
@@ -297,10 +320,17 @@ function handleSegmentFilled(segmentNumber, previousSegmentNumber) {
                 commuters.highlightElement(newCommuter.element);
             }
             
-            // Show train button again
-            if (gameState.elements.trainButton) {
-                gameState.elements.trainButton.style.display = 'block';
-            }
+            // Fade back in
+            setTimeout(() => {
+                if (fadeOverlay) {
+                    fadeOverlay.style.opacity = '0';
+                }
+                
+                // Show train button again
+                if (gameState.elements.trainButton) {
+                    gameState.elements.trainButton.style.display = 'block';
+                }
+            }, 500);
         }
     }
 }
