@@ -7,13 +7,6 @@
  * <script src="extensions.js"></script>
  */
 
-// Debug logging to help identify initialization issues
-console.log('Extensions.js loaded');
-console.log('Game state available:', typeof gameState !== 'undefined');
-console.log('Core module available:', typeof window.core !== 'undefined');
-console.log('UI module available:', typeof window.ui !== 'undefined');
-console.log('Commuters module available:', typeof window.commuters !== 'undefined');
-
 /**
  * ADVANCED COLOR SYSTEM
  * 
@@ -46,13 +39,10 @@ const colorSystem = {
             this.updateColors(e.detail.awareness);
         });
         
-        // Initial update - wait for gameState to be defined
+        // Initial update - wait for awareness to be defined
         setTimeout(() => {
-            if (typeof gameState !== 'undefined') {
-                // For XP-based system, use awarenessLevel (0-10)
-                this.updateColors(gameState.awarenessLevel * 10);
-            }
-        }, 100);
+            this.updateColors(awareness);
+        }, 0);
     },
     
     /**
@@ -154,8 +144,7 @@ const audioSystem = {
         trainArrive: null,
         correct: null,
         incorrect: null,
-        milestone: null,
-        levelUp: null
+        milestone: null
     },
     
     /**
@@ -168,10 +157,8 @@ const audioSystem = {
         this.createSounds();
         
         // Add event listeners
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('train-button')) {
-                this.playSound('trainDepart');
-            }
+        trainButton.addEventListener('click', () => {
+            this.playSound('trainDepart');
         });
         
         document.addEventListener('dayChanged', () => {
@@ -180,15 +167,16 @@ const audioSystem = {
             }, GAME_SETTINGS.fadeOutDuration + GAME_SETTINGS.waitDuration);
         });
         
-        // Use XP-based events
-        document.addEventListener('awarenessXPChanged', (e) => {
-            if (e.detail.change > 0) {
-                this.playSound('correct');
-            }
+        document.addEventListener('correctGuess', () => {
+            this.playSound('correct');
         });
         
-        document.addEventListener('awarenessLevelUp', () => {
-            this.playSound('levelUp');
+        document.addEventListener('incorrectGuess', () => {
+            this.playSound('incorrect');
+        });
+        
+        document.addEventListener('milestoneReached', () => {
+            this.playSound('milestone');
         });
     },
     
@@ -231,12 +219,6 @@ const audioSystem = {
                 type: 'square',
                 frequency: 330,
                 duration: 500,
-                fade: 'none'
-            },
-            levelUp: {
-                type: 'sawtooth',
-                frequency: 440,
-                duration: 800,
                 fade: 'none'
             }
         };
@@ -310,12 +292,8 @@ const saveSystem = {
         // Load saved game on start
         this.loadGame();
         
-        // Save game when XP or level changes
-        document.addEventListener('awarenessXPChanged', () => {
-            this.saveGame();
-        });
-        
-        document.addEventListener('awarenessLevelUp', () => {
+        // Save game when awareness changes
+        document.addEventListener('awarenessChanged', () => {
             this.saveGame();
         });
         
@@ -367,18 +345,15 @@ const saveSystem = {
      * Save the current game state
      */
     saveGame: function() {
-        if (!gameState) return;
-        
-        const saveState = {
-            day: gameState.day,
-            awarenessLevel: gameState.awarenessLevel,
-            awarenessXP: gameState.awarenessXP,
-            changesFound: gameState.changesFound
+        const gameState = {
+            day,
+            awareness,
+            currentState,
+            allChanges // Save the history of all changes for persistence
         };
         
         try {
-            localStorage.setItem('droneGameState', JSON.stringify(saveState));
-            console.log('Game saved:', saveState);
+            localStorage.setItem('droneGameState', JSON.stringify(gameState));
         } catch (error) {
             console.error('Error saving game:', error);
         }
@@ -390,33 +365,43 @@ const saveSystem = {
     loadGame: function() {
         try {
             const savedState = localStorage.getItem('droneGameState');
-            if (savedState && gameState) {
-                const loadedState = JSON.parse(savedState);
+            if (savedState) {
+                const gameState = JSON.parse(savedState);
                 
                 // Restore game state
-                gameState.day = loadedState.day || 1;
-                gameState.awarenessLevel = loadedState.awarenessLevel || 0;
-                gameState.awarenessXP = loadedState.awarenessXP || 0;
-                gameState.changesFound = loadedState.changesFound || 0;
+                day = gameState.day;
+                awareness = gameState.awareness;
+                currentState = gameState.currentState;
+                
+                // Restore change history for persistence
+                if (gameState.allChanges) {
+                    allChanges = gameState.allChanges;
+                }
                 
                 // Update UI
-                if (gameState.elements) {
-                    if (gameState.elements.dayDisplay) {
-                        gameState.elements.dayDisplay.textContent = gameState.day;
-                    }
-                }
+                dayDisplay.textContent = day;
+                updateAwarenessDisplay();
+                updateColorStage();
+                checkForLyrics();
                 
-                // Update awareness meter
-                if (gameState.awarenessMeter) {
-                    gameState.awarenessMeter.setProgress(gameState.awarenessLevel, gameState.awarenessXP);
+                // Apply all saved changes to maintain the state
+                if (allChanges && allChanges.length > 0) {
+                    allChanges.forEach(change => {
+                        const element = document.getElementById(change.id);
+                        if (element) {
+                            element.style[change.change.property] = change.change.value;
+                        }
+                    });
+                } else {
+                    // Apply current state to elements if no change history
+                    Object.keys(currentState).forEach(id => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            const state = currentState[id];
+                            element.style[state.property] = state.value;
+                        }
+                    });
                 }
-                
-                // Update color stage
-                if (window.core && window.core.updateColorStage) {
-                    window.core.updateColorStage();
-                }
-                
-                console.log('Game loaded:', loadedState);
             }
         } catch (error) {
             console.error('Error loading game:', error);
@@ -430,55 +415,98 @@ const saveSystem = {
         // Clear saved game
         localStorage.removeItem('droneGameState');
         
-        if (gameState) {
-            // Reset game state
-            gameState.day = 1;
-            gameState.awarenessLevel = 0;
-            gameState.awarenessXP = 0;
-            gameState.canClick = false;
-            gameState.currentChange = null;
-            gameState.changesFound = 0;
-            
-            // Update UI
-            if (gameState.elements && gameState.elements.dayDisplay) {
-                gameState.elements.dayDisplay.textContent = gameState.day;
-            }
-            
-            // Update awareness meter
-            if (gameState.awarenessMeter) {
-                gameState.awarenessMeter.setProgress(0, 0);
-            }
-            
-            // Update color stage
-            if (window.core && window.core.updateColorStage) {
-                window.core.updateColorStage();
-            }
-            
-            // Enable train button
-            if (gameState.elements && gameState.elements.trainButton) {
-                gameState.elements.trainButton.disabled = false;
-            }
-            
-            console.log('Game reset');
-        }
+        // Reset game state
+        day = 1;
+        awareness = 0;
+        canClick = false;
+        currentChange = null;
+        previousState = {};
+        currentState = {};
+        allChanges = [];
+        
+        // Update UI
+        dayDisplay.textContent = day;
+        updateAwarenessDisplay();
+        updateColorStage();
+        checkForLyrics();
+        
+        // Reset all element states by reinitializing default styles
+        initializeDefaultStyles();
+        
+        // Enable train button
+        trainButton.disabled = false;
     }
 };
 
-// Updated initialization code for the modular system
+// Fix for function overriding - properly store original functions
 document.addEventListener('DOMContentLoaded', () => {
+    // Store original functions before overriding
+    const originalIncreaseAwareness = window.increaseAwareness;
+    const originalTakeTrain = window.takeTrain;
+    const originalHandleElementClick = window.handleElementClick;
+    
     // Initialize extensions
     colorSystem.init();
     audioSystem.init();
-    
-    // Initialize save system
     saveSystem.init();
     
-    console.log("Extensions initialized for XP-based awareness system");
+    // Override increaseAwareness function
+    window.increaseAwareness = function(amount) {
+        // Call the original function first
+        originalIncreaseAwareness(amount);
+        
+        // Dispatch awareness changed event
+        const event = new CustomEvent('awarenessChanged', {
+            detail: {
+                oldAwareness: awareness - amount,
+                awareness,
+                change: amount
+            }
+        });
+        document.dispatchEvent(event);
+        
+        // Check for milestone for audio system
+        if ((awareness % 10 === 0) || SONG_LYRICS.some(lyric => lyric.day === day)) {
+            document.dispatchEvent(new Event('milestoneReached'));
+        }
+    };
+    
+    // Override takeTrain function
+    window.takeTrain = function() {
+        // Store old day value
+        const oldDay = day;
+        
+        // Call the original function
+        originalTakeTrain();
+        
+        // Dispatch day changed event after a short delay to let original function complete
+        setTimeout(() => {
+            const event = new CustomEvent('dayChanged', {
+                detail: {
+                    oldDay,
+                    day
+                }
+            });
+            document.dispatchEvent(event);
+        }, 100);
+    };
+    
+    // Override handleElementClick function
+    window.handleElementClick = function(event) {
+        // Store if this was a correct click before calling original function
+        const clickedId = event.target.id;
+        const isCorrect = clickedId === currentChange?.id;
+        
+        // Call the original function
+        originalHandleElementClick(event);
+        
+        // Dispatch appropriate event after a short delay
+        setTimeout(() => {
+            if (isCorrect) {
+                document.dispatchEvent(new Event('correctGuess'));
+            } else if (currentChange) {  // Only dispatch incorrect if there is a current change
+                document.dispatchEvent(new Event('incorrectGuess'));
+            }
+        }, 100);
+    };
 });
-
-// Export extensions to window object for access from other modules
-window.extensions = {
-    colorSystem,
-    audioSystem,
-    saveSystem
-};
