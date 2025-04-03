@@ -134,6 +134,159 @@ const colorSystem = {
 };
 
 /**
+ * AUDIO SYSTEM
+ * 
+ * Adds sound effects and ambient audio to the game
+ */
+const audioSystem = {
+    enabled: false, // Set to true to enable this feature
+    context: null,
+    
+    sounds: {
+        trainDepart: null,
+        trainArrive: null,
+        correct: null,
+        incorrect: null,
+        milestone: null,
+        levelUp: null
+    },
+    
+    /**
+     * Initialize the audio system
+     */
+    init: function() {
+        if (!this.enabled) return;
+        
+        // Create sound effects
+        this.createSounds();
+        
+        // Add event listeners
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('train-button')) {
+                this.playSound('trainDepart');
+            }
+        });
+        
+        document.addEventListener('dayChanged', () => {
+            setTimeout(() => {
+                this.playSound('trainArrive');
+            }, GAME_SETTINGS.fadeOutDuration + GAME_SETTINGS.waitDuration);
+        });
+        
+        // Use XP-based events
+        document.addEventListener('awarenessXPChanged', (e) => {
+            if (e.detail.change > 0) {
+                this.playSound('correct');
+            }
+        });
+        
+        document.addEventListener('awarenessLevelUp', () => {
+            this.playSound('levelUp');
+        });
+    },
+    
+    /**
+     * Create sound effect objects
+     */
+    createSounds: function() {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        
+        this.context = new AudioContext();
+        
+        // Define sound characteristics
+        const sounds = {
+            trainDepart: {
+                type: 'sine',
+                frequency: 150,
+                duration: 800,
+                fade: 'out'
+            },
+            trainArrive: {
+                type: 'sine',
+                frequency: 220,
+                duration: 800,
+                fade: 'in'
+            },
+            correct: {
+                type: 'sine',
+                frequency: 440,
+                duration: 200,
+                fade: 'none'
+            },
+            incorrect: {
+                type: 'triangle',
+                frequency: 220,
+                duration: 200,
+                fade: 'none'
+            },
+            milestone: {
+                type: 'square',
+                frequency: 330,
+                duration: 500,
+                fade: 'none'
+            },
+            levelUp: {
+                type: 'sawtooth',
+                frequency: 440,
+                duration: 800,
+                fade: 'none'
+            }
+        };
+        
+        // Create each sound
+        Object.keys(sounds).forEach(key => {
+            const sound = sounds[key];
+            this.sounds[key] = this.createSound(sound.type, sound.frequency, sound.duration, sound.fade);
+        });
+    },
+    
+    /**
+     * Create a sound with specified parameters
+     */
+    createSound: function(type, frequency, duration, fade) {
+        return {
+            play: () => {
+                if (!this.context) return;
+                
+                const oscillator = this.context.createOscillator();
+                const gainNode = this.context.createGain();
+                
+                oscillator.type = type;
+                oscillator.frequency.value = frequency;
+                oscillator.connect(gainNode);
+                gainNode.connect(this.context.destination);
+                
+                // Set initial volume
+                gainNode.gain.value = fade === 'in' ? 0.01 : 0.2;
+                
+                // Apply fade effect
+                if (fade === 'in') {
+                    gainNode.gain.exponentialRampToValueAtTime(0.2, this.context.currentTime + duration / 1000);
+                } else if (fade === 'out') {
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + duration / 1000);
+                }
+                
+                oscillator.start();
+                
+                setTimeout(() => {
+                    oscillator.stop();
+                }, duration);
+            }
+        };
+    },
+    
+    /**
+     * Play a sound by name
+     */
+    playSound: function(name) {
+        if (this.sounds[name]) {
+            this.sounds[name].play();
+        }
+    }
+};
+
+/**
  * SAVE SYSTEM
  * 
  * Adds game state saving and loading
@@ -303,9 +456,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const originalTakeTrain = window.takeTrain;
     const originalHandleElementClick = window.handleElementClick;
     
-    // Initialize extensions - remove audioSystem
+    // Initialize extensions
     colorSystem.init();
-    // audioSystem.init(); // Audio system removed
+    audioSystem.init();
     saveSystem.init();
     
     // Override increaseAwareness function
@@ -323,10 +476,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         document.dispatchEvent(event);
         
-        // Remove audio milestone check
-        // if ((awareness % 10 === 0) || SONG_LYRICS.some(lyric => lyric.day === day)) {
-        //     document.dispatchEvent(new Event('milestoneReached'));
-        // }
+        // Check for milestone for audio system
+        if ((awareness % 10 === 0) || SONG_LYRICS.some(lyric => lyric.day === day)) {
+            document.dispatchEvent(new Event('milestoneReached'));
+        }
     };
     
     // Override takeTrain function
@@ -358,13 +511,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Call the original function
         originalHandleElementClick(event);
         
-        // Remove audio event dispatches
-        // setTimeout(() => {
-        //     if (isCorrect) {
-        //         document.dispatchEvent(new Event('correctGuess'));
-        //     } else if (currentChange) {  // Only dispatch incorrect if there is a current change
-        //         document.dispatchEvent(new Event('incorrectGuess'));
-        //     }
-        // }, 100);
+        // Dispatch appropriate event after a short delay
+        setTimeout(() => {
+            if (isCorrect) {
+                document.dispatchEvent(new Event('correctGuess'));
+            } else if (currentChange) {  // Only dispatch incorrect if there is a current change
+                document.dispatchEvent(new Event('incorrectGuess'));
+            }
+        }, 100);
     };
 });
