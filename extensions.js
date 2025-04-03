@@ -41,7 +41,7 @@ const colorSystem = {
         
         // Initial update - wait for awareness to be defined
         setTimeout(() => {
-            this.updateColors(awareness);
+            this.updateColors(gameState.awarenessLevel);
         }, 0);
     },
     
