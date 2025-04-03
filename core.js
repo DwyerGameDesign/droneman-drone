@@ -292,3 +292,14 @@ function handleCommuterClick(event) {
 // This should be exported and replace the existing handler in commuters.js
 window.commuters = window.commuters || {};
 window.commuters.handleCommuterClick = handleCommuterClick;
+
+// Export core functions and gameState to window for accessibility
+window.core = window.core || {};
+window.core.addAwarenessXP = addAwarenessXP;
+window.core.handleLevelUp = handleLevelUp;
+window.core.updateColorStage = updateColorStage;
+window.core.takeTrain = takeTrain;
+window.core.increaseAwareness = addAwarenessXP; // Alias for backwards compatibility
+
+// Export gameState to window
+window.gameState = gameState;
