@@ -39,10 +39,13 @@ const colorSystem = {
             this.updateColors(e.detail.awareness);
         });
         
-        // Initial update - wait for awareness to be defined
+        // Initial update - wait for gameState to be defined
         setTimeout(() => {
-            this.updateColors(awareness);
-        }, 0);
+            if (typeof gameState !== 'undefined') {
+                // For XP-based system, use awarenessLevel (0-10)
+                this.updateColors(gameState.awarenessLevel * 10);
+            }
+        }, 100);
     },
     
     /**
@@ -127,151 +130,6 @@ const colorSystem = {
         let b = bigint & 255;
         
         return { r, g, b };
-    }
-};
-
-/**
- * AUDIO SYSTEM
- * 
- * Adds sound effects and ambient audio to the game
- */
-const audioSystem = {
-    enabled: false, // Set to true to enable this feature
-    context: null,
-    
-    sounds: {
-        trainDepart: null,
-        trainArrive: null,
-        correct: null,
-        incorrect: null,
-        milestone: null
-    },
-    
-    /**
-     * Initialize the audio system
-     */
-    init: function() {
-        if (!this.enabled) return;
-        
-        // Create sound effects
-        this.createSounds();
-        
-        // Add event listeners
-        trainButton.addEventListener('click', () => {
-            this.playSound('trainDepart');
-        });
-        
-        document.addEventListener('dayChanged', () => {
-            setTimeout(() => {
-                this.playSound('trainArrive');
-            }, GAME_SETTINGS.fadeOutDuration + GAME_SETTINGS.waitDuration);
-        });
-        
-        document.addEventListener('correctGuess', () => {
-            this.playSound('correct');
-        });
-        
-        document.addEventListener('incorrectGuess', () => {
-            this.playSound('incorrect');
-        });
-        
-        document.addEventListener('milestoneReached', () => {
-            this.playSound('milestone');
-        });
-    },
-    
-    /**
-     * Create sound effect objects
-     */
-    createSounds: function() {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-        
-        this.context = new AudioContext();
-        
-        // Define sound characteristics
-        const sounds = {
-            trainDepart: {
-                type: 'sine',
-                frequency: 150,
-                duration: 800,
-                fade: 'out'
-            },
-            trainArrive: {
-                type: 'sine',
-                frequency: 220,
-                duration: 800,
-                fade: 'in'
-            },
-            correct: {
-                type: 'sine',
-                frequency: 440,
-                duration: 200,
-                fade: 'none'
-            },
-            incorrect: {
-                type: 'triangle',
-                frequency: 220,
-                duration: 200,
-                fade: 'none'
-            },
-            milestone: {
-                type: 'square',
-                frequency: 330,
-                duration: 500,
-                fade: 'none'
-            }
-        };
-        
-        // Create each sound
-        Object.keys(sounds).forEach(key => {
-            const sound = sounds[key];
-            this.sounds[key] = this.createSound(sound.type, sound.frequency, sound.duration, sound.fade);
-        });
-    },
-    
-    /**
-     * Create a sound with specified parameters
-     */
-    createSound: function(type, frequency, duration, fade) {
-        return {
-            play: () => {
-                if (!this.context) return;
-                
-                const oscillator = this.context.createOscillator();
-                const gainNode = this.context.createGain();
-                
-                oscillator.type = type;
-                oscillator.frequency.value = frequency;
-                oscillator.connect(gainNode);
-                gainNode.connect(this.context.destination);
-                
-                // Set initial volume
-                gainNode.gain.value = fade === 'in' ? 0.01 : 0.2;
-                
-                // Apply fade effect
-                if (fade === 'in') {
-                    gainNode.gain.exponentialRampToValueAtTime(0.2, this.context.currentTime + duration / 1000);
-                } else if (fade === 'out') {
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + duration / 1000);
-                }
-                
-                oscillator.start();
-                
-                setTimeout(() => {
-                    oscillator.stop();
-                }, duration);
-            }
-        };
-    },
-    
-    /**
-     * Play a sound by name
-     */
-    playSound: function(name) {
-        if (this.sounds[name]) {
-            this.sounds[name].play();
-        }
     }
 };
 
@@ -445,9 +303,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const originalTakeTrain = window.takeTrain;
     const originalHandleElementClick = window.handleElementClick;
     
-    // Initialize extensions
+    // Initialize extensions - remove audioSystem
     colorSystem.init();
-    audioSystem.init();
+    // audioSystem.init(); // Audio system removed
     saveSystem.init();
     
     // Override increaseAwareness function
@@ -465,10 +323,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         document.dispatchEvent(event);
         
-        // Check for milestone for audio system
-        if ((awareness % 10 === 0) || SONG_LYRICS.some(lyric => lyric.day === day)) {
-            document.dispatchEvent(new Event('milestoneReached'));
-        }
+        // Remove audio milestone check
+        // if ((awareness % 10 === 0) || SONG_LYRICS.some(lyric => lyric.day === day)) {
+        //     document.dispatchEvent(new Event('milestoneReached'));
+        // }
     };
     
     // Override takeTrain function
@@ -500,13 +358,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Call the original function
         originalHandleElementClick(event);
         
-        // Dispatch appropriate event after a short delay
-        setTimeout(() => {
-            if (isCorrect) {
-                document.dispatchEvent(new Event('correctGuess'));
-            } else if (currentChange) {  // Only dispatch incorrect if there is a current change
-                document.dispatchEvent(new Event('incorrectGuess'));
-            }
-        }, 100);
+        // Remove audio event dispatches
+        // setTimeout(() => {
+        //     if (isCorrect) {
+        //         document.dispatchEvent(new Event('correctGuess'));
+        //     } else if (currentChange) {  // Only dispatch incorrect if there is a current change
+        //         document.dispatchEvent(new Event('incorrectGuess'));
+        //     }
+        // }, 100);
     };
 });
