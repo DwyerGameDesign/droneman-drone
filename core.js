@@ -526,8 +526,8 @@ function takeTrain() {
             proceedToNextDay();
         }, 1500);
     } else {
-        // No missed change, award XP for "observant riding"
-        if (gameState.day > 4) {  // Only start giving XP after the first change appears
+        // No change exists today - award XP for "observant riding"
+        if (gameState.day >= 0 && !gameState.currentChange) {  // Only if there was no change at all today
             addAwarenessXP(AWARENESS_CONFIG.baseXpForTakingTrain);
         }
         
