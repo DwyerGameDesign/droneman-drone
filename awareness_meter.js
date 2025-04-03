@@ -19,9 +19,9 @@ class AwarenessMeter {
         };
         
         this.currentXP = 0;        // Current XP points
-        this.currentLevel = 0;     // Current level (starts at 0)
+        this.currentLevel = 1;     // Current level (starts at 1)
         this.maxLevel = 10;        // Maximum achievable level
-        this.xpToNextLevel = 100;  // XP needed for first level
+        this.xpToNextLevel = this.getXPRequiredForNextLevel(this.currentLevel);  // XP needed for next level
         this.meterElement = null;
         this.progressElement = null;
         this.levelDisplay = null;

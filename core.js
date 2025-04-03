@@ -9,7 +9,7 @@
 // Game state
 let gameState = {
     day: 1,
-    awarenessLevel: 0,     // Current level of awareness (0-10)
+    awarenessLevel: 1,     // Current level of awareness (1-10)
     awarenessXP: 0,        // Current XP within the current level
     canClick: false,
     currentChange: null,
@@ -230,7 +230,7 @@ async function init() {
 
     // Initialize game state
     gameState.day = 1;
-    gameState.awarenessLevel = 0;
+    gameState.awarenessLevel = 1;
     gameState.awarenessXP = 0;
     gameState.canClick = false;  // Start with clicking disabled
     gameState.currentChange = null;
@@ -619,10 +619,11 @@ function addAwarenessXP(amount) {
     if (!gameState.awarenessMeter) return;
 
     // Apply level-based multiplier to XP gain
-    const multiplier = AWARENESS_CONFIG.xpMultiplierByLevel[gameState.awarenessLevel] || 1.0;
+    const level = gameState.awarenessLevel;
+    const multiplier = AWARENESS_CONFIG.xpMultiplierByLevel[level] || 1.0;
     const adjustedAmount = Math.floor(amount * multiplier);
     
-    console.log(`Adding ${adjustedAmount} XP (base: ${amount}, multiplier: ${multiplier})`);
+    console.log(`Adding ${adjustedAmount} XP (base: ${amount}, multiplier: ${multiplier}, level: ${level})`);
     
     // Add XP through the meter (it will handle level-ups)
     const leveledUp = gameState.awarenessMeter.addXP(adjustedAmount);
@@ -633,6 +634,7 @@ function addAwarenessXP(amount) {
     } else {
         // If leveled up, meter has already updated the XP value
         gameState.awarenessXP = gameState.awarenessMeter.currentXP;
+        gameState.awarenessLevel = gameState.awarenessMeter.currentLevel;
     }
 
     // Show XP gain effect

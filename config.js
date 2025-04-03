@@ -118,16 +118,17 @@ const AWARENESS_CONFIG = {
     
     // XP multipliers based on the current level (makes finding changes more valuable at higher levels)
     xpMultiplierByLevel: [
-        1.0,  // Level 0
-        1.2,  // Level 1
-        1.5,  // Level 2
-        1.7,  // Level 3
-        1.9,  // Level 4
-        2.1,  // Level 5
-        2.3,  // Level 6
-        2.5,  // Level 7
-        2.7,  // Level 8
-        3.0   // Level 9
+        null, // Index 0 not used
+        1.0,  // Level 1
+        1.2,  // Level 2
+        1.5,  // Level 3
+        1.7,  // Level 4
+        1.9,  // Level 5
+        2.1,  // Level 6
+        2.3,  // Level 7
+        2.5,  // Level 8
+        2.7,  // Level 9
+        3.0   // Level 10
     ],
     
     // XP requirements for each level
@@ -138,15 +139,16 @@ const AWARENESS_CONFIG = {
     
     // Color stages corresponding to awareness levels
     colorStages: [
-        { level: 0, class: 'stage-1' },
-        { level: 1, class: 'stage-2' },
-        { level: 2, class: 'stage-3' },
-        { level: 3, class: 'stage-4' },
-        { level: 4, class: 'stage-5' },
-        { level: 5, class: 'stage-6' },
-        { level: 6, class: 'stage-7' },
-        { level: 7, class: 'stage-8' },
-        { level: 8, class: 'stage-9' },
-        { level: 9, class: 'stage-10' }
+        { level: 0, class: 'stage-1' }, // Not used
+        { level: 1, class: 'stage-1' },
+        { level: 2, class: 'stage-2' },
+        { level: 3, class: 'stage-3' },
+        { level: 4, class: 'stage-4' },
+        { level: 5, class: 'stage-5' },
+        { level: 6, class: 'stage-6' },
+        { level: 7, class: 'stage-7' },
+        { level: 8, class: 'stage-8' },
+        { level: 9, class: 'stage-9' },
+        { level: 10, class: 'stage-10' }
     ]
 };
