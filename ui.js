@@ -16,49 +16,19 @@ function updateAwarenessDisplay() {
 /**
  * Update the background color stage based on awareness
  */
-function updateColorStage() {
-    // Color stages
-    const colorStages = [
-        { threshold: 0, class: 'stage-1' },
-        { threshold: 10, class: 'stage-2' },
-        { threshold: 20, class: 'stage-3' },
-        { threshold: 30, class: 'stage-4' },
-        { threshold: 40, class: 'stage-5' },
-        { threshold: 50, class: 'stage-6' },
-        { threshold: 60, class: 'stage-7' },
-        { threshold: 70, class: 'stage-8' },
-        { threshold: 80, class: 'stage-9' },
-        { threshold: 90, class: 'stage-10' }
-    ];
-
-    // Remove all stage classes first
+function updateColorStage(awareness) {
+    const colorStages = GAME_SETTINGS.colorStages;
+    
+    // Remove all existing stage classes
     colorStages.forEach(stage => {
         sceneContainer.classList.remove(stage.class);
     });
-
-    // Find the appropriate stage for current awareness
+    
+    // Add the appropriate stage class
     for (let i = colorStages.length - 1; i >= 0; i--) {
         if (awareness >= colorStages[i].threshold) {
             sceneContainer.classList.add(colorStages[i].class);
             break;
-        }
-    }
-}
-
-/**
- * Check for lyrics for the current day
- */
-function checkForLyrics() {
-    const lyricForToday = SONG_LYRICS.find(lyric => lyric.day === day);
-    if (lyricForToday) {
-        if (typewriter) {
-            typewriter.stop();
-            narrativeText.textContent = '';
-            setTimeout(() => {
-                typewriter.type(`"${lyricForToday.text}"`);
-            }, 100);
-        } else {
-            narrativeText.textContent = `"${lyricForToday.text}"`;
         }
     }
 }
@@ -69,41 +39,8 @@ function checkForLyrics() {
 function updateNarrativeText() {
     if (!gameState.typewriter) return;
 
-    let text = "";
-    switch (gameState.day) {
-        case 1:
-            text = "Another day, another commute...";
-            break;
-        case 2:
-            text = "The station feels different today...";
-            break;
-        case 3:
-            text = "Something's not quite right...";
-            break;
-        case 4:
-            text = "Wait... did that commuter just change?";
-            break;
-        case 5:
-            text = "I need to pay more attention...";
-            break;
-        case 6:
-            text = "The changes are becoming more obvious...";
-            break;
-        case 7:
-            text = "I'm starting to notice patterns...";
-            break;
-        case 8:
-            text = "The world is shifting around me...";
-            break;
-        case 9:
-            text = "I can see the changes clearly now...";
-            break;
-        case 10:
-            text = "The veil is lifting...";
-            break;
-        default:
-            text = "The world keeps changing...";
-    }
+    // Get the narrative text from config
+    let text = DAY_NARRATIVES[gameState.day] || DAY_NARRATIVES.default;
 
     gameState.typewriter.type(text);
 }
@@ -114,35 +51,8 @@ function updateNarrativeText() {
 function showSegmentNarrative(segmentNumber) {
     if (!gameState.typewriter) return;
 
-    let text = "";
-    switch (segmentNumber) {
-        case 1:
-            text = "I notice someone new on the platform...";
-            break;
-        case 2:
-            text = "Another person stands out from the crowd...";
-            break;
-        case 3:
-            text = "I'm starting to recognize faces in the crowd...";
-            break;
-        case 4:
-            text = "The commuters are becoming more distinct...";
-            break;
-        case 5:
-            text = "I can see more details in each person now...";
-            break;
-        case 6:
-            text = "The world is becoming more vibrant...";
-            break;
-        case 7:
-            text = "I'm seeing connections between people...";
-            break;
-        case 8:
-            text = "The veil is lifting, I can see clearly now...";
-            break;
-        default:
-            text = "Something feels different about the crowd...";
-    }
+    // Get the narrative text from config
+    let text = LEVEL_UP_NARRATIVES[segmentNumber] || LEVEL_UP_NARRATIVES.default;
 
     gameState.typewriter.stop();
     gameState.elements.narrativeText.textContent = '';
@@ -225,63 +135,33 @@ function showPopupMessage(text, x, y) {
  * Show a thought bubble with text based on awareness level
  */
 function showThoughtBubble() {
-    // Define thoughts based on awareness levels
-    const THOUGHTS = {
-        early: [
-            "Another day, another dollar.",
-            "6:40 train again.",
-            "Same commute, different day.",
-            "This seat feels familiar.",
-            "Two more stops to go."
-        ],
-        mid: [
-            "Why do I do this every day?",
-            "The train moves, but am I going anywhere?",
-            "That person seems different today.",
-            "I never noticed that building before.",
-            "Time feels different when you pay attention."
-        ],
-        late: [
-            "I don't have to do this forever.",
-            "There's more to life than this cycle.",
-            "I could engineer a plan to change things.",
-            "My soul feels less drained today.",
-            "The grip is loosening."
-        ],
-        final: [
-            "I am not just a drone.",
-            "The man ain't got his grip on me.",
-            "I'm going to break this cycle.",
-            "Today will be different.",
-            "I'm my own person."
-        ]
-    };
-
-    // Select appropriate thought based on awareness level
-    let thoughtPool;
-
-    if (awareness < 25) {
-        thoughtPool = THOUGHTS.early;
-    } else if (awareness < 50) {
-        thoughtPool = THOUGHTS.mid;
-    } else if (awareness < 75) {
-        thoughtPool = THOUGHTS.late;
-    } else {
-        thoughtPool = THOUGHTS.final;
+    // Get thoughts from config
+    // THOUGHTS is defined in config.js
+    
+    // Determine which thought set to use based on awareness level
+    let thoughtSet = 'early';
+    
+    if (gameState.awarenessLevel >= 8) {
+        thoughtSet = 'final';
+    } else if (gameState.awarenessLevel >= 5) {
+        thoughtSet = 'late';
+    } else if (gameState.awarenessLevel >= 3) {
+        thoughtSet = 'mid';
     }
-
-    // Randomly select a thought
-    const thought = thoughtPool[Math.floor(Math.random() * thoughtPool.length)];
+    
+    // Choose a random thought from the appropriate set
+    const thoughts = THOUGHTS[thoughtSet];
+    const randomIndex = Math.floor(Math.random() * thoughts.length);
+    const thought = thoughts[randomIndex];
+    
+    // Display the thought
     thoughtBubble.textContent = thought;
-
-    // Position the thought bubble near the player
-    thoughtBubble.style.top = '40%';
-    thoughtBubble.style.left = '75%';
-    thoughtBubble.style.visibility = 'visible';
-
+    thoughtBubble.style.display = 'block';
+    
+    // Hide after a few seconds
     setTimeout(() => {
-        thoughtBubble.style.visibility = 'hidden';
-    }, 3000);
+        thoughtBubble.style.display = 'none';
+    }, 5000);
 }
 
 function showSegmentConnectionNarrative(segmentNumber) {
@@ -406,7 +286,6 @@ window.ui = {
     updateNarrativeText,
     showSegmentNarrative,
     updateTypewriterText,
-    checkForLyrics,
     gameComplete,
     showSegmentConnectionNarrative,
     showHint

@@ -21,7 +21,7 @@ class AwarenessMeter {
         this.currentXP = 0;        // Current XP points
         this.currentLevel = 1;     // Current level (starts at 1)
         this.maxLevel = 10;        // Maximum achievable level
-        this.xpToNextLevel = this.getXPRequiredForNextLevel(this.currentLevel);  // XP needed for next level
+        this.xpToNextLevel = this.getXPRequiredForNextLevel(this.currentLevel);
         this.meterElement = null;
         this.progressElement = null;
         this.levelDisplay = null;
@@ -93,17 +93,20 @@ class AwarenessMeter {
      * This implements a scaling difficulty curve
      */
     getXPRequiredForNextLevel(level) {
-        // Base XP requirement (for level 0 to level 1)
-        const baseXP = 100;
+        // Use hardcoded values from config if available
+        if (AWARENESS_CONFIG.xpRequirements && 
+            Array.isArray(AWARENESS_CONFIG.xpRequirements) && 
+            level < AWARENESS_CONFIG.xpRequirements.length &&
+            AWARENESS_CONFIG.xpRequirements[level]) {
+            return AWARENESS_CONFIG.xpRequirements[level];
+        }
         
-        // Scale XP requirements for higher levels
-        // Examples:
-        // Level 0->1: 100 XP
-        // Level 1->2: 150 XP
-        // Level 2->3: 225 XP
-        // Level 3->4: 340 XP
-        // Level 4->5: 510 XP etc.
-        return Math.floor(baseXP * Math.pow(1.5, level));
+        // Fallback to calculated value if not defined in config
+        const baseXP = 100;
+        const scalingFactor = 1.5;
+        
+        // Scale XP requirements using formula
+        return Math.floor(baseXP * Math.pow(scalingFactor, level - 1));
     }
     
     /**
@@ -139,19 +142,11 @@ class AwarenessMeter {
             this.currentXP = Math.min(this.currentXP, this.xpToNextLevel);
         }
         
-        // Show XP gain effect
-        if (amount > 0) {
-            this.showXPGain(amount);
-        }
-        
         // Update display
         this.updateDisplay();
         
         // If level increased and callback exists, call it
         if (leveledUp && this.options.onLevelUp) {
-            // Show level up effect
-            this.showLevelUp(this.currentLevel);
-            
             // Call the callback
             this.options.onLevelUp(this.currentLevel, previousLevel);
         }
@@ -174,30 +169,6 @@ class AwarenessMeter {
     }
     
     /**
-     * Get current awareness level
-     * @returns {number} Current level
-     */
-    getLevel() {
-        return this.currentLevel;
-    }
-    
-    /**
-     * Get current progress percentage to next level
-     * @returns {number} Progress percentage (0-100)
-     */
-    getProgressPercentage() {
-        return (this.currentXP / this.xpToNextLevel) * 100;
-    }
-    
-    /**
-     * Get remaining XP needed for next level
-     * @returns {number} XP needed
-     */
-    getXPToNextLevel() {
-        return this.xpToNextLevel - this.currentXP;
-    }
-    
-    /**
      * Set the progress directly (mainly for initialization)
      * @param {number} level - Level to set
      * @param {number} xp - Current XP within that level
@@ -213,177 +184,6 @@ class AwarenessMeter {
         
         // Update display
         this.updateDisplay();
-    }
-    
-    // ===============================
-    // Integrated XP Effects Functions
-    // ===============================
-    
-    /**
-     * Show XP gain particles
-     * @param {number} amount - Amount of XP gained
-     */
-    showXPGain(amount) {
-        // Reference to the meter element
-        const meterElement = this.meterElement;
-        if (!meterElement) return;
-        
-        // Get element position
-        const rect = meterElement.getBoundingClientRect();
-        
-        // Create particle text
-        const particle = document.createElement('div');
-        particle.className = 'xp-particle';
-        particle.textContent = `+${amount} XP`;
-        particle.style.color = this.options.activeColor;
-        
-        // Add necessary styles if they don't exist in the CSS
-        this.ensureStylesExist();
-        
-        // Position the particle
-        particle.style.position = 'absolute';
-        particle.style.left = `${rect.left + rect.width / 2}px`;
-        particle.style.top = `${rect.top}px`;
-        particle.style.transform = 'translate(-50%, -50%)';
-        
-        // Add animation
-        particle.style.animation = 'float-up 1.5s forwards';
-        
-        // Add to document
-        document.body.appendChild(particle);
-        
-        // Remove after animation completes
-        setTimeout(() => {
-            if (particle.parentNode) {
-                particle.parentNode.removeChild(particle);
-            }
-        }, 1500);
-    }
-    
-    /**
-     * Show level up effect
-     * @param {number} newLevel - The new level
-     */
-    showLevelUp(newLevel) {
-        const meterElement = this.meterElement;
-        if (!meterElement) return;
-        
-        // Add level up class for animation
-        meterElement.classList.add('level-up-animation');
-        
-        // Create level up text
-        const levelUpText = document.createElement('div');
-        levelUpText.className = 'xp-particle';
-        levelUpText.textContent = `LEVEL ${newLevel}!`;
-        levelUpText.style.color = '#ffcc00';
-        levelUpText.style.fontSize = '16px';
-        
-        // Get element position
-        const rect = meterElement.getBoundingClientRect();
-        
-        // Position the text
-        levelUpText.style.position = 'absolute';
-        levelUpText.style.left = `${rect.left + rect.width / 2}px`;
-        levelUpText.style.top = `${rect.top - 10}px`;
-        levelUpText.style.transform = 'translate(-50%, -50%)';
-        
-        // Add animation
-        levelUpText.style.animation = 'float-up 2s forwards';
-        
-        // Add to document
-        document.body.appendChild(levelUpText);
-        
-        // Make the eye icon pulse
-        const eyeIcon = document.querySelector('.awareness-icon');
-        if (eyeIcon) {
-            eyeIcon.classList.add('awareness-icon-pulse');
-            setTimeout(() => {
-                eyeIcon.classList.remove('awareness-icon-pulse');
-            }, 800);
-        }
-        
-        // Remove level up animation class after it completes
-        setTimeout(() => {
-            meterElement.classList.remove('level-up-animation');
-        }, 800);
-        
-        // Remove the text after animation completes
-        setTimeout(() => {
-            if (levelUpText.parentNode) {
-                levelUpText.parentNode.removeChild(levelUpText);
-            }
-        }, 2000);
-    }
-    
-    /**
-     * Ensure necessary CSS styles exist for XP effects
-     */
-    ensureStylesExist() {
-        // Check if styles already exist
-        if (document.getElementById('xp-effects-styles')) return;
-        
-        // Create style element
-        const styleElement = document.createElement('style');
-        styleElement.id = 'xp-effects-styles';
-        
-        // Define necessary styles
-        styleElement.textContent = `
-            /* XP Particles effect */
-            .xp-particle {
-                position: absolute;
-                pointer-events: none;
-                font-size: 12px;
-                font-weight: bold;
-                color: #4e4eb2;
-                text-shadow: 0 0 3px rgba(255, 255, 255, 0.7);
-                z-index: 1000;
-            }
-            
-            @keyframes float-up {
-                0% {
-                    opacity: 1;
-                    transform: translateY(0) scale(1);
-                }
-                100% {
-                    opacity: 0;
-                    transform: translateY(-30px) scale(1.2);
-                }
-            }
-            
-            /* Animations for level up */
-            @keyframes level-up-pulse {
-                0% { 
-                    box-shadow: 0 0 0 0 rgba(78, 78, 178, 0.7);
-                    transform: scale(1);
-                }
-                50% { 
-                    box-shadow: 0 0 0 10px rgba(78, 78, 178, 0);
-                    transform: scale(1.05);
-                }
-                100% { 
-                    box-shadow: 0 0 0 0 rgba(78, 78, 178, 0);
-                    transform: scale(1);
-                }
-            }
-            
-            .level-up-animation {
-                animation: level-up-pulse 0.8s 1;
-            }
-            
-            /* Eye icon animation */
-            @keyframes eye-pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.3); }
-                100% { transform: scale(1); }
-            }
-            
-            .awareness-icon-pulse {
-                animation: eye-pulse 0.8s 1;
-            }
-        `;
-        
-        // Add to document head
-        document.head.appendChild(styleElement);
     }
 }
 

@@ -321,7 +321,7 @@ function initTypewriter() {
                 // Do nothing
             }
         };
-        
+
         // Try to load the Typewriter script dynamically
         const script = document.createElement('script');
         script.src = 'typewriter.js';
@@ -565,9 +565,6 @@ function proceedToNextDay() {
 
         // Enable clicking since there's something to find (if day >= 4)
         gameState.canClick = gameState.day >= 4;
-
-        // Check for lyrics or special day text
-        window.ui.checkForLyrics();
 
         // Fade back in
         setTimeout(() => {

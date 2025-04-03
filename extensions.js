@@ -382,7 +382,6 @@ const saveSystem = {
                 dayDisplay.textContent = day;
                 updateAwarenessDisplay();
                 updateColorStage();
-                checkForLyrics();
                 
                 // Apply all saved changes to maintain the state
                 if (allChanges && allChanges.length > 0) {
@@ -428,7 +427,6 @@ const saveSystem = {
         dayDisplay.textContent = day;
         updateAwarenessDisplay();
         updateColorStage();
-        checkForLyrics();
         
         // Reset all element states by reinitializing default styles
         initializeDefaultStyles();
@@ -466,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.dispatchEvent(event);
         
         // Check for milestone for audio system
-        if ((awareness % 10 === 0) || SONG_LYRICS.some(lyric => lyric.day === day)) {
+        if (awareness % 10 === 0) {
             document.dispatchEvent(new Event('milestoneReached'));
         }
     };

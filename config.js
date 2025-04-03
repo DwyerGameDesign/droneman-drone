@@ -1,22 +1,7 @@
 /**
  * Drone: The Daily Commute
- * Configuration file - Simplified for single sprite approach
+ * Configuration file - Simplified for XP system
  */
-
-// Song lyrics from the album that appear at certain days
-const SONG_LYRICS = [
-    { day: 5, text: "Every day the same, rolling to a paycheck" },
-    { day: 10, text: "6:40 train, drink my 40 on the way back" },
-    { day: 15, text: "Soul's nearly drained, gotta be a way out" },
-    { day: 20, text: "Signal in my brain, stopping me with self-doubt" },
-    { day: 30, text: "Drone no more, I'm clean and free" },
-    { day: 40, text: "The Man ain't got his grip on me" },
-    { day: 50, text: "Drone no more, I'm my own man" },
-    { day: 60, text: "Gotta engineer a plan" },
-    { day: 75, text: "Time for a change, bell's ringing louder" },
-    { day: 90, text: "No one left to blame, 'cause I'm my biggest doubter" },
-    { day: 100, text: "Drone no more, I'm my own man" }
-];
 
 // First change configuration (hat appears on day 4)
 const FIRST_CHANGE = {
@@ -24,26 +9,6 @@ const FIRST_CHANGE = {
     property: 'hasHat',
     value: true,
     commuterId: 0 // This will be the first commuter
-};
-
-// Awareness meter configuration
-const AWARENESS_METER_CONFIG = {
-    maxLevel: 100,
-    segmentSize: 20, // Each segment represents 20 awareness points
-    meterWidth: 200,
-    meterHeight: 15,
-    activeColor: '#4e4eb2', // Matches the most aware color stage
-    inactiveColor: '#3a3a3a',
-    borderColor: '#666'
-};
-
-// Configuration for commuter addition
-const COMMUTER_ADDITION = {
-    // We'll add a new commuter when each segment is filled
-    // So max 5 commuters (using 20 awareness per segment)
-    maxCommuters: 5,
-    // Starting positions for each commuter (percentage from left)
-    positions: [50, 30, 70, 10, 90]
 };
 
 // Thoughts shown in thought bubble based on awareness levels
@@ -78,33 +43,55 @@ const THOUGHTS = {
     ]
 };
 
+// Day-based narrative text
+const DAY_NARRATIVES = {
+    1: "Another day, another commute...",
+    2: "The station feels different today...",
+    3: "Something's not quite right...",
+    4: "Wait... did that commuter just change?",
+    5: "I need to pay more attention...",
+    6: "The changes are becoming more obvious...",
+    7: "I'm starting to notice patterns...",
+    8: "The world is shifting around me...",
+    9: "I can see the changes clearly now...",
+    10: "The veil is lifting...",
+    default: "The world keeps changing..."
+};
+
+// Level-up narrative text
+const LEVEL_UP_NARRATIVES = {
+    1: "I notice someone new on the platform...",
+    2: "Another person stands out from the crowd...",
+    3: "I'm starting to recognize faces in the crowd...",
+    4: "The commuters are becoming more distinct...",
+    5: "I can see more details in each person now...",
+    6: "The world is becoming more vibrant...",
+    7: "I'm seeing connections between people...",
+    8: "The veil is lifting, I can see clearly now...",
+    9: "Everything is coming into focus...",
+    10: "I am fully aware now. I am not just a drone...",
+    default: "Something feels different about the crowd..."
+};
+
 // Game settings
 const GAME_SETTINGS = {
-    // Faster transition timing
+    // Transition timing
     fadeOutDuration: 300,  // How long the fade out animation takes (ms)
     fadeInDuration: 300,   // How long the fade in animation takes (ms)
     waitDuration: 200,     // How long to wait between fade out and fade in (ms)
     
     // Highlight a missed change
     missedChangeHighlightColor: '#e9cb5f', // Changed to match the goldish/yellow color
-    missedChangeHighlightDuration: 1500,
+    missedChangeHighlightDuration: 1500
+};
+
+// Progression configuration referenced in commuters.js
+const PROGRESSION_CONFIG = {
+    // Base awareness gain per change found
+    awarenessGainPerChange: 25,
     
-    // Gameplay settings
-    baseAwarenessGain: 4,  // How much awareness increases per correct guess - increased to fill meter faster
-    
-    // Background stage thresholds
-    colorStages: [
-        { threshold: 0, class: 'stage-1' },
-        { threshold: 10, class: 'stage-2' },
-        { threshold: 20, class: 'stage-3' },
-        { threshold: 30, class: 'stage-4' },
-        { threshold: 40, class: 'stage-5' },
-        { threshold: 50, class: 'stage-6' },
-        { threshold: 60, class: 'stage-7' },
-        { threshold: 70, class: 'stage-8' },
-        { threshold: 80, class: 'stage-9' },
-        { threshold: 90, class: 'stage-10' }
-    ]
+    // Number of changes needed to fill each segment
+    changesToFillSegment: [2, 2, 3, 3, 4, 4, 5, 5, 6, 6]
 };
 
 // Configuration for XP/Awareness system
@@ -115,6 +102,21 @@ const AWARENESS_CONFIG = {
     // Base XP values for actions
     baseXpForFindingChange: 25,   // Base XP for finding a change
     baseXpForTakingTrain: 10,     // Base XP for taking the train (when no change was present)
+    
+    // Hardcoded XP requirements for each level
+    xpRequirements: [
+        null,   // Level 0 (not used)
+        100,    // XP needed to reach level 2 from level 1
+        150,    // XP needed to reach level 3 from level 2
+        225,    // XP needed to reach level 4 from level 3
+        340,    // XP needed to reach level 5 from level 4
+        510,    // XP needed to reach level 6 from level 5
+        765,    // XP needed to reach level 7 from level 6
+        1150,   // XP needed to reach level 8 from level 7
+        1725,   // XP needed to reach level 9 from level 8
+        2590,   // XP needed to reach level 10 from level 9
+        3885    // XP needed to complete level 10 (game completion)
+    ],
     
     // XP multipliers based on the current level (makes finding changes more valuable at higher levels)
     xpMultiplierByLevel: [
@@ -130,12 +132,6 @@ const AWARENESS_CONFIG = {
         2.7,  // Level 9
         3.0   // Level 10
     ],
-    
-    // XP requirements for each level
-    xpRequirements: {
-        // These will be calculated automatically in the meter class
-        // but can be overridden here if needed
-    },
     
     // Color stages corresponding to awareness levels
     colorStages: [
