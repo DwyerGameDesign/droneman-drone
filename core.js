@@ -507,7 +507,7 @@ function handleLevelUp(newLevel, previousLevel) {
     // Calculate excess XP beyond what was needed for level up
     const excessXP = Math.max(0, gameState.awarenessXP - newLevelRequirement);
     
-    console.log(`[LEVEL UP] Current XP: ${gameState.awarenessXP}, New level requirement: ${newLevelRequirement}, Excess XP: ${excessXP}`);
+    console.log(`[LEVEL UP] Current XP: ${gameState.awarenessXP}, New level req: ${newLevelRequirement}, Excess XP: ${excessXP}`);
     
     // Update game state
     gameState.awarenessLevel = newLevel;
