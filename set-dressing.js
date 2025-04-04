@@ -447,7 +447,7 @@ function applyVariation(setDressing, variation) {
 function highlightElement(element) {
     if (!element) return;
 
-    // Add highlight class
+    // Add highlight class to get the same rectangle highlight and scaling effect as commuters
     element.classList.add('highlight-pulse');
 
     // Remove after animation completes
@@ -468,23 +468,8 @@ function highlightMissedChange() {
     if (setDressing && setDressing.element) {
         console.log(`Highlighting missed set dressing change: ${setDressing.type} (${gameState.currentChange.changeAction})`);
         
-        // Clear any existing animations first
-        setDressing.element.style.animation = '';
-        
-        // Add missed highlight class
+        // Add missed highlight class - this will use the same style as commuters
         setDressing.element.classList.add('highlight-missed');
-        
-        // For all missed set dressing changes, make the highlight very noticeable
-        // Apply a strong pulsing effect
-        setDressing.element.style.animation = 'commuter-missed 1.5s 3';
-        setDressing.element.style.boxShadow = '0 0 20px rgba(217, 83, 79, 0.7)';
-        
-        // Apply an outline to make it more visible
-        setDressing.element.style.outline = '3px solid rgba(217, 83, 79, 0.7)';
-        
-        // Temporarily increase z-index to ensure highlight is visible
-        const currentZIndex = parseInt(setDressing.element.style.zIndex || '10');
-        setDressing.element.style.zIndex = (currentZIndex + 5).toString();
         
         // Show a message pointing out the missed element
         if (gameState.currentChange.changeAction === 'add') {
@@ -496,16 +481,7 @@ function highlightMissedChange() {
         // Remove after animation completes
         setTimeout(() => {
             setDressing.element.classList.remove('highlight-missed');
-            
-            // Clean up additional styles
-            setDressing.element.style.boxShadow = '';
-            setDressing.element.style.outline = '';
-            
-            // Reset to normal animation and z-index
-            setDressing.element.style.animation = '';
-            setDressing.element.style.zIndex = currentZIndex.toString();
-            
-        }, 4500); // Extended time for visibility
+        }, 1500);
     }
 }
 

@@ -131,24 +131,41 @@ h1 {
 
 /* UI Elements */
 .train-button {
-    padding: 12px 20px;
+    padding: 14px 24px;
     font-size: 16px;
-    background-color: #52525b;
-    color: #d4d4c8;
+    background-color: #4e4eb2;
+    color: white;
     border: none;
+    border-radius: 5px;
     cursor: pointer;
-    margin-top: 10px;
+    margin-top: 15px;
     font-family: 'Courier New', monospace;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .train-button:hover {
-    background-color: #646470;
+    background-color: #5e5ec2;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+}
+
+.train-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
 }
 
 .train-button:disabled {
     background-color: #3a3a45;
+    color: #888;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.7;
+    text-decoration: line-through;
 }
 
 /* Message and Thought Bubble */
@@ -486,6 +503,7 @@ body.mobile .mobile-controls {
         padding: 15px;
         width: 80%;
         margin: 15px auto;
+        font-size: 14px;
     }
 }
 
@@ -504,6 +522,8 @@ body.mobile .mobile-controls {
     .train-button {
         padding: 10px;
         font-size: 14px;
+        margin: 10px auto;
+        width: 80%;
     }
     
     .awareness-meter {
@@ -534,6 +554,59 @@ body.mobile .mobile-controls {
     transform: translateX(-50%) scale(1.05);
 }
 
+/* Update to ensure highlight-pulse animation works on set dressing elements */
+.set-dressing-sprite.highlight-pulse {
+    animation: set-dressing-pulse 1.5s 1;
+    z-index: 50 !important; /* Ensure highlighted set dressing is above others */
+}
+
+/* Animation for set dressing highlight (same effect as commuters) */
+@keyframes set-dressing-pulse {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(233, 203, 95, 0.7);
+        transform: translateX(-50%) scale(1);
+    }
+    30% { 
+        box-shadow: 0 0 0 15px rgba(233, 203, 95, 0);
+        transform: translateX(-50%) scale(1.1);
+    }
+    60% { 
+        box-shadow: 0 0 0 0 rgba(233, 203, 95, 0.7);
+        transform: translateX(-50%) scale(1);
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(233, 203, 95, 0);
+        transform: translateX(-50%) scale(1);
+    }
+}
+
+/* Update to ensure highlight-missed animation works on set dressing elements */
+.set-dressing-sprite.highlight-missed {
+    animation: set-dressing-missed 1.5s 3;
+    outline: 2px solid #d9534f;
+    z-index: 100 !important;
+}
+
+/* Animation for set dressing missed highlight (same effect as commuters) */
+@keyframes set-dressing-missed {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(217, 83, 79, 0.7);
+        transform: translateX(-50%) scale(1);
+    }
+    30% { 
+        box-shadow: 0 0 0 15px rgba(217, 83, 79, 0);
+        transform: translateX(-50%) scale(1.1);
+    }
+    60% { 
+        box-shadow: 0 0 0 0 rgba(217, 83, 79, 0.7);
+        transform: translateX(-50%) scale(1);
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(217, 83, 79, 0);
+        transform: translateX(-50%) scale(1);
+    }
+}
+
 /* Set dressing animation for new elements - more subtle version */
 @keyframes set-dressing-add {
     0% {
@@ -548,19 +621,6 @@ body.mobile .mobile-controls {
 
 .set-dressing-add {
     animation: set-dressing-add 1.5s ease-out forwards;
-}
-
-/* Set dressing highlight pulse - additional animation for new elements */
-@keyframes set-dressing-pulse {
-    0% {
-        filter: brightness(1.3) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
-    }
-    50% {
-        filter: brightness(1.8) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
-    }
-    100% {
-        filter: brightness(1.3) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
-    }
 }
 
 /* Set dressing animations for changes */
@@ -591,34 +651,6 @@ body.mobile .mobile-controls {
     }
 }
 
-/* Debug controls */
-.debug-controls {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: rgba(0, 0, 0, 0.7);
-    border-radius: 5px;
-}
-
-.debug-button {
-    background-color: #666;
-    color: #fff;
-    border: none;
-    padding: 8px 12px;
-    cursor: pointer;
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    border-radius: 3px;
-    transition: background-color 0.2s;
-}
-
-.debug-button:hover {
-    background-color: #888;
-}
-
-.debug-button:active {
-    background-color: #555;
-}
-
 /* Game over styles */
 .game-over {
     filter: grayscale(80%) brightness(0.8);
@@ -634,12 +666,13 @@ body.mobile .mobile-controls {
     color: #d4d4c8;
     padding: 20px;
     text-align: center;
-    z-index: 1000;
+    z-index: 1500;
     border-radius: 5px;
     box-shadow: 0 0 15px rgba(78, 78, 178, 0.7);
     font-family: 'Courier New', monospace;
     max-width: 80%;
     width: 400px;
+    filter: none !important; /* Ensure no filters are applied to the popup */
 }
 
 .game-over-summary h2 {

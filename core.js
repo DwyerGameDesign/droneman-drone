@@ -269,7 +269,6 @@ window.core = {
     createDailyChange,
     showHint,
     gameComplete,
-    initDebugControls,
     showGameOverSummary
 };
 
@@ -335,9 +334,6 @@ async function init() {
         await window.setDressing.detectSetDressingVariations();
         // No initial set dressing - only add them as changes
     }
-
-    // Initialize debug buttons
-    initDebugControls();
 
     // Initialize doober system
     if (window.dooberSystem && window.dooberSystem.init) {
@@ -1196,146 +1192,6 @@ function createDailyChange() {
         gameState.currentChange = { changeType: 'commuter' };
         commuters.createRandomChange(1);
     }
-}
-
-/**
- * Initialize debug controls
- */
-function initDebugControls() {
-    // Debug buttons
-    const debugCommuterBtn = document.getElementById('debug-commuter-change');
-    const debugSetDressingBtn = document.getElementById('debug-setdressing-change');
-    
-    // Add event listeners to debug buttons
-    if (debugCommuterBtn) {
-        debugCommuterBtn.addEventListener('click', () => debugTakeTrain('commuter'));
-    }
-    
-    if (debugSetDressingBtn) {
-        debugSetDressingBtn.addEventListener('click', () => debugTakeTrain('setDressing'));
-    }
-}
-
-/**
- * Debug version of takeTrain that forces a specific change type
- */
-function debugTakeTrain(changeType) {
-    // Prevent multiple clicks during transition
-    if (gameState.isTransitioning) {
-        console.log("Game is transitioning, ignoring debug button click");
-        return;
-    }
-
-    console.log(`Debug: Taking train with change type: ${changeType}`);
-    gameState.isTransitioning = true;
-
-    // Disable train button during transition
-    if (gameState.elements.trainButton) {
-        gameState.elements.trainButton.disabled = true;
-    }
-
-    // Check if there's an unfound change to highlight
-    if (gameState.currentChange && !gameState.currentChange.found) {
-        // Highlight missed change
-        if (!gameState.currentChange.changeType || gameState.currentChange.changeType === 'commuter') {
-            commuters.highlightMissedChange();
-        } else if (gameState.currentChange.changeType === 'setDressing' && window.setDressing) {
-            window.setDressing.highlightMissedChange();
-        }
-
-        // Proceed to next day after highlighting
-        setTimeout(() => {
-            proceedToNextDayWithChangeType(changeType);
-        }, 1500);
-    } else {
-        // No change exists today - award XP for "observant riding"
-        if (gameState.day >= 2 && !gameState.currentChange) {  // Only if there was no change at all today
-            addAwarenessXP(AWARENESS_CONFIG.baseXpForTakingTrain);
-        }
-        
-        // Proceed immediately
-        proceedToNextDayWithChangeType(changeType);
-    }
-}
-
-/**
- * Debug version of proceedToNextDay that forces a specific change type
- * @param {string} changeType - 'commuter' or 'setDressing'
- */
-function proceedToNextDayWithChangeType(changeType) {
-    // Fade out
-    gameState.elements.sceneContainer.classList.add('fading');
-
-    setTimeout(() => {
-        // Increment day
-        gameState.day++;
-        gameState.elements.dayDisplay.textContent = gameState.day;
-
-        // Reset current change
-        gameState.currentChange = null;
-
-        // Create the specified change type
-        if (changeType === 'commuter') {
-            console.log("Debug: Creating commuter change for today");
-            gameState.currentChange = { changeType: 'commuter' };
-            commuters.createRandomChange(1);
-        } else if (changeType === 'setDressing' && window.setDressing) {
-            console.log("Debug: Creating set dressing change for today");
-            
-            let change;
-            // If no set dressing elements exist yet, forcefully add a new one
-            if (window.setDressing.allSetDressing.length === 0) {
-                console.log("Debug: No set dressing elements exist yet, adding the first one");
-                change = window.setDressing.createNewSetDressingElement();
-            } else {
-                // Otherwise use the normal function that can add or change
-                change = window.setDressing.createSetDressingChange();
-            }
-            
-            if (change) {
-                console.log("Set dressing change created successfully:", change);
-                
-                // Additional detailed logging for set dressing changes
-                if (change.changeAction === 'add') {
-                    const dressing = window.setDressing.allSetDressing.find(d => d.id === change.elementId);
-                    if (dressing) {
-                        console.log(`Added new ${dressing.type} set dressing at position [${dressing.position}]`);
-                        console.log(`Total set dressing count: ${window.setDressing.allSetDressing.length}`);
-                    }
-                }
-                
-                gameState.currentChange = change;
-            } else {
-                console.warn("Failed to create set dressing change, falling back to commuter change");
-                gameState.currentChange = { changeType: 'commuter' };
-                commuters.createRandomChange(1);
-            }
-        }
-
-        // Enable clicking since there's something to find (if day >= 2)
-        gameState.canClick = gameState.day >= 2;
-
-        // Fade back in
-        setTimeout(() => {
-            gameState.elements.sceneContainer.classList.remove('fading');
-
-            // Re-enable train button
-            if (gameState.elements.trainButton) {
-                gameState.elements.trainButton.disabled = false;
-            }
-
-            // Update narrative text with typewriter effect
-            if (gameState.typewriter) {
-                gameState.typewriter.stop();
-                gameState.elements.narrativeText.textContent = '';
-                setTimeout(() => {
-                    window.ui.updateNarrativeText();
-                }, 100);
-            }
-
-            gameState.isTransitioning = false; // Reset transition flag
-        }, 500); // Fade in duration
-    }, 500); // Fade out duration
 }
 
 /**
