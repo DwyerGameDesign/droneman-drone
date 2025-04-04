@@ -460,7 +460,7 @@ function applyVariation(setDressing, variation) {
 function highlightElement(element) {
     if (!element) return;
 
-    // Add highlight class to get the same rectangle highlight and scaling effect as commuters
+    // Add highlight class for subtle glow effect
     element.classList.add('highlight-pulse');
 
     // Remove after animation completes

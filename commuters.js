@@ -370,7 +370,7 @@ function applyVariation(commuter, variation) {
 function highlightElement(element) {
     if (!element) return;
 
-    // Add highlight class
+    // Add highlight class for subtle glow effect
     element.classList.add('highlight-pulse');
 
     // Remove after animation completes

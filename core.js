@@ -106,6 +106,39 @@ const xpEffects = {
             .awareness-icon-pulse {
                 animation: eye-pulse 0.8s 1;
             }
+
+            /* Subtle glow for highlighted elements */
+            .highlight-pulse {
+                animation: glow-pulse 1.5s ease-in-out;
+                box-shadow: 0 0 15px rgba(78, 78, 178, 0.8);
+                z-index: 50;
+                position: relative;
+            }
+            
+            .highlight-missed {
+                animation: glow-missed 1.5s ease-in-out;
+                box-shadow: 0 0 15px rgba(217, 83, 79, 0.8);
+                z-index: 50;
+                position: relative;
+            }
+            
+            .found-change {
+                box-shadow: 0 0 8px rgba(78, 78, 178, 0.5);
+                position: relative;
+                z-index: 40;
+            }
+            
+            @keyframes glow-pulse {
+                0% { box-shadow: 0 0 0 rgba(78, 78, 178, 0); }
+                50% { box-shadow: 0 0 20px rgba(78, 78, 178, 0.9); }
+                100% { box-shadow: 0 0 8px rgba(78, 78, 178, 0.5); }
+            }
+            
+            @keyframes glow-missed {
+                0% { box-shadow: 0 0 0 rgba(217, 83, 79, 0); }
+                50% { box-shadow: 0 0 20px rgba(217, 83, 79, 0.9); }
+                100% { box-shadow: 0 0 8px rgba(217, 83, 79, 0.5); }
+            }
         `;
         
         // Add to document head
