@@ -247,8 +247,18 @@ function handleSetDressingClick(event) {
         // Mark as found
         gameState.currentChange.found = true;
 
-        // Highlight the set dressing element
+        // Highlight the set dressing element with temporary pulse effect
         highlightElement(setDressingElement);
+        
+        // Add permanent glow effect after the initial highlight animation
+        setTimeout(() => {
+            setDressingElement.classList.add('found-change');
+            
+            // Create and add click blocker to prevent further interactions
+            const clickBlocker = document.createElement('div');
+            clickBlocker.className = 'click-blocker';
+            gameState.elements.sceneContainer.appendChild(clickBlocker);
+        }, 1500);
         
         // Add doober animation to awareness meter
         if (window.dooberSystem && window.dooberSystem.animate) {
@@ -283,6 +293,9 @@ function handleSetDressingClick(event) {
         if (gameState.elements.trainButton) {
             gameState.elements.trainButton.disabled = false;
         }
+        
+        // Disable clicking until next day
+        gameState.canClick = false;
 
         // Update narrative text
         window.ui.updateNarrativeText();

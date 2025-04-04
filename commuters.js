@@ -186,14 +186,27 @@ function handleCommuterClick(event) {
     }
 
     // Check if this is the current change
-    if (gameState.currentChange && gameState.currentChange.commuterId === commuterId) {
+    if (gameState.currentChange && 
+        !gameState.currentChange.found &&
+        (gameState.currentChange.changeType !== 'setDressing') && 
+        gameState.currentChange.commuterId === commuterId) {
         console.log("Correct commuter clicked!");
-
+        
         // Mark as found
         gameState.currentChange.found = true;
 
-        // Highlight the commuter
+        // Highlight the commuter with temporary pulse effect
         highlightElement(commuterElement);
+        
+        // Add permanent glow effect after the initial highlight animation
+        setTimeout(() => {
+            commuterElement.classList.add('found-change');
+            
+            // Create and add click blocker to prevent further interactions
+            const clickBlocker = document.createElement('div');
+            clickBlocker.className = 'click-blocker';
+            gameState.elements.sceneContainer.appendChild(clickBlocker);
+        }, 1500);
         
         // Add doober animation to awareness meter
         if (window.dooberSystem && window.dooberSystem.animate) {
@@ -207,31 +220,51 @@ function handleCommuterClick(event) {
         gameState.changesFound++;
 
         // Calculate awareness gain based on difficulty
-        const baseGain = PROGRESSION_CONFIG.awarenessGainPerChange;
+        const baseGain = AWARENESS_CONFIG.baseXpForFindingChange;
         const difficultyMultiplier = 1 + (gameState.day - 4) * 0.1; // 10% increase per day
         const awarenessGain = Math.floor(baseGain * difficultyMultiplier);
 
         // Increase awareness
-        window.core.increaseAwareness(awarenessGain);
+        window.core.addAwarenessXP(awarenessGain);
 
-        // Increment progress to next segment
-        gameState.progressToNextSegment++;
+        // Show positive thought bubble from a random commuter
+        window.core.showRandomThoughtBubble(true);
 
-        // Check if we've filled the current segment
-        const changesNeeded = PROGRESSION_CONFIG.changesToFillSegment[gameState.currentSegment];
-        if (gameState.progressToNextSegment >= changesNeeded) {
-            // Segment filled, handle transition
-            window.core.handleSegmentFilled(gameState.currentSegment + 1, gameState.currentSegment);
+        // Enable train button so player can proceed
+        if (gameState.elements.trainButton) {
+            gameState.elements.trainButton.disabled = false;
         }
-
-        // Disable further clicking until next day
+        
+        // Disable clicking until next day
         gameState.canClick = false;
-
+        
         // Update narrative text
         window.ui.updateNarrativeText();
     } else {
         console.log("Wrong commuter clicked or no change to find");
-        window.ui.showMessage("I didn't notice anything different there", 1500);
+        
+        // Show a message about the wrong choice
+        window.ui.showMessage("That's not what changed...", 1500);
+        
+        // Highlight the actual change if it's a commuter change
+        if (gameState.currentChange && 
+            !gameState.currentChange.found && 
+            gameState.currentChange.changeType !== 'setDressing') {
+            highlightMissedChange();
+        } else if (gameState.currentChange && 
+            !gameState.currentChange.found && 
+            gameState.currentChange.changeType === 'setDressing' &&
+            window.setDressing) {
+            window.setDressing.highlightMissedChange();
+        }
+        
+        // Show negative thought bubble from a random commuter
+        window.core.showRandomThoughtBubble(false);
+        
+        // End the game with a summary after showing the highlight
+        setTimeout(() => {
+            window.core.showGameOverSummary("Your awareness wasn't strong enough to notice the changes.");
+        }, 1500);
     }
 }
 

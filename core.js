@@ -601,6 +601,20 @@ function proceedToNextDay() {
     gameState.elements.sceneContainer.classList.add('fading');
 
     setTimeout(() => {
+        // Clean up found-change highlights
+        const foundElements = document.querySelectorAll('.found-change');
+        foundElements.forEach(element => {
+            element.classList.remove('found-change');
+        });
+        
+        // Remove any click blockers
+        const clickBlockers = document.querySelectorAll('.click-blocker');
+        clickBlockers.forEach(blocker => {
+            if (blocker.parentNode) {
+                blocker.parentNode.removeChild(blocker);
+            }
+        });
+
         // Increment day
         gameState.day++;
         gameState.elements.dayDisplay.textContent = gameState.day;

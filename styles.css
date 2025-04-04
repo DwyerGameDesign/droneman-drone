@@ -787,3 +787,26 @@ body.mobile .mobile-controls {
     outline: 2px solid #d9534f;
     z-index: 100 !important;
 }
+
+/* Found change persistent glow effect */
+.found-change {
+    animation: none !important;
+    box-shadow: 0 0 15px 5px rgba(233, 203, 95, 0.7) !important;
+    outline: 2px solid rgba(233, 203, 95, 0.9) !important;
+    transform: translateX(-50%) scale(1.05) !important;
+    z-index: 200 !important;
+    transition: all 0.3s ease !important;
+    pointer-events: none !important; /* Prevent further clicks on this element */
+}
+
+/* Scene overlay to block clicks after finding a change */
+.click-blocker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    z-index: 150;
+    cursor: not-allowed;
+}
