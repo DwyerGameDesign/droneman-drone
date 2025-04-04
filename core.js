@@ -60,6 +60,11 @@ const xpEffects = {
                 z-index: 1000;
             }
             
+            .xp-particle.xp-loss {
+                color: #d9534f; /* Red color for XP loss */
+                text-shadow: 0 0 3px rgba(255, 255, 255, 0.7);
+            }
+            
             @keyframes float-up {
                 0% {
                     opacity: 1;
@@ -110,14 +115,14 @@ const xpEffects = {
     
     /**
      * Show XP gain particles
-     * @param {HTMLElement} element - The element to show particles around
      * @param {number} amount - Amount of XP gained
      */
-    showXPGain: function(element, amount) {
-        if (!element) return;
+    showXPGain: function(amount) {
+        const awarenessContainer = document.getElementById('awareness-container');
+        if (!awarenessContainer) return;
         
         // Get element position
-        const rect = element.getBoundingClientRect();
+        const rect = awarenessContainer.getBoundingClientRect();
         
         // Create particle text
         const particle = document.createElement('div');
@@ -127,7 +132,43 @@ const xpEffects = {
         // Position the particle
         particle.style.position = 'absolute';
         particle.style.left = `${rect.left + rect.width / 2}px`;
-        particle.style.top = `${rect.top}px`;
+        particle.style.top = `${rect.top + rect.height / 2}px`;
+        particle.style.transform = 'translate(-50%, -50%)';
+        
+        // Add animation
+        particle.style.animation = 'float-up 1.5s forwards';
+        
+        // Add to document
+        document.body.appendChild(particle);
+        
+        // Remove after animation completes
+        setTimeout(() => {
+            if (particle.parentNode) {
+                particle.parentNode.removeChild(particle);
+            }
+        }, 1500);
+    },
+    
+    /**
+     * Show XP loss particles
+     * @param {number} amount - Amount of XP lost
+     */
+    showXPLoss: function(amount) {
+        const awarenessContainer = document.getElementById('awareness-container');
+        if (!awarenessContainer) return;
+        
+        // Get element position
+        const rect = awarenessContainer.getBoundingClientRect();
+        
+        // Create particle text
+        const particle = document.createElement('div');
+        particle.className = 'xp-particle xp-loss';
+        particle.textContent = `-${amount} XP`;
+        
+        // Position the particle
+        particle.style.position = 'absolute';
+        particle.style.left = `${rect.left + rect.width / 2}px`;
+        particle.style.top = `${rect.top + rect.height / 2}px`;
         particle.style.transform = 'translate(-50%, -50%)';
         
         // Add animation
@@ -203,24 +244,33 @@ const xpEffects = {
 // Initialize the game when DOM is fully loaded
 document.addEventListener('DOMContentLoaded', init);
 
-// Export game state and core functions
+// Export game state and core objects
 window.gameState = gameState;
+window.xpEffects = xpEffects;
 
-// Export core functions
+// Export core game functions to window object
 window.core = {
     init,
-    initTypewriter,
-    createAwarenessMeter,
-    handleLevelUp,
-    initializeTrainPlatformBackground,
     takeTrain,
     proceedToNextDay,
-    determineChangesForDay,
     addAwarenessXP,
+    removeAwarenessXP,
+    showRandomThoughtBubble,
+    showThoughtBubbleAtElement,
+    updateAwarenessLevel,
+    handleLevelUp,
+    handleCommuterClick,
+    highlightMissedChange,
+    initTypewriter,
+    createAwarenessMeter,
+    initializeTrainPlatformBackground,
     setupMobileSupport,
     enhanceTouchTargets,
-    handleCommuterClick,
-    createDailyChange
+    createDailyChange,
+    showHint,
+    gameComplete,
+    initDebugControls,
+    updateColorStage
 };
 
 /**
@@ -578,14 +628,14 @@ function proceedToNextDay() {
         // Enable clicking since there's something to find (if day >= 2)
         gameState.canClick = gameState.day >= 2;
 
+        // Disable train button on day 2+ until player finds the change or makes a mistake
+        if (gameState.day >= 2 && gameState.elements.trainButton) {
+            gameState.elements.trainButton.disabled = true;
+        }
+
         // Fade back in
         setTimeout(() => {
             gameState.elements.sceneContainer.classList.remove('fading');
-
-            // Re-enable train button
-            if (gameState.elements.trainButton) {
-                gameState.elements.trainButton.disabled = false;
-            }
 
             // Update narrative text with typewriter effect
             if (gameState.typewriter) {
@@ -621,36 +671,160 @@ function determineChangesForDay() {
 }
 
 /**
- * Increase awareness by adding XP
+ * Add awareness XP with visual feedback
  * @param {number} amount - Amount of XP to add
  */
 function addAwarenessXP(amount) {
-    if (!gameState.awarenessMeter) return;
+    const oldAwarenessLevel = gameState.awarenessLevel;
+    
+    gameState.awarenessXP += amount;
+    
+    // Update the awareness level based on new XP
+    updateAwarenessLevel();
+    
+    // Update the XP display
+    if (gameState.awarenessMeter) {
+        const currentXP = gameState.awarenessXP;
+        const requiredXP = AWARENESS_CONFIG.xpRequirements[gameState.awarenessLevel];
+        
+        // If we're about to level up, cap at max XP for this level
+        const displayXP = currentXP > requiredXP ? requiredXP : currentXP;
+        
+        gameState.awarenessMeter.update(displayXP, requiredXP);
+    }
+    
+    // Show floating XP text
+    if (window.xpEffects && window.xpEffects.showXPGain) {
+        window.xpEffects.showXPGain(amount);
+    }
+    
+    // If levelup occurred, handle it
+    if (gameState.awarenessLevel > oldAwarenessLevel) {
+        handleLevelUp(gameState.awarenessLevel);
+    }
+}
 
-    // Apply level-based multiplier to XP gain
-    const level = gameState.awarenessLevel;
-    const multiplier = AWARENESS_CONFIG.xpMultiplierByLevel[level] || 1.0;
-    const adjustedAmount = Math.floor(amount * multiplier);
+/**
+ * Remove awareness XP with visual feedback
+ * Prevents XP from going below 0 or decreasing the awareness level
+ * @param {number} amount - Amount of XP to remove
+ */
+function removeAwarenessXP(amount) {
+    // Store current level to prevent decreasing it
+    const currentLevel = gameState.awarenessLevel;
+    const currentXP = gameState.awarenessXP;
     
-    console.log(`Adding ${adjustedAmount} XP (base: ${amount}, multiplier: ${multiplier}, level: ${level})`);
+    // Calculate minimum XP for the current level (XP required for previous level)
+    const prevLevelXP = currentLevel > 1 ? AWARENESS_CONFIG.xpRequirements[currentLevel - 1] : 0;
     
-    // Add XP through the meter (it will handle level-ups)
-    const leveledUp = gameState.awarenessMeter.addXP(adjustedAmount);
+    // Calculate new XP, ensuring it doesn't go below minimum for current level or below 0
+    const newXP = Math.max(prevLevelXP, Math.max(0, currentXP - amount));
     
-    // Update internal XP tracking (meter also does this, but keep in sync)
-    if (!leveledUp) {
-        gameState.awarenessXP += adjustedAmount;
+    // Only proceed if there's an actual change
+    if (newXP < currentXP) {
+        gameState.awarenessXP = newXP;
+        
+        // Update the XP display
+        if (gameState.awarenessMeter) {
+            const requiredXP = AWARENESS_CONFIG.xpRequirements[currentLevel];
+            gameState.awarenessMeter.update(newXP, requiredXP);
+        }
+        
+        // Show floating XP loss text
+        if (window.xpEffects && window.xpEffects.showXPLoss) {
+            window.xpEffects.showXPLoss(amount);
+        } else {
+            console.log(`Lost ${amount} XP`);
+        }
+    }
+}
+
+/**
+ * Show a random thought bubble from one of the commuters
+ * @param {boolean} isPositive - Whether to show a positive or negative thought
+ */
+function showRandomThoughtBubble(isPositive) {
+    // Only proceed if there are commuters
+    if (!commuters.allCommuters || commuters.allCommuters.length === 0) return;
+    
+    // Select a random commuter
+    const randomIndex = Math.floor(Math.random() * commuters.allCommuters.length);
+    const randomCommuter = commuters.allCommuters[randomIndex];
+    
+    if (!randomCommuter || !randomCommuter.element) return;
+    
+    // Get the thought content based on positive/negative
+    let thoughts;
+    if (isPositive) {
+        // Use positive thoughts from higher awareness levels
+        const thoughtSet = gameState.awarenessLevel >= 8 ? 'final' : 
+                          gameState.awarenessLevel >= 5 ? 'late' : 
+                          gameState.awarenessLevel >= 3 ? 'mid' : 'early';
+        thoughts = THOUGHTS[thoughtSet];
     } else {
-        // If leveled up, meter has already updated the XP value
-        gameState.awarenessXP = gameState.awarenessMeter.currentXP;
-        gameState.awarenessLevel = gameState.awarenessMeter.currentLevel;
+        // Define negative thoughts
+        thoughts = [
+            "Something feels off...",
+            "That's not it...",
+            "I'm not seeing clearly...",
+            "My awareness is slipping...",
+            "Focus is fading...",
+            "Can't quite put my finger on it...",
+            "I thought I was more observant...",
+            "The details are blurring...",
+            "I need to pay closer attention..."
+        ];
     }
+    
+    // Select a random thought
+    const randomThoughtIndex = Math.floor(Math.random() * thoughts.length);
+    const thought = thoughts[randomThoughtIndex];
+    
+    // Create and position the thought bubble
+    showThoughtBubbleAtElement(randomCommuter.element, thought, isPositive);
+}
 
-    // Show XP gain effect
-    const meterElement = document.querySelector('.awareness-meter');
-    if (meterElement && amount > 0) {
-        xpEffects.showXPGain(meterElement, adjustedAmount);
+/**
+ * Display a thought bubble at a specific element
+ * @param {HTMLElement} element - The element to attach the thought bubble to
+ * @param {string} text - The thought text
+ * @param {boolean} isPositive - Whether it's a positive or negative thought
+ */
+function showThoughtBubbleAtElement(element, text, isPositive) {
+    if (!element) return;
+    
+    // Create a temporary thought bubble
+    const thoughtBubble = document.createElement('div');
+    thoughtBubble.className = 'thought-bubble temp-thought';
+    thoughtBubble.textContent = text;
+    
+    // Add color based on positive/negative
+    if (!isPositive) {
+        thoughtBubble.style.backgroundColor = '#e6a4a4';
+        thoughtBubble.style.color = '#5a1a1a';
     }
+    
+    // Position the bubble above the element
+    const rect = element.getBoundingClientRect();
+    const sceneRect = gameState.elements.sceneContainer.getBoundingClientRect();
+    
+    thoughtBubble.style.position = 'absolute';
+    thoughtBubble.style.left = `${rect.left + rect.width/2 - sceneRect.left}px`;
+    thoughtBubble.style.bottom = `${sceneRect.bottom - rect.top + 10}px`;
+    thoughtBubble.style.transform = 'translateX(-50%)';
+    thoughtBubble.style.maxWidth = '120px';
+    thoughtBubble.style.display = 'block';
+    thoughtBubble.style.zIndex = '100';
+    
+    // Add to scene
+    gameState.elements.sceneContainer.appendChild(thoughtBubble);
+    
+    // Remove after a few seconds
+    setTimeout(() => {
+        if (thoughtBubble.parentNode) {
+            thoughtBubble.parentNode.removeChild(thoughtBubble);
+        }
+    }, 3000);
 }
 
 /**
@@ -798,9 +972,12 @@ function handleCommuterClick(event) {
     }
 
     // Check if this is the current change
-    if (gameState.currentChange && gameState.currentChange.commuterId === commuterId) {
+    if (gameState.currentChange && 
+        !gameState.currentChange.found &&
+        (gameState.currentChange.changeType !== 'setDressing') && 
+        gameState.currentChange.commuterId === commuterId) {
         console.log("Correct commuter clicked!");
-
+        
         // Mark as found
         gameState.currentChange.found = true;
 
@@ -818,17 +995,50 @@ function handleCommuterClick(event) {
         // Increment changes found counter
         gameState.changesFound++;
 
-        // Award XP for finding the change
-        addAwarenessXP(AWARENESS_CONFIG.baseXpForFindingChange);
+        // Calculate awareness gain based on difficulty
+        const baseGain = AWARENESS_CONFIG.baseXpForFindingChange;
+        const difficultyMultiplier = 1 + (gameState.day - 4) * 0.1; // 10% increase per day
+        const awarenessGain = Math.floor(baseGain * difficultyMultiplier);
 
-        // Disable further clicking until next day
-        gameState.canClick = false;
+        // Increase awareness
+        addAwarenessXP(awarenessGain);
 
+        // Show positive thought bubble from a random commuter
+        showRandomThoughtBubble(true);
+
+        // Enable train button so player can proceed
+        if (gameState.elements.trainButton) {
+            gameState.elements.trainButton.disabled = false;
+        }
+        
         // Update narrative text
         window.ui.updateNarrativeText();
     } else {
         console.log("Wrong commuter clicked or no change to find");
-        window.ui.showMessage("I didn't notice anything different there", 1500);
+        
+        // Show a message about the wrong choice
+        window.ui.showMessage("That's not what changed...", 1500);
+        
+        // Apply XP penalty for wrong choice
+        const penaltyAmount = Math.floor(AWARENESS_CONFIG.baseXpForFindingChange * 0.5); // 50% of base gain
+        removeAwarenessXP(penaltyAmount);
+        
+        // Show negative thought bubble from a random commuter
+        showRandomThoughtBubble(false);
+        
+        // Highlight the actual change if it's a commuter change
+        if (gameState.currentChange && 
+            !gameState.currentChange.found && 
+            gameState.currentChange.changeType !== 'setDressing') {
+            highlightMissedChange();
+        }
+        
+        // Enable train button so player can proceed, but only after showing the highlight
+        setTimeout(() => {
+            if (gameState.elements.trainButton) {
+                gameState.elements.trainButton.disabled = false;
+            }
+        }, 1500);
     }
 }
 
@@ -1092,4 +1302,26 @@ function proceedToNextDayWithChangeType(changeType) {
             gameState.isTransitioning = false; // Reset transition flag
         }, 500); // Fade in duration
     }, 500); // Fade out duration
+}
+
+/**
+ * Update awareness level based on current XP
+ */
+function updateAwarenessLevel() {
+    const xpRequirements = AWARENESS_CONFIG.xpRequirements;
+    let newLevel = 1;
+    
+    // Find the highest level that we meet the XP requirement for
+    for (let i = 1; i < xpRequirements.length; i++) {
+        if (gameState.awarenessXP >= xpRequirements[i-1]) {
+            newLevel = i;
+        } else {
+            break;
+        }
+    }
+    
+    // Update level if changed
+    if (newLevel !== gameState.awarenessLevel) {
+        gameState.awarenessLevel = newLevel;
+    }
 }

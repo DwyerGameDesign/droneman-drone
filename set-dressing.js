@@ -236,6 +236,7 @@ function handleSetDressingClick(event) {
 
     // Check if this is the current change
     if (gameState.currentChange && 
+        !gameState.currentChange.found &&
         gameState.currentChange.changeType === 'setDressing' && 
         gameState.currentChange.elementId === setDressingId) {
         console.log("Correct set dressing element clicked!");
@@ -275,14 +276,42 @@ function handleSetDressingClick(event) {
             window.ui.showMessage(`You noticed the ${setDressingType} changed!`, 2000);
         }
 
-        // Disable further clicking until next day
-        gameState.canClick = false;
+        // Show positive thought bubble from a random commuter
+        window.core.showRandomThoughtBubble(true);
+        
+        // Enable train button so player can proceed
+        if (gameState.elements.trainButton) {
+            gameState.elements.trainButton.disabled = false;
+        }
 
         // Update narrative text
         window.ui.updateNarrativeText();
     } else {
         console.log("Wrong set dressing element clicked or no change to find");
-        window.ui.showMessage("I didn't notice anything different there", 1500);
+        
+        // Show message about wrong choice
+        window.ui.showMessage("That's not what changed...", 1500);
+
+        // Apply XP penalty for wrong choice
+        const penaltyAmount = Math.floor(AWARENESS_CONFIG.baseXpForFindingChange * 0.5); // 50% of base gain
+        window.core.removeAwarenessXP(penaltyAmount);
+        
+        // Show negative thought bubble from a random commuter
+        window.core.showRandomThoughtBubble(false);
+        
+        // Highlight the actual change if it exists and hasn't been found
+        if (gameState.currentChange && 
+            !gameState.currentChange.found && 
+            gameState.currentChange.changeType === 'setDressing') {
+            highlightMissedChange();
+        }
+        
+        // Enable train button so player can proceed, but only after showing the highlight
+        setTimeout(() => {
+            if (gameState.elements.trainButton) {
+                gameState.elements.trainButton.disabled = false;
+            }
+        }, 1500);
     }
 }
 
