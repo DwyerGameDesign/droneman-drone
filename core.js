@@ -1059,8 +1059,8 @@ function showGameOverSummary(message) {
             <button id="replay-button">Take the Train Again</button>
         `;
         
-        // Add to scene
-        sceneContainer.appendChild(summaryPopup);
+        // Add to document body instead of scene container
+        document.body.appendChild(summaryPopup);
         
         // Add event listener to replay button
         const replayButton = document.getElementById('replay-button');
