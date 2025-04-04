@@ -335,17 +335,17 @@ function createNewSetDressingElement() {
     // Mark as newly added
     newElement.isNewlyAdded = true;
     
-    // Add animation class for visibility
+    // Add a subtle fade-in animation without any highlights
     newElement.element.classList.add('set-dressing-add');
     
-    // Make sure it's displayed on top of other elements
-    newElement.element.style.zIndex = '20';
+    // Make sure it's on the right layer but without attention-grabbing effects
+    newElement.element.style.zIndex = '15';
     
-    // Apply combined animations for maximum visibility
-    newElement.element.style.animation = 'set-dressing-add 1.5s ease-out forwards, set-dressing-pulse 2s 2s infinite';
+    // Apply only a simple fade-in animation, no pulsing or glowing effects
+    newElement.element.style.animation = 'set-dressing-add 1.5s ease-out forwards';
     
-    // Add a subtle shadow for better visibility
-    newElement.element.style.filter = 'drop-shadow(0 0 5px rgba(255, 255, 255, 0.5))';
+    // Remove any filter effects
+    newElement.element.style.filter = 'none';
 
     // Create change object
     const change = {
@@ -440,23 +440,29 @@ function highlightMissedChange() {
     if (setDressing && setDressing.element) {
         console.log(`Highlighting missed set dressing change: ${setDressing.type} (${gameState.currentChange.changeAction})`);
         
+        // Clear any existing animations first
+        setDressing.element.style.animation = '';
+        
         // Add missed highlight class
         setDressing.element.classList.add('highlight-missed');
         
-        // For newly added elements, make the highlight even more noticeable
-        if (gameState.currentChange.changeAction === 'add' && setDressing.isNewlyAdded) {
-            // Clear any existing animations
-            setDressing.element.style.animation = '';
-            
-            // Apply a strong pulsing effect
-            setDressing.element.style.animation = 'commuter-missed 1.5s 3';
-            setDressing.element.style.boxShadow = '0 0 20px rgba(217, 83, 79, 0.7)';
-            
-            // Apply an outline to make it more visible
-            setDressing.element.style.outline = '3px solid rgba(217, 83, 79, 0.7)';
-            
-            // Show a message pointing out the missed new element
+        // For all missed set dressing changes, make the highlight very noticeable
+        // Apply a strong pulsing effect
+        setDressing.element.style.animation = 'commuter-missed 1.5s 3';
+        setDressing.element.style.boxShadow = '0 0 20px rgba(217, 83, 79, 0.7)';
+        
+        // Apply an outline to make it more visible
+        setDressing.element.style.outline = '3px solid rgba(217, 83, 79, 0.7)';
+        
+        // Temporarily increase z-index to ensure highlight is visible
+        const currentZIndex = parseInt(setDressing.element.style.zIndex || '10');
+        setDressing.element.style.zIndex = (currentZIndex + 5).toString();
+        
+        // Show a message pointing out the missed element
+        if (gameState.currentChange.changeAction === 'add') {
             window.ui.showMessage(`You missed a new ${setDressing.type} that appeared!`, 2000);
+        } else {
+            window.ui.showMessage(`You missed that the ${setDressing.type} changed!`, 2000);
         }
 
         // Remove after animation completes
@@ -464,13 +470,13 @@ function highlightMissedChange() {
             setDressing.element.classList.remove('highlight-missed');
             
             // Clean up additional styles
-            if (gameState.currentChange.changeAction === 'add' && setDressing.isNewlyAdded) {
-                setDressing.element.style.boxShadow = '';
-                setDressing.element.style.outline = '';
-                
-                // Reset to normal animation
-                setDressing.element.style.animation = '';
-            }
+            setDressing.element.style.boxShadow = '';
+            setDressing.element.style.outline = '';
+            
+            // Reset to normal animation and z-index
+            setDressing.element.style.animation = '';
+            setDressing.element.style.zIndex = currentZIndex.toString();
+            
         }, 4500); // Extended time for visibility
     }
 }

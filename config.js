@@ -45,8 +45,8 @@ const THOUGHTS = {
 
 // Day-based narrative text
 const DAY_NARRATIVES = {
-    1: "Another day, another commute...",
-    2: "The station feels different today...",
+    1: "Everyday the same...",
+    2: "Everyday the same... but something feels different",
     3: "Something's not quite right...",
     4: "Wait... did that commuter just change?",
     5: "I need to pay more attention...",

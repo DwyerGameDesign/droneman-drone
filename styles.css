@@ -549,28 +549,20 @@ body.mobile .mobile-controls {
     transform: translateX(-50%) scale(1.05);
 }
 
-/* Set dressing animation for new elements */
+/* Set dressing animation for new elements - more subtle version */
 @keyframes set-dressing-add {
     0% {
         opacity: 0;
-        transform: translateX(-50%) scale(0.5);
-        filter: brightness(2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
-    }
-    50% {
-        opacity: 1;
-        transform: translateX(-50%) scale(1.2);
-        filter: brightness(1.7) drop-shadow(0 0 8px rgba(255, 255, 255, 0.7));
+        transform: translateX(-50%) scale(0.95);
     }
     100% {
         opacity: 1;
         transform: translateX(-50%) scale(1);
-        filter: brightness(1.3) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
     }
 }
 
 .set-dressing-add {
     animation: set-dressing-add 1.5s ease-out forwards;
-    z-index: 20 !important; /* Make sure new additions appear on top */
 }
 
 /* Set dressing highlight pulse - additional animation for new elements */
