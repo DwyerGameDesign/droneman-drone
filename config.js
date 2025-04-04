@@ -130,16 +130,16 @@ const AWARENESS_CONFIG = {
     // Hardcoded XP requirements for each level
     xpRequirements: [
         null,   // Level 0 (not used)
-        65,    // XP needed to reach level 2 from level 1
-        115,    // XP needed to reach level 3 from level 2
-        190,    // XP needed to reach level 4 from level 3
-        265,    // XP needed to reach level 5 from level 4
+        50,    // XP needed to reach level 2 from level 1
+        100,    // XP needed to reach level 3 from level 2
+        175,    // XP needed to reach level 4 from level 3
+        250,    // XP needed to reach level 5 from level 4
         350,    // XP needed to reach level 6 from level 5
         450,    // XP needed to reach level 7 from level 6
-        550,   // XP needed to reach level 8 from level 7
-        650,   // XP needed to reach level 9 from level 8
-        800,   // XP needed to reach level 10 from level 9
-        1000    // XP needed to complete level 10 (game completion)
+        600,   // XP needed to reach level 8 from level 7
+        800,   // XP needed to reach level 9 from level 8
+        1000,   // XP needed to reach level 10 from level 9
+        1250    // XP needed to complete level 10 (game completion)
     ],
     
     // XP multipliers based on the current level (makes finding changes more valuable at higher levels)

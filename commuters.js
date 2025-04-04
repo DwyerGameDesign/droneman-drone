@@ -234,9 +234,9 @@ function handleCommuterClick(event) {
         // Show positive thought bubble from a random commuter
         window.core.showRandomThoughtBubble(true);
 
-        // Enable train button so player can proceed
+        // Show train button so player can proceed
         if (gameState.elements.trainButton) {
-            gameState.elements.trainButton.disabled = false;
+            gameState.elements.trainButton.style.display = 'block';
         }
         
         // Disable clicking until next day

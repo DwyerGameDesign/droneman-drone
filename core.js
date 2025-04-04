@@ -533,13 +533,10 @@ function handleLevelUp(newLevel, previousLevel) {
     const levelUpPopup = document.createElement('div');
     levelUpPopup.className = 'level-up-popup';
     levelUpPopup.innerHTML = `
-        <div class="level-up-content">
-            <h2>Level Up</h2>
-            <div class="level-info">
-                <p>Awareness Level: <span class="level-number">${newLevel}</span></p>
-            </div>
-            <button id="continue-level-up">Continue</button>
-        </div>
+        <h2>LEVEL UP</h2>
+        <p>Your awareness is growing stronger.</p>
+        <p>Awareness Level: <span class="level-number">${newLevel}</span></p>
+        <button id="continue-level-up">Continue</button>
     `;
     
     // Add styles
@@ -547,48 +544,85 @@ function handleLevelUp(newLevel, previousLevel) {
     styleElement.textContent = `
         .level-up-popup {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .level-up-content {
-            background-color: #222;
-            border: 2px solid #4e4eb2;
-            border-radius: 10px;
-            padding: 20px 30px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.85);
+            color: #d4d4c8;
+            padding: 20px;
             text-align: center;
-            color: #eee;
+            z-index: 1500;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(78, 78, 178, 0.7);
+            font-family: 'Courier New', monospace;
             max-width: 80%;
-            box-shadow: 0 0 30px rgba(78, 78, 178, 0.5);
+            width: 400px;
+            filter: none !important;
         }
-        .level-up-content h2 {
-            color: #4e4eb2;
+        
+        .level-up-popup h2 {
             margin-top: 0;
+            color: #4e4eb2;
+            font-size: 24px;
+            letter-spacing: 2px;
         }
+        
+        .level-up-popup p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        
         .level-number {
             font-size: 24px;
             font-weight: bold;
             color: #4e4eb2;
         }
+        
         #continue-level-up {
-            background-color: #4e4eb2;
-            color: white;
-            border: none;
+            background-color: #2a2a2a;
+            color: #d4d4c8;
+            border: 2px solid #4e4eb2;
+            border-radius: 0;
             padding: 10px 20px;
-            margin-top: 15px;
-            border-radius: 5px;
             cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 4px 4px 0 #111;
+            position: relative;
+            transition: all 0.2s ease;
+            image-rendering: pixelated;
         }
+        
         #continue-level-up:hover {
-            background-color: #3a3a8e;
+            background-color: #3a3a3a;
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 #111;
+        }
+        
+        #continue-level-up:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 #111;
+        }
+        
+        #continue-level-up::before, #continue-level-up::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: #4e4eb2;
+        }
+        
+        #continue-level-up::before {
+            top: -2px;
+            left: -2px;
+        }
+        
+        #continue-level-up::after {
+            bottom: -2px;
+            right: -2px;
         }
     `;
     document.head.appendChild(styleElement);
@@ -700,9 +734,9 @@ function takeTrain() {
     console.log("Taking the train");
     gameState.isTransitioning = true;
 
-    // Disable train button during transition
+    // Hide train button during transition
     if (gameState.elements.trainButton) {
-        gameState.elements.trainButton.disabled = true;
+        gameState.elements.trainButton.style.display = 'none';
     }
 
     // Check if there's an unfound change to highlight
@@ -787,9 +821,9 @@ function proceedToNextDay() {
         // Enable clicking since there's something to find (if day >= 2)
         gameState.canClick = gameState.day >= 2;
 
-        // Disable train button on day 2+ until player finds the change or makes a mistake
+        // Hide train button on day 2+ until player finds the change or makes a mistake
         if (gameState.day >= 2 && gameState.elements.trainButton) {
-            gameState.elements.trainButton.disabled = true;
+            gameState.elements.trainButton.style.display = 'none';
         }
 
         // Fade back in
@@ -1029,7 +1063,7 @@ function gameComplete() {
         window.ui.updateTypewriterText("DRONE NO MORE, I'M MY OWN MAN. You've broken free from the cycle.");
 
         if (trainButton) {
-            trainButton.disabled = true;
+            trainButton.style.display = 'none';
         }
     }, 2000);
 }
@@ -1200,9 +1234,9 @@ function showGameOverSummary(message) {
     // Add game over class
     sceneContainer.classList.add('game-over');
     
-    // Disable train button
+    // Hide train button
     if (trainButton) {
-        trainButton.disabled = true;
+        trainButton.style.display = 'none';
     }
     
     // Select random ending text from config
