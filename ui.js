@@ -14,26 +14,6 @@ function updateAwarenessDisplay() {
 }
 
 /**
- * Update the background color stage based on awareness
- */
-function updateColorStage(awareness) {
-    const colorStages = GAME_SETTINGS.colorStages;
-    
-    // Remove all existing stage classes
-    colorStages.forEach(stage => {
-        sceneContainer.classList.remove(stage.class);
-    });
-    
-    // Add the appropriate stage class
-    for (let i = colorStages.length - 1; i >= 0; i--) {
-        if (awareness >= colorStages[i].threshold) {
-            sceneContainer.classList.add(colorStages[i].class);
-            break;
-        }
-    }
-}
-
-/**
  * Update the narrative text based on the current day
  */
 function updateNarrativeText() {
@@ -279,7 +259,6 @@ function showHint() {
 // Export UI functions to window object
 window.ui = {
     updateAwarenessDisplay,
-    updateColorStage,
     showMessage,
     showPopupMessage,
     showThoughtBubble,

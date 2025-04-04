@@ -270,7 +270,7 @@ window.core = {
     showHint,
     gameComplete,
     initDebugControls,
-    updateColorStage
+    showGameOverSummary
 };
 
 /**
@@ -469,9 +469,6 @@ function handleLevelUp(newLevel, previousLevel) {
 
     // Update game state
     gameState.awarenessLevel = newLevel;
-    
-    // Update color stage
-    updateColorStage();
 
     // Hide train button temporarily
     if (gameState.elements.trainButton) {
@@ -828,27 +825,6 @@ function showThoughtBubbleAtElement(element, text, isPositive) {
 }
 
 /**
- * Update the background color stage based on awareness level
- */
-function updateColorStage() {
-    // Get color stages from config
-    const colorStages = AWARENESS_CONFIG.colorStages;
-
-    // Remove all stage classes first
-    colorStages.forEach(stage => {
-        gameState.elements.sceneContainer.classList.remove(stage.class);
-    });
-
-    // Find the appropriate stage for current awareness level
-    for (let i = colorStages.length - 1; i >= 0; i--) {
-        if (gameState.awarenessLevel >= colorStages[i].level) {
-            gameState.elements.sceneContainer.classList.add(colorStages[i].class);
-            break;
-        }
-    }
-}
-
-/**
  * Game completion
  */
 function gameComplete() {
@@ -1019,27 +995,85 @@ function handleCommuterClick(event) {
         // Show a message about the wrong choice
         window.ui.showMessage("That's not what changed...", 1500);
         
-        // Apply XP penalty for wrong choice
-        const penaltyAmount = Math.floor(AWARENESS_CONFIG.baseXpForFindingChange * 0.5); // 50% of base gain
-        removeAwarenessXP(penaltyAmount);
-        
-        // Show negative thought bubble from a random commuter
-        showRandomThoughtBubble(false);
-        
         // Highlight the actual change if it's a commuter change
         if (gameState.currentChange && 
             !gameState.currentChange.found && 
             gameState.currentChange.changeType !== 'setDressing') {
             highlightMissedChange();
+        } else if (gameState.currentChange && 
+            !gameState.currentChange.found && 
+            gameState.currentChange.changeType === 'setDressing' &&
+            window.setDressing) {
+            window.setDressing.highlightMissedChange();
         }
         
-        // Enable train button so player can proceed, but only after showing the highlight
+        // Show negative thought bubble from a random commuter
+        showRandomThoughtBubble(false);
+        
+        // End the game with a summary after showing the highlight
         setTimeout(() => {
-            if (gameState.elements.trainButton) {
-                gameState.elements.trainButton.disabled = false;
-            }
+            showGameOverSummary("Your awareness wasn't strong enough to notice the changes.");
         }, 1500);
     }
+}
+
+/**
+ * Show game over summary with replay option
+ * @param {string} message - The message to display
+ */
+function showGameOverSummary(message) {
+    const sceneContainer = gameState.elements.sceneContainer;
+    const trainButton = gameState.elements.trainButton;
+    
+    // Disable clicking
+    gameState.canClick = false;
+    gameState.isTransitioning = true;
+    
+    // Add game over class
+    sceneContainer.classList.add('game-over');
+    
+    // Disable train button
+    if (trainButton) {
+        trainButton.disabled = true;
+    }
+    
+    // Select random ending text from config
+    const randomText = GAME_OVER_TEXTS[Math.floor(Math.random() * GAME_OVER_TEXTS.length)];
+    
+    // Update typewriter with random ending text
+    if (gameState.typewriter) {
+        gameState.typewriter.stop();
+        gameState.elements.narrativeText.textContent = '';
+        setTimeout(() => {
+            gameState.typewriter.type(randomText);
+        }, 100);
+    }
+    
+    // Create and show the summary popup
+    setTimeout(() => {
+        const summaryPopup = document.createElement('div');
+        summaryPopup.className = 'game-over-summary';
+        
+        summaryPopup.innerHTML = `
+            <h2>AWARENESS LOST</h2>
+            <p>${message}</p>
+            <p>Days on the train: ${gameState.day}</p>
+            <p>Awareness level: ${gameState.awarenessLevel}</p>
+            <p>Changes found: ${gameState.changesFound}</p>
+            <button id="replay-button">Take the Train Again</button>
+        `;
+        
+        // Add to scene
+        sceneContainer.appendChild(summaryPopup);
+        
+        // Add event listener to replay button
+        const replayButton = document.getElementById('replay-button');
+        if (replayButton) {
+            replayButton.addEventListener('click', () => {
+                location.reload(); // Reload the page to restart the game
+            });
+        }
+    }, 2000);
 }
 
 /**

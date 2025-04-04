@@ -274,21 +274,6 @@ h1 {
     }
 }
 
-/* Color stages */
-.stage-1 { background-color: rgba(42, 42, 42, 0.3); }
-.stage-2 { background-color: rgba(46, 46, 57, 0.3); }
-.stage-3 { background-color: rgba(50, 50, 72, 0.3); }
-.stage-4 { background-color: rgba(54, 54, 88, 0.3); }
-.stage-5 { background-color: rgba(58, 58, 103, 0.3); }
-.stage-6 { background-color: rgba(62, 62, 118, 0.3); }
-.stage-7 { background-color: rgba(66, 66, 133, 0.3); }
-.stage-8 { background-color: rgba(70, 70, 148, 0.3); }
-.stage-9 { background-color: rgba(74, 74, 163, 0.3); }
-.stage-10 { background-color: rgba(78, 78, 178, 0.3); }
-
-/* Style for the awareness meter */
-/* Updates to styles.css for XP-style awareness meter */
-
 /* Awareness container layout */
 .awareness-container {
     display: flex;
@@ -632,4 +617,79 @@ body.mobile .mobile-controls {
 
 .debug-button:active {
     background-color: #555;
+}
+
+/* Game over styles */
+.game-over {
+    filter: grayscale(80%) brightness(0.8);
+    transition: filter 2s ease;
+}
+
+.game-over-summary {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.85);
+    color: #d4d4c8;
+    padding: 20px;
+    text-align: center;
+    z-index: 1000;
+    border-radius: 5px;
+    box-shadow: 0 0 15px rgba(78, 78, 178, 0.7);
+    font-family: 'Courier New', monospace;
+    max-width: 80%;
+    width: 400px;
+}
+
+.game-over-summary h2 {
+    margin-top: 0;
+    color: #d9534f;
+    font-size: 24px;
+    letter-spacing: 2px;
+}
+
+.game-over-summary p {
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+#replay-button {
+    background-color: #4e4eb2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+}
+
+#replay-button:hover {
+    background-color: #5e5ec2;
+    transform: scale(1.05);
+    transition: all 0.2s ease;
+}
+
+/* Highlight missed change animation */
+@keyframes missed-pulse {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(217, 83, 79, 0.8);
+        filter: brightness(1);
+    }
+    50% { 
+        box-shadow: 0 0 20px 5px rgba(217, 83, 79, 0.8);
+        filter: brightness(1.3);
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(217, 83, 79, 0);
+        filter: brightness(1);
+    }
+}
+
+.highlight-missed {
+    animation: missed-pulse 0.8s 3;
+    outline: 2px solid #d9534f;
+    z-index: 100 !important;
 }

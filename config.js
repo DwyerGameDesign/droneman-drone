@@ -73,6 +73,19 @@ const LEVEL_UP_NARRATIVES = {
     default: "Something feels different about the crowd..."
 };
 
+// Game over texts
+const GAME_OVER_TEXTS = [
+    "The pattern continues without you...",
+    "Back to being a drone...",
+    "Your brief moment of clarity fades...",
+    "The routine claims you once more...",
+    "The commuters all look the same again...",
+    "Your awareness flickers and dims...",
+    "The cycle of sameness resumes...",
+    "The train arrives, just like yesterday...",
+    "Your perception blurs back to normal..."
+];
+
 // Game settings
 const GAME_SETTINGS = {
     // Transition timing
@@ -131,20 +144,5 @@ const AWARENESS_CONFIG = {
         2.5,  // Level 8
         2.7,  // Level 9
         3.0   // Level 10
-    ],
-    
-    // Color stages corresponding to awareness levels
-    colorStages: [
-        { level: 0, class: 'stage-1' }, // Not used
-        { level: 1, class: 'stage-1' },
-        { level: 2, class: 'stage-2' },
-        { level: 3, class: 'stage-3' },
-        { level: 4, class: 'stage-4' },
-        { level: 5, class: 'stage-5' },
-        { level: 6, class: 'stage-6' },
-        { level: 7, class: 'stage-7' },
-        { level: 8, class: 'stage-8' },
-        { level: 9, class: 'stage-9' },
-        { level: 10, class: 'stage-10' }
     ]
 };

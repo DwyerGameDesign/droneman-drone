@@ -291,26 +291,25 @@ function handleSetDressingClick(event) {
         
         // Show message about wrong choice
         window.ui.showMessage("That's not what changed...", 1500);
-
-        // Apply XP penalty for wrong choice
-        const penaltyAmount = Math.floor(AWARENESS_CONFIG.baseXpForFindingChange * 0.5); // 50% of base gain
-        window.core.removeAwarenessXP(penaltyAmount);
-        
-        // Show negative thought bubble from a random commuter
-        window.core.showRandomThoughtBubble(false);
         
         // Highlight the actual change if it exists and hasn't been found
         if (gameState.currentChange && 
             !gameState.currentChange.found && 
             gameState.currentChange.changeType === 'setDressing') {
             highlightMissedChange();
+        } else if (gameState.currentChange && 
+            !gameState.currentChange.found && 
+            gameState.currentChange.changeType !== 'setDressing') {
+            // If it's a commuter change that was missed, highlight that instead
+            window.core.highlightMissedChange();
         }
         
-        // Enable train button so player can proceed, but only after showing the highlight
+        // Show negative thought bubble from a random commuter
+        window.core.showRandomThoughtBubble(false);
+        
+        // End the game with a summary after showing the highlight
         setTimeout(() => {
-            if (gameState.elements.trainButton) {
-                gameState.elements.trainButton.disabled = false;
-            }
+            window.core.showGameOverSummary("Your awareness wasn't strong enough to notice the changes.");
         }, 1500);
     }
 }
