@@ -40,6 +40,17 @@ const THOUGHTS = {
         "I'm going to break this cycle.",
         "Today will be different.",
         "I'm my own person."
+    ],
+    negative: [
+        "Something feels off...",
+        "That's not it...",
+        "I'm not seeing clearly...",
+        "My awareness is slipping...",
+        "Focus is fading...",
+        "Can't quite put my finger on it...",
+        "I thought I was more observant...",
+        "The details are blurring...",
+        "I need to pay closer attention..."
     ]
 };
 

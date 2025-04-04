@@ -901,29 +901,22 @@ function showRandomThoughtBubble(isPositive) {
     // Get the thought content based on positive/negative
     let thoughts;
     if (isPositive) {
-        // Use positive thoughts from higher awareness levels
+        // Use positive thoughts from appropriate awareness level
         const thoughtSet = gameState.awarenessLevel >= 8 ? 'final' : 
                           gameState.awarenessLevel >= 5 ? 'late' : 
                           gameState.awarenessLevel >= 3 ? 'mid' : 'early';
         thoughts = THOUGHTS[thoughtSet];
+        console.log(`Using ${thoughtSet} thoughts for awareness level ${gameState.awarenessLevel}`);
     } else {
-        // Define negative thoughts
-        thoughts = [
-            "Something feels off...",
-            "That's not it...",
-            "I'm not seeing clearly...",
-            "My awareness is slipping...",
-            "Focus is fading...",
-            "Can't quite put my finger on it...",
-            "I thought I was more observant...",
-            "The details are blurring...",
-            "I need to pay closer attention..."
-        ];
+        // Use negative thoughts from config
+        thoughts = THOUGHTS.negative;
     }
     
     // Select a random thought
     const randomThoughtIndex = Math.floor(Math.random() * thoughts.length);
     const thought = thoughts[randomThoughtIndex];
+    
+    console.log(`Showing thought bubble: "${thought}"`);
     
     // Create and position the thought bubble
     showThoughtBubbleAtElement(randomCommuter.element, thought, isPositive);
@@ -940,31 +933,40 @@ function showThoughtBubbleAtElement(element, text, isPositive) {
     
     // Create a temporary thought bubble
     const thoughtBubble = document.createElement('div');
-    thoughtBubble.className = 'thought-bubble temp-thought';
+    thoughtBubble.className = isPositive ? 'thought-bubble temp-thought' : 'thought-bubble temp-thought negative';
     thoughtBubble.textContent = text;
-    
-    // Add color based on positive/negative
-    if (!isPositive) {
-        thoughtBubble.style.backgroundColor = '#e6a4a4';
-        thoughtBubble.style.color = '#5a1a1a';
-    }
     
     // Position the bubble above the element
     const rect = element.getBoundingClientRect();
     const sceneRect = gameState.elements.sceneContainer.getBoundingClientRect();
     
+    // Calculate position, keeping bubble inside the scene container
+    let leftPos = rect.left + rect.width/2 - sceneRect.left;
+    let bottomPos = sceneRect.bottom - rect.top + 10;
+    
+    // Create and style the bubble
     thoughtBubble.style.position = 'absolute';
-    thoughtBubble.style.left = `${rect.left + rect.width/2 - sceneRect.left}px`;
-    thoughtBubble.style.bottom = `${sceneRect.bottom - rect.top + 10}px`;
+    thoughtBubble.style.left = `${leftPos}px`;
+    thoughtBubble.style.bottom = `${bottomPos}px`;
     thoughtBubble.style.transform = 'translateX(-50%)';
-    thoughtBubble.style.maxWidth = '120px';
-    thoughtBubble.style.display = 'block';
-    thoughtBubble.style.zIndex = '100';
+    
+    // Add speech bubble tail
+    const tail = document.createElement('div');
+    tail.style.position = 'absolute';
+    tail.style.bottom = '-8px';
+    tail.style.left = '50%';
+    tail.style.transform = 'translateX(-50%)';
+    tail.style.width = '0';
+    tail.style.height = '0';
+    tail.style.borderLeft = '8px solid transparent';
+    tail.style.borderRight = '8px solid transparent';
+    tail.style.borderTop = isPositive ? '8px solid #d4d4c8' : '8px solid #e6a4a4';
+    thoughtBubble.appendChild(tail);
     
     // Add to scene
     gameState.elements.sceneContainer.appendChild(thoughtBubble);
     
-    // Remove after a few seconds
+    // Remove after animation completes
     setTimeout(() => {
         if (thoughtBubble.parentNode) {
             thoughtBubble.parentNode.removeChild(thoughtBubble);

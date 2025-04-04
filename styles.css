@@ -810,3 +810,27 @@ body.mobile .mobile-controls {
     z-index: 150;
     cursor: not-allowed;
 }
+
+/* Temporary thought bubbles for commuter thoughts */
+.temp-thought {
+    visibility: visible !important;
+    opacity: 1;
+    animation: fade-in-out 3s ease-in-out !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    background-color: #d4d4c8;
+    color: #2a2a2a;
+    pointer-events: none;
+    z-index: 100 !important;
+}
+
+.temp-thought.negative {
+    background-color: #e6a4a4;
+    color: #5a1a1a;
+}
+
+@keyframes fade-in-out {
+    0% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+}
