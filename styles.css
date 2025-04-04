@@ -592,3 +592,31 @@ body.mobile .mobile-controls {
         transform: translateX(-50%) scale(0.95);
     }
 }
+
+/* Debug controls */
+.debug-controls {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 5px;
+}
+
+.debug-button {
+    background-color: #666;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+.debug-button:hover {
+    background-color: #888;
+}
+
+.debug-button:active {
+    background-color: #555;
+}

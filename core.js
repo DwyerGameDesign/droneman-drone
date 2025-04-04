@@ -280,11 +280,14 @@ async function init() {
     await commuters.detectCommuterVariations();
     commuters.addInitialCommuter();
 
-    // Initialize set dressing - ADD THIS CODE
+    // Initialize set dressing
     if (window.setDressing && window.setDressing.detectSetDressingVariations) {
         await window.setDressing.detectSetDressingVariations();
         window.setDressing.addInitialSetDressing(2); // Start with 2 set dressing elements
     }
+
+    // Initialize debug buttons
+    initDebugControls();
 
     // Initialize doober system
     if (window.dooberSystem && window.dooberSystem.init) {
@@ -927,4 +930,137 @@ function createDailyChange() {
         console.log("No change for today");
         gameState.currentChange = null;
     }
+}
+
+/**
+ * Initialize debug controls
+ */
+function initDebugControls() {
+    const debugNoChange = document.getElementById('debug-no-change');
+    const debugCommuterChange = document.getElementById('debug-commuter-change');
+    const debugSetDressingChange = document.getElementById('debug-setdressing-change');
+
+    if (debugNoChange) {
+        debugNoChange.addEventListener('click', () => {
+            if (gameState.isTransitioning) return;
+            debugTakeTrain('none');
+        });
+    }
+
+    if (debugCommuterChange) {
+        debugCommuterChange.addEventListener('click', () => {
+            if (gameState.isTransitioning) return;
+            debugTakeTrain('commuter');
+        });
+    }
+
+    if (debugSetDressingChange) {
+        debugSetDressingChange.addEventListener('click', () => {
+            if (gameState.isTransitioning) return;
+            debugTakeTrain('setDressing');
+        });
+    }
+}
+
+/**
+ * Debug version of takeTrain that forces a specific change type
+ * @param {string} changeType - 'none', 'commuter', or 'setDressing'
+ */
+function debugTakeTrain(changeType) {
+    // Prevent multiple clicks during transition
+    if (gameState.isTransitioning) return;
+
+    console.log(`Debug: Taking train with change type: ${changeType}`);
+    gameState.isTransitioning = true;
+
+    // Disable train button during transition
+    if (gameState.elements.trainButton) {
+        gameState.elements.trainButton.disabled = true;
+    }
+
+    // Check if there's an unfound change to highlight
+    if (gameState.currentChange && !gameState.currentChange.found) {
+        // Highlight missed change
+        if (!gameState.currentChange.changeType || gameState.currentChange.changeType === 'commuter') {
+            commuters.highlightMissedChange();
+        } else if (gameState.currentChange.changeType === 'setDressing' && window.setDressing) {
+            window.setDressing.highlightMissedChange();
+        }
+
+        // Proceed to next day after highlighting
+        setTimeout(() => {
+            proceedToNextDayWithChangeType(changeType);
+        }, 1500);
+    } else {
+        // No change exists today - award XP for "observant riding"
+        if (gameState.day >= 4 && !gameState.currentChange) {  // Only if there was no change at all today
+            addAwarenessXP(AWARENESS_CONFIG.baseXpForTakingTrain);
+        }
+        
+        // Proceed immediately
+        proceedToNextDayWithChangeType(changeType);
+    }
+}
+
+/**
+ * Debug version of proceedToNextDay that forces a specific change type
+ * @param {string} changeType - 'none', 'commuter', or 'setDressing'
+ */
+function proceedToNextDayWithChangeType(changeType) {
+    // Fade out
+    gameState.elements.sceneContainer.classList.add('fading');
+
+    setTimeout(() => {
+        // Increment day
+        gameState.day++;
+        gameState.elements.dayDisplay.textContent = gameState.day;
+
+        // Reset current change
+        gameState.currentChange = null;
+
+        // Create the specified change type
+        if (changeType === 'commuter') {
+            console.log("Debug: Creating commuter change for today");
+            gameState.currentChange = { changeType: 'commuter' };
+            commuters.createRandomChange(1);
+        } else if (changeType === 'setDressing' && window.setDressing) {
+            console.log("Debug: Creating set dressing change for today");
+            const change = window.setDressing.createSetDressingChange();
+            if (change) {
+                console.log("Set dressing change created successfully:", change);
+                gameState.currentChange = change;
+            } else {
+                console.warn("Failed to create set dressing change, falling back to no change");
+                gameState.currentChange = null;
+            }
+        } else {
+            // No change
+            console.log("Debug: No change for today");
+            gameState.currentChange = null;
+        }
+
+        // Enable clicking since there's something to find (if day >= 4)
+        gameState.canClick = gameState.day >= 4;
+
+        // Fade back in
+        setTimeout(() => {
+            gameState.elements.sceneContainer.classList.remove('fading');
+
+            // Re-enable train button
+            if (gameState.elements.trainButton) {
+                gameState.elements.trainButton.disabled = false;
+            }
+
+            // Update narrative text with typewriter effect
+            if (gameState.typewriter) {
+                gameState.typewriter.stop();
+                gameState.elements.narrativeText.textContent = '';
+                setTimeout(() => {
+                    window.ui.updateNarrativeText();
+                }, 100);
+            }
+
+            gameState.isTransitioning = false; // Reset transition flag
+        }, 500); // Fade in duration
+    }, 500); // Fade out duration
 }
