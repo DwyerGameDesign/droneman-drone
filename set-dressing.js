@@ -23,7 +23,6 @@ const SET_DRESSING_TYPES = [
     'bench',
     'bottle',
     'caution',
-    'crack',
     'trash',
     'trashcan'
 ];
@@ -172,10 +171,6 @@ function addSetDressing() {
             setDressingElement.style.width = '48px';  // 40px * 1.2
             setDressingElement.style.height = '72px'; // 60px * 1.2
             break;
-        case 'crack':
-            setDressingElement.style.width = '84px';  // 70px * 1.2
-            setDressingElement.style.height = '48px'; // 40px * 1.2
-            break;
         case 'trash':
             setDressingElement.style.width = '36px';  // 30px * 1.2
             setDressingElement.style.height = '30px'; // 25px * 1.2
@@ -297,6 +292,12 @@ function handleSetDressingClick(event) {
 function createSetDressingChange() {
     console.log("Creating set dressing change");
 
+    // If no set dressing elements exist yet, always add a new one
+    if (allSetDressing.length === 0) {
+        console.log("No set dressing elements exist yet, adding the first one");
+        return createNewSetDressingElement();
+    }
+
     // Randomly decide between adding a new element or changing an existing one
     // Force adding a new element more often, especially if we have few elements
     const shouldAddNew = (allSetDressing.length < MAX_SET_DRESSING) && 
@@ -304,43 +305,58 @@ function createSetDressingChange() {
 
     if (shouldAddNew) {
         console.log("Will add a new set dressing element");
-        // Add a new set dressing element
-        const newElement = addSetDressing();
-        if (!newElement) {
-            console.warn("Failed to add new set dressing element");
-            return null;
-        }
-
-        // Mark as newly added
-        newElement.isNewlyAdded = true;
-        
-        // Add animation class for visibility
-        newElement.element.classList.add('set-dressing-add');
-        
-        // Make sure it's displayed on top of other elements
-        newElement.element.style.zIndex = '20';
-        
-        // Apply combined animations for maximum visibility
-        newElement.element.style.animation = 'set-dressing-add 1.5s ease-out forwards, set-dressing-pulse 2s 2s infinite';
-        
-        // Add a subtle shadow for better visibility
-        newElement.element.style.filter = 'drop-shadow(0 0 5px rgba(255, 255, 255, 0.5))';
-
-        // Create change object
-        const change = {
-            changeType: 'setDressing',
-            elementId: newElement.id,
-            changeAction: 'add',
-            found: false
-        };
-
-        console.log("Successfully created new set dressing element:", newElement.type);
-        return change;
+        return createNewSetDressingElement();
     } else {
         // Change an existing set dressing element
         console.log("Will change an existing set dressing element");
-        return changeExistingSetDressing();
+        const changedElement = changeExistingSetDressing();
+        
+        // If changing an existing element fails, fall back to adding a new one
+        if (!changedElement && allSetDressing.length < MAX_SET_DRESSING) {
+            console.log("Changing existing set dressing failed, falling back to adding a new one");
+            return createNewSetDressingElement();
+        }
+        
+        return changedElement;
     }
+}
+
+/**
+ * Create a new set dressing element and return the change object
+ */
+function createNewSetDressingElement() {
+    // Add a new set dressing element
+    const newElement = addSetDressing();
+    if (!newElement) {
+        console.warn("Failed to add new set dressing element");
+        return null;
+    }
+
+    // Mark as newly added
+    newElement.isNewlyAdded = true;
+    
+    // Add animation class for visibility
+    newElement.element.classList.add('set-dressing-add');
+    
+    // Make sure it's displayed on top of other elements
+    newElement.element.style.zIndex = '20';
+    
+    // Apply combined animations for maximum visibility
+    newElement.element.style.animation = 'set-dressing-add 1.5s ease-out forwards, set-dressing-pulse 2s 2s infinite';
+    
+    // Add a subtle shadow for better visibility
+    newElement.element.style.filter = 'drop-shadow(0 0 5px rgba(255, 255, 255, 0.5))';
+
+    // Create change object
+    const change = {
+        changeType: 'setDressing',
+        elementId: newElement.id,
+        changeAction: 'add',
+        found: false
+    };
+
+    console.log("Successfully created new set dressing element:", newElement.type);
+    return change;
 }
 
 /**
@@ -466,6 +482,7 @@ window.setDressing = {
     detectSetDressingVariations,
     handleSetDressingClick,
     createSetDressingChange,
+    createNewSetDressingElement,
     changeExistingSetDressing,
     applyVariation,
     highlightElement,

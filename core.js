@@ -280,10 +280,10 @@ async function init() {
     await commuters.detectCommuterVariations();
     commuters.addInitialCommuter();
 
-    // Initialize set dressing
+    // Initialize set dressing detection (but don't add any pieces on day 1)
     if (window.setDressing && window.setDressing.detectSetDressingVariations) {
         await window.setDressing.detectSetDressingVariations();
-        window.setDressing.addInitialSetDressing(2); // Start with 2 set dressing elements
+        // No initial set dressing - only add them as changes
     }
 
     // Initialize debug buttons
@@ -917,7 +917,17 @@ function createDailyChange() {
     } else if (window.setDressing) {
         // Create set dressing change
         console.log("Creating set dressing change for today");
-        const change = window.setDressing.createSetDressingChange();
+        
+        let change;
+        // If no set dressing elements exist yet, forcefully add a new one
+        if (window.setDressing.allSetDressing.length === 0) {
+            console.log("No set dressing elements exist yet, adding the first one");
+            change = window.setDressing.createNewSetDressingElement();
+        } else {
+            // Otherwise use the normal function that can add or change
+            change = window.setDressing.createSetDressingChange();
+        }
+        
         if (change) {
             // Set dressing change created successfully
             console.log(`Set dressing change created: ${change.changeAction} for ${change.elementId}`);
@@ -1027,7 +1037,17 @@ function proceedToNextDayWithChangeType(changeType) {
             commuters.createRandomChange(1);
         } else if (changeType === 'setDressing' && window.setDressing) {
             console.log("Debug: Creating set dressing change for today");
-            const change = window.setDressing.createSetDressingChange();
+            
+            let change;
+            // If no set dressing elements exist yet, forcefully add a new one
+            if (window.setDressing.allSetDressing.length === 0) {
+                console.log("Debug: No set dressing elements exist yet, adding the first one");
+                change = window.setDressing.createNewSetDressingElement();
+            } else {
+                // Otherwise use the normal function that can add or change
+                change = window.setDressing.createSetDressingChange();
+            }
+            
             if (change) {
                 console.log("Set dressing change created successfully:", change);
                 
