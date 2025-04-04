@@ -497,11 +497,26 @@ function createAwarenessMeter() {
 function handleLevelUp(newLevel, previousLevel) {
     console.log(`Level up! ${previousLevel} -> ${newLevel}`);
 
+    // Get XP requirements
+    const prevLevelRequirement = previousLevel > 0 ? 
+        AWARENESS_CONFIG.xpRequirements[previousLevel - 1] : 0;
+    const newLevelRequirement = AWARENESS_CONFIG.xpRequirements[newLevel - 1];
+    
+    // Calculate excess XP beyond what was needed for level up
+    const excessXP = Math.max(0, gameState.awarenessXP - newLevelRequirement);
+    
     // Update game state
     gameState.awarenessLevel = newLevel;
     
-    // Reset the awareness XP to 0 for the new level
-    gameState.awarenessXP = 0;
+    // Reset the XP to just the excess amount (to start the new level with)
+    gameState.awarenessXP = excessXP;
+    
+    console.log(`XP reset to ${excessXP} (excess beyond level requirement)`);
+    
+    // Update the XP display
+    if (gameState.awarenessMeter) {
+        gameState.awarenessMeter.setProgress(newLevel, excessXP);
+    }
     
     // Hide train button temporarily
     if (gameState.elements.trainButton) {
@@ -621,7 +636,7 @@ function continueWithLevelUp(newLevel) {
                 // Add and animate the new commuter
                 setTimeout(() => {
                     const newCommuter = commuters.addCommuter();
-                    if (newCommuter) {
+        if (newCommuter) {
                         console.log(`Added commuter ${newCommuter.type} for level ${newLevel}`);
                         // Add the new-commuter class for the animation
                         newCommuter.element.classList.add('new-commuter');
@@ -821,18 +836,18 @@ function determineChangesForDay() {
 function addAwarenessXP(amount) {
     const oldAwarenessLevel = gameState.awarenessLevel;
     
+    // Add XP
     gameState.awarenessXP += amount;
     
-    // Update the awareness level based on new XP
-    updateAwarenessLevel();
+    // Check if we've reached the next level's XP requirement
+    const xpRequirements = AWARENESS_CONFIG.xpRequirements;
+    const requiredXP = xpRequirements[gameState.awarenessLevel];
     
     // Update the XP display
     if (gameState.awarenessMeter) {
-        const currentXP = gameState.awarenessXP;
-        const requiredXP = AWARENESS_CONFIG.xpRequirements[gameState.awarenessLevel];
-        
-        // If we're about to level up, cap at max XP for this level
-        const displayXP = currentXP > requiredXP ? requiredXP : currentXP;
+        // Always show the current XP progress within the current level
+        // This ensures the meter fills up from 0 to 100% for each level
+        const displayXP = gameState.awarenessXP;
         
         gameState.awarenessMeter.setProgress(gameState.awarenessLevel, displayXP);
     }
@@ -842,10 +857,13 @@ function addAwarenessXP(amount) {
         window.xpEffects.showXPGain(amount);
     }
     
-    // If levelup occurred, handle it
-    if (gameState.awarenessLevel > oldAwarenessLevel) {
+    // Check for level up
+    if (gameState.awarenessXP >= requiredXP && gameState.awarenessLevel < xpRequirements.length - 1) {
+        // Level up!
+        const newLevel = gameState.awarenessLevel + 1;
+        
         // The XP gets reset in the handleLevelUp function
-        handleLevelUp(gameState.awarenessLevel, oldAwarenessLevel);
+        handleLevelUp(newLevel, gameState.awarenessLevel);
     }
 }
 
@@ -1350,15 +1368,16 @@ function createDailyChange() {
 
 /**
  * Update awareness level based on current XP
+ * This is used for initialization and checks
  */
 function updateAwarenessLevel() {
     const xpRequirements = AWARENESS_CONFIG.xpRequirements;
     let newLevel = 1;
     
     // Find the highest level that we meet the XP requirement for
-    for (let i = 1; i < xpRequirements.length; i++) {
-        if (gameState.awarenessXP >= xpRequirements[i-1]) {
-            newLevel = i;
+    for (let i = 1; i < xpRequirements.length - 1; i++) {
+        if (gameState.awarenessXP >= xpRequirements[i]) {
+            newLevel = i + 1;
         } else {
             break;
         }
@@ -1366,6 +1385,9 @@ function updateAwarenessLevel() {
     
     // Update level if changed
     if (newLevel !== gameState.awarenessLevel) {
+        console.log(`Updating awareness level: ${gameState.awarenessLevel} -> ${newLevel} (XP: ${gameState.awarenessXP})`);
         gameState.awarenessLevel = newLevel;
     }
+    
+    return gameState.awarenessLevel;
 }

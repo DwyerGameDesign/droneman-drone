@@ -8,14 +8,14 @@ const MAX_SET_DRESSING = 8;
 
 // Positions for each set dressing element [left%, bottom%]
 const SET_DRESSING_POSITIONS = [
-    [20, 10],  // far left, low
-    [40, 10],  // left-center, low
-    [60, 10],  // right-center, low
-    [80, 10],  // far right, low
-    [15, 30],  // far left, mid
-    [35, 30],  // left-center, mid
-    [65, 30],  // right-center, mid
-    [85, 30]   // far right, mid
+    [20, 18],  // far left, platform
+    [40, 20],  // left-center, platform
+    [60, 22],  // right-center, platform
+    [80, 24],  // far right, platform
+    [15, 18],  // far left, platform higher
+    [35, 20],  // left-center, platform higher
+    [65, 22],  // right-center, platform higher
+    [85, 24]   // far right, platform higher
 ];
 
 // Types of set dressing elements - updated to match your available sprites
@@ -103,6 +103,48 @@ function addInitialSetDressing(count = 3) {
 }
 
 /**
+ * Check if a position would overlap with existing set dressing
+ * @param {number} xPos - X position in pixels
+ * @param {number} yPos - Y position in pixels
+ * @param {number} width - Width of new element
+ * @param {number} height - Height of new element
+ * @param {number} buffer - Additional buffer space to prevent close placement
+ * @returns {boolean} - True if position overlaps with existing elements
+ */
+function checkForOverlap(xPos, yPos, width, height, buffer = 10) {
+    // Add buffer to dimensions to prevent elements from being too close
+    const adjustedWidth = width + buffer;
+    const adjustedHeight = height + buffer;
+    
+    // Check against all existing set dressing elements
+    for (const dressing of allSetDressing) {
+        if (!dressing.element) continue;
+        
+        // Get element position and size
+        const rect = dressing.element.getBoundingClientRect();
+        const sceneRect = gameState.elements.sceneContainer.getBoundingClientRect();
+        
+        // Convert to same coordinate system as new element
+        const elementLeft = rect.left - sceneRect.left;
+        const elementBottom = sceneRect.bottom - rect.bottom;
+        const elementWidth = rect.width;
+        const elementHeight = rect.height;
+        
+        // Check for overlap using rectangles
+        if (
+            xPos - adjustedWidth/2 < elementLeft + elementWidth/2 + buffer &&
+            xPos + adjustedWidth/2 > elementLeft - elementWidth/2 - buffer &&
+            yPos - adjustedHeight < elementBottom + elementHeight + buffer &&
+            yPos > elementBottom - buffer
+        ) {
+            return true; // Overlap detected
+        }
+    }
+    
+    return false; // No overlap
+}
+
+/**
  * Add a new set dressing element to the scene
  */
 function addSetDressing() {
@@ -126,7 +168,7 @@ function addSetDressing() {
     const selectedType = availableTypes[randomTypeIndex];
 
     // Get position for this set dressing element
-    const position = SET_DRESSING_POSITIONS[activeSetDressing] || [50, 20];
+    const position = SET_DRESSING_POSITIONS[activeSetDressing] || [50, 45];
 
     // Create the set dressing element
     const setDressingId = `set-dressing-${activeSetDressing}`;
@@ -136,11 +178,65 @@ function addSetDressing() {
     setDressingElement.dataset.setDressingType = selectedType;
     setDressingElement.dataset.setDressingId = activeSetDressing;
 
+    // Calculate dimensions based on type
+    let width, height;
+    switch(selectedType) {
+        case 'bench':
+            width = 96;
+            height = 36;
+            break;
+        case 'bottle':
+            width = 18;
+            height = 27;
+            break;
+        case 'caution':
+            width = 36;
+            height = 54;
+            break;
+        case 'trash':
+            width = 30;
+            height = 24;
+            break;
+        case 'trashcan':
+            width = 36;
+            height = 45;
+            break;
+        default:
+            width = 36;
+            height = 36;
+    }
+    
     // Calculate actual position
     const containerWidth = gameState.elements.sceneContainer.offsetWidth;
     const containerHeight = gameState.elements.sceneContainer.offsetHeight;
-    const xPos = (position[0] / 100) * containerWidth;
-    const yPos = (position[1] / 100) * containerHeight;
+    let xPos, yPos, adjustedYPercent;
+    let attempts = 0;
+    const maxAttempts = 10;
+    
+    // Try to find a position without overlap
+    do {
+        // Get base position
+        const baseX = position[0];
+        const baseY = position[1];
+        
+        // Add randomness to positions (±5% for Y, ±3% for X)
+        const randomXOffset = (Math.random() * 6 - 3);
+        const randomYOffset = (Math.random() * 10 - 5);
+        
+        const adjustedXPercent = baseX + randomXOffset;
+        adjustedYPercent = baseY + randomYOffset;
+        
+        xPos = (adjustedXPercent / 100) * containerWidth;
+        yPos = (adjustedYPercent / 100) * containerHeight;
+        
+        attempts++;
+    } while (attempts < maxAttempts && checkForOverlap(xPos, yPos, width, height));
+    
+    if (attempts >= maxAttempts) {
+        console.log(`Couldn't find non-overlapping position for ${selectedType} after ${maxAttempts} attempts`);
+    }
+    
+    console.log(`Placing ${selectedType} at position [${xPos}px, ${yPos}px] (attempt ${attempts})`);
 
     // Set styles
     setDressingElement.style.position = 'absolute';
@@ -154,35 +250,15 @@ function addSetDressing() {
     setDressingElement.style.backgroundSize = 'contain';
     setDressingElement.style.backgroundRepeat = 'no-repeat';
     setDressingElement.style.backgroundPosition = 'bottom center';
-    setDressingElement.style.zIndex = `${5 + activeSetDressing}`;
+    
+    // Set z-index to be between platform (1) and commuters (10)
+    // This ensures set dressing appears above platform but below commuters
+    setDressingElement.style.zIndex = '5';
     setDressingElement.style.cursor = 'pointer';
     
-    // Size based on type - increase sizes by 20% to improve visibility
-    switch(selectedType) {
-        case 'bench':
-            setDressingElement.style.width = '96px';  // 80px * 1.2
-            setDressingElement.style.height = '36px'; // 30px * 1.2
-            break;
-        case 'bottle':
-            setDressingElement.style.width = '24px';  // 20px * 1.2
-            setDressingElement.style.height = '36px'; // 30px * 1.2
-            break;
-        case 'caution':
-            setDressingElement.style.width = '48px';  // 40px * 1.2
-            setDressingElement.style.height = '72px'; // 60px * 1.2
-            break;
-        case 'trash':
-            setDressingElement.style.width = '36px';  // 30px * 1.2
-            setDressingElement.style.height = '30px'; // 25px * 1.2
-            break;
-        case 'trashcan':
-            setDressingElement.style.width = '42px';  // 35px * 1.2
-            setDressingElement.style.height = '54px'; // 45px * 1.2
-            break;
-        default:
-            setDressingElement.style.width = '48px';  // 40px * 1.2
-            setDressingElement.style.height = '48px'; // 40px * 1.2
-    }
+    // Set dimensions
+    setDressingElement.style.width = `${width}px`;
+    setDressingElement.style.height = `${height}px`;
 
     // Add to DOM
     gameState.elements.sceneContainer.appendChild(setDressingElement);
