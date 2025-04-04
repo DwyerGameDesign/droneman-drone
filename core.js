@@ -904,10 +904,15 @@ function createDailyChange() {
     
     // As awareness increases, increase the probability of changes
     const awarenessLevel = gameState.awarenessLevel || 1;
-    const changeProb = Math.min(0.8, 0.4 + (awarenessLevel * 0.05)); // 40% base chance, increasing with awareness
-    const commuterProb = changeProb * 0.5; // Half of change probability is commuter changes
-    const setDressingProb = changeProb * 0.5; // Half of change probability is set dressing changes
+    const changeProb = Math.min(0.9, 0.5 + (awarenessLevel * 0.05)); // 50% base chance, increasing with awareness
     
+    // Adjust balance between commuter and set dressing changes
+    // Higher probability for set dressing changes
+    const commuterProb = changeProb * 0.4; // 40% of change probability for commuter changes
+    const setDressingProb = changeProb * 0.6; // 60% of change probability for set dressing changes
+    
+    console.log(`Change probabilities: total=${changeProb.toFixed(2)}, commuter=${commuterProb.toFixed(2)}, setDressing=${setDressingProb.toFixed(2)}`);
+
     if (randomValue < commuterProb) {
         // Create commuter change
         console.log("Creating commuter change for today");
@@ -919,9 +924,19 @@ function createDailyChange() {
         const change = window.setDressing.createSetDressingChange();
         if (change) {
             // Set dressing change created successfully
+            console.log(`Set dressing change created: ${change.changeAction} for ${change.elementId}`);
             gameState.currentChange = change;
+            
+            // If this is an 'add' change, specifically log it
+            if (change.changeAction === 'add') {
+                const newDressing = window.setDressing.allSetDressing.find(d => d.id === change.elementId);
+                if (newDressing) {
+                    console.log(`Added new ${newDressing.type} set dressing element at position [${newDressing.position}]`);
+                }
+            }
         } else {
             // Fallback to commuter change if set dressing change fails
+            console.warn("Failed to create set dressing change, falling back to commuter change");
             gameState.currentChange = { changeType: 'commuter' };
             commuters.createRandomChange(1);
         }
@@ -1028,6 +1043,16 @@ function proceedToNextDayWithChangeType(changeType) {
             const change = window.setDressing.createSetDressingChange();
             if (change) {
                 console.log("Set dressing change created successfully:", change);
+                
+                // Additional detailed logging for set dressing changes
+                if (change.changeAction === 'add') {
+                    const dressing = window.setDressing.allSetDressing.find(d => d.id === change.elementId);
+                    if (dressing) {
+                        console.log(`Added new ${dressing.type} set dressing at position [${dressing.position}]`);
+                        console.log(`Total set dressing count: ${window.setDressing.allSetDressing.length}`);
+                    }
+                }
+                
                 gameState.currentChange = change;
             } else {
                 console.warn("Failed to create set dressing change, falling back to no change");

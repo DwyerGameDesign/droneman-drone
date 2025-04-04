@@ -201,7 +201,8 @@ function addSetDressing() {
         type: selectedType,
         currentVariation: defaultVariation,
         position: position,
-        index: activeSetDressing
+        index: activeSetDressing,
+        isNewlyAdded: false // By default, not newly added
     };
 
     // Add to set dressing array
@@ -241,6 +242,9 @@ function handleSetDressingClick(event) {
         gameState.currentChange.changeType === 'setDressing' && 
         gameState.currentChange.elementId === setDressingId) {
         console.log("Correct set dressing element clicked!");
+        
+        // Log change action type for debugging
+        console.log(`Set dressing change action: ${gameState.currentChange.changeAction}`);
 
         // Mark as found
         gameState.currentChange.found = true;
@@ -267,6 +271,13 @@ function handleSetDressingClick(event) {
         // Increase awareness
         window.core.addAwarenessXP(awarenessGain);
 
+        // Show appropriate message based on change action
+        if (gameState.currentChange.changeAction === 'add') {
+            window.ui.showMessage("Something new appeared!", 1500);
+        } else {
+            window.ui.showMessage("That changed!", 1500);
+        }
+
         // Disable further clicking until next day
         gameState.canClick = false;
 
@@ -285,13 +296,25 @@ function createSetDressingChange() {
     console.log("Creating set dressing change");
 
     // Randomly decide between adding a new element or changing an existing one
+    // Force adding a new element more often, especially if we have few elements
     const shouldAddNew = (allSetDressing.length < MAX_SET_DRESSING) && 
-                         (Math.random() < 0.5 || allSetDressing.length === 0);
+                         (Math.random() < 0.7 || allSetDressing.length < 3);
 
     if (shouldAddNew) {
+        console.log("Will add a new set dressing element");
         // Add a new set dressing element
         const newElement = addSetDressing();
-        if (!newElement) return null;
+        if (!newElement) {
+            console.warn("Failed to add new set dressing element");
+            return null;
+        }
+
+        // Mark as newly added and add animation class for visibility
+        newElement.isNewlyAdded = true;
+        newElement.element.classList.add('set-dressing-add');
+        
+        // Apply a pulsing effect to make it more noticeable
+        newElement.element.style.animation = 'set-dressing-add 1s ease-out forwards, commuter-pulse 2s 2s infinite';
 
         // Create change object
         const change = {
@@ -301,9 +324,11 @@ function createSetDressingChange() {
             found: false
         };
 
+        console.log("Successfully created new set dressing element:", newElement.type);
         return change;
     } else {
         // Change an existing set dressing element
+        console.log("Will change an existing set dressing element");
         return changeExistingSetDressing();
     }
 }
@@ -387,13 +412,40 @@ function highlightMissedChange() {
     const setDressing = allSetDressing.find(s => s.id === gameState.currentChange.elementId);
 
     if (setDressing && setDressing.element) {
+        console.log(`Highlighting missed set dressing change: ${setDressing.type} (${gameState.currentChange.changeAction})`);
+        
         // Add missed highlight class
         setDressing.element.classList.add('highlight-missed');
+        
+        // For newly added elements, make the highlight even more noticeable
+        if (gameState.currentChange.changeAction === 'add' && setDressing.isNewlyAdded) {
+            // Clear any existing animations
+            setDressing.element.style.animation = '';
+            
+            // Apply a strong pulsing effect
+            setDressing.element.style.animation = 'commuter-missed 1.5s 3';
+            setDressing.element.style.boxShadow = '0 0 20px rgba(217, 83, 79, 0.7)';
+            
+            // Apply an outline to make it more visible
+            setDressing.element.style.outline = '3px solid rgba(217, 83, 79, 0.7)';
+            
+            // Show a message pointing out the missed new element
+            window.ui.showMessage(`You missed a new ${setDressing.type} that appeared!`, 2000);
+        }
 
         // Remove after animation completes
         setTimeout(() => {
             setDressing.element.classList.remove('highlight-missed');
-        }, 1500);
+            
+            // Clean up additional styles
+            if (gameState.currentChange.changeAction === 'add' && setDressing.isNewlyAdded) {
+                setDressing.element.style.boxShadow = '';
+                setDressing.element.style.outline = '';
+                
+                // Reset to normal animation
+                setDressing.element.style.animation = '';
+            }
+        }, 4500); // Extended time for visibility
     }
 }
 
