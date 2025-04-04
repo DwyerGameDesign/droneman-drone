@@ -690,7 +690,7 @@ function addAwarenessXP(amount) {
         // If we're about to level up, cap at max XP for this level
         const displayXP = currentXP > requiredXP ? requiredXP : currentXP;
         
-        gameState.awarenessMeter.update(displayXP, requiredXP);
+        gameState.awarenessMeter.setProgress(gameState.awarenessLevel, displayXP);
     }
     
     // Show floating XP text
@@ -727,7 +727,7 @@ function removeAwarenessXP(amount) {
         // Update the XP display
         if (gameState.awarenessMeter) {
             const requiredXP = AWARENESS_CONFIG.xpRequirements[currentLevel];
-            gameState.awarenessMeter.update(newXP, requiredXP);
+            gameState.awarenessMeter.setProgress(currentLevel, newXP);
         }
         
         // Show floating XP loss text

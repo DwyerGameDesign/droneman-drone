@@ -9,7 +9,7 @@
 function updateAwarenessDisplay() {
     // Update meter if available
     if (awarenessMeter) {
-        awarenessMeter.update(awareness);
+        awarenessMeter.setProgress(gameState.awarenessLevel, gameState.awarenessXP);
     }
 }
 
