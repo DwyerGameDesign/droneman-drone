@@ -302,8 +302,8 @@ async function init() {
     // Set initial narrative text
     window.ui.updateNarrativeText();
 
-    // Enable clicking if we're on day 4 or later
-    gameState.canClick = gameState.day >= 4;
+    // Enable clicking if we're on day 2 or later
+    gameState.canClick = gameState.day >= 2;
 
     // Set up mobile support
     setupMobileSupport();
@@ -566,17 +566,17 @@ function proceedToNextDay() {
         gameState.currentChange = null;
 
         // Create changes for the new day
-        if (gameState.day === 4) {
-            // First change is always on day 4 - always a commuter
+        if (gameState.day === 2) {
+            // First change is now on day 2 - always a commuter
             gameState.currentChange = { changeType: 'commuter' };
             commuters.createFirstChange();
-        } else if (gameState.day > 4) {
-            // For later days, choose between different types of changes
+        } else if (gameState.day > 2) {
+            // For later days, always create a change (commuter or set dressing)
             createDailyChange();
         }
 
-        // Enable clicking since there's something to find (if day >= 4)
-        gameState.canClick = gameState.day >= 4;
+        // Enable clicking since there's something to find (if day >= 2)
+        gameState.canClick = gameState.day >= 2;
 
         // Fade back in
         setTimeout(() => {
@@ -899,26 +899,22 @@ function showHint() {
 }
 
 function createDailyChange() {
-    // For all days after day 4, randomly select between commuter change, set dressing change, or no change
+    // For all days after day 2, always create either a commuter or set dressing change
     const randomValue = Math.random();
     
-    // As awareness increases, increase the probability of changes
-    const awarenessLevel = gameState.awarenessLevel || 1;
-    const changeProb = Math.min(0.9, 0.5 + (awarenessLevel * 0.05)); // 50% base chance, increasing with awareness
-    
-    // Adjust balance between commuter and set dressing changes
+    // Balance between commuter and set dressing changes
     // Higher probability for set dressing changes
-    const commuterProb = changeProb * 0.4; // 40% of change probability for commuter changes
-    const setDressingProb = changeProb * 0.6; // 60% of change probability for set dressing changes
+    const commuterProb = 0.4; // 40% chance for commuter changes
+    const setDressingProb = 0.6; // 60% chance for set dressing changes
     
-    console.log(`Change probabilities: total=${changeProb.toFixed(2)}, commuter=${commuterProb.toFixed(2)}, setDressing=${setDressingProb.toFixed(2)}`);
+    console.log(`Change probabilities: commuter=${commuterProb.toFixed(2)}, setDressing=${setDressingProb.toFixed(2)}`);
 
     if (randomValue < commuterProb) {
         // Create commuter change
         console.log("Creating commuter change for today");
         gameState.currentChange = { changeType: 'commuter' };
         commuters.createRandomChange(1);
-    } else if (randomValue < commuterProb + setDressingProb && window.setDressing) {
+    } else if (window.setDressing) {
         // Create set dressing change
         console.log("Creating set dressing change for today");
         const change = window.setDressing.createSetDressingChange();
@@ -941,9 +937,10 @@ function createDailyChange() {
             commuters.createRandomChange(1);
         }
     } else {
-        // No change today
-        console.log("No change for today");
-        gameState.currentChange = null;
+        // Fallback to commuter change if set dressing is not available
+        console.log("Set dressing not available, creating commuter change");
+        gameState.currentChange = { changeType: 'commuter' };
+        commuters.createRandomChange(1);
     }
 }
 
@@ -1008,7 +1005,7 @@ function debugTakeTrain(changeType) {
         }, 1500);
     } else {
         // No change exists today - award XP for "observant riding"
-        if (gameState.day >= 4 && !gameState.currentChange) {  // Only if there was no change at all today
+        if (gameState.day >= 2 && !gameState.currentChange) {  // Only if there was no change at all today
             addAwarenessXP(AWARENESS_CONFIG.baseXpForTakingTrain);
         }
         
@@ -1064,8 +1061,8 @@ function proceedToNextDayWithChangeType(changeType) {
             gameState.currentChange = null;
         }
 
-        // Enable clicking since there's something to find (if day >= 4)
-        gameState.canClick = gameState.day >= 4;
+        // Enable clicking since there's something to find (if day >= 2)
+        gameState.canClick = gameState.day >= 2;
 
         // Fade back in
         setTimeout(() => {
