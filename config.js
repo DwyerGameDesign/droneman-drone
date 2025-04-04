@@ -109,15 +109,6 @@ const GAME_SETTINGS = {
     missedChangeHighlightDuration: 1500
 };
 
-// Progression configuration referenced in commuters.js
-const PROGRESSION_CONFIG = {
-    // Base awareness gain per change found
-    awarenessGainPerChange: 25,
-    
-    // Number of changes needed to fill each segment
-    changesToFillSegment: [2, 2, 3, 3, 4, 4, 5, 5, 6, 6]
-};
-
 // Configuration for XP/Awareness system
 const AWARENESS_CONFIG = {
     // Maximum achievable level
@@ -140,20 +131,5 @@ const AWARENESS_CONFIG = {
         800,   // XP needed to reach level 9 from level 8
         1000,   // XP needed to reach level 10 from level 9
         1250    // XP needed to complete level 10 (game completion)
-    ],
-    
-    // XP multipliers based on the current level (makes finding changes more valuable at higher levels)
-    xpMultiplierByLevel: [
-        null, // Index 0 not used
-        1.0,  // Level 1
-        1.0,  // Level 2
-        1.0,  // Level 3
-        1.0,  // Level 4
-        1.0,  // Level 5
-        1.0,  // Level 6
-        1.0,  // Level 7
-        1.0,  // Level 8
-        1.0,  // Level 9
-        1.0   // Level 10
     ]
 };

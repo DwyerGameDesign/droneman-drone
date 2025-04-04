@@ -288,6 +288,8 @@ window.core = {
     proceedToNextDay,
     addAwarenessXP,
     removeAwarenessXP,
+    calculateAwarenessXP,
+    calculateTrainXP,
     showRandomThoughtBubble,
     showThoughtBubbleAtElement,
     updateAwarenessLevel,
@@ -495,7 +497,7 @@ function createAwarenessMeter() {
  * Handle when a level up occurs
  */
 function handleLevelUp(newLevel, previousLevel) {
-    console.log(`Level up! ${previousLevel} -> ${newLevel}`);
+    console.log(`[LEVEL UP] ${previousLevel} -> ${newLevel}`);
 
     // Get XP requirements
     const prevLevelRequirement = previousLevel > 0 ? 
@@ -505,13 +507,15 @@ function handleLevelUp(newLevel, previousLevel) {
     // Calculate excess XP beyond what was needed for level up
     const excessXP = Math.max(0, gameState.awarenessXP - newLevelRequirement);
     
+    console.log(`[LEVEL UP] Current XP: ${gameState.awarenessXP}, New level requirement: ${newLevelRequirement}, Excess XP: ${excessXP}`);
+    
     // Update game state
     gameState.awarenessLevel = newLevel;
     
     // Reset the XP to just the excess amount (to start the new level with)
     gameState.awarenessXP = excessXP;
     
-    console.log(`XP reset to ${excessXP} (excess beyond level requirement)`);
+    console.log(`[LEVEL UP] Updated: Level ${newLevel}, XP reset to ${excessXP}`);
     
     // Update the XP display
     if (gameState.awarenessMeter) {
@@ -755,7 +759,7 @@ function takeTrain() {
     } else {
         // No change exists today - award XP for "observant riding"
         if (gameState.day >= 0 && !gameState.currentChange) {  // Only if there was no change at all today
-            addAwarenessXP(AWARENESS_CONFIG.baseXpForTakingTrain);
+            addAwarenessXP(calculateTrainXP());
         }
         
         // Proceed immediately
@@ -868,21 +872,25 @@ function determineChangesForDay() {
  * @param {number} amount - Amount of XP to add
  */
 function addAwarenessXP(amount) {
+    // Get the current level and XP
+    const currentLevel = gameState.awarenessLevel;
+    const currentXP = gameState.awarenessXP;
+    
     // Log initial state for debugging
-    console.log(`Adding ${amount} XP. Current: Level ${gameState.awarenessLevel}, XP ${gameState.awarenessXP}`);
+    console.log(`[XP DEBUG] Adding ${amount} XP. Current: Level ${currentLevel}, XP ${currentXP}`);
     
     // Add XP
     gameState.awarenessXP += amount;
     
     // Check if we've reached the next level's XP requirement
     const xpRequirements = AWARENESS_CONFIG.xpRequirements;
-    const requiredXP = xpRequirements[gameState.awarenessLevel]; // Get required XP for NEXT level
+    const requiredXP = xpRequirements[currentLevel]; // Get required XP for NEXT level
     
-    console.log(`Current XP: ${gameState.awarenessXP}, Required for next level: ${requiredXP}`);
+    console.log(`[XP DEBUG] After adding: XP ${gameState.awarenessXP}, Required for next level: ${requiredXP}`);
     
     // Update the XP display
     if (gameState.awarenessMeter) {
-        gameState.awarenessMeter.setProgress(gameState.awarenessLevel, gameState.awarenessXP);
+        gameState.awarenessMeter.setProgress(currentLevel, gameState.awarenessXP);
     }
     
     // Show floating XP text
@@ -891,13 +899,13 @@ function addAwarenessXP(amount) {
     }
     
     // Check for level up
-    if (gameState.awarenessXP >= requiredXP && gameState.awarenessLevel < xpRequirements.length - 1) {
+    if (gameState.awarenessXP >= requiredXP && currentLevel < xpRequirements.length - 1) {
         // Level up!
-        const newLevel = gameState.awarenessLevel + 1;
-        console.log(`Leveling up! ${gameState.awarenessLevel} -> ${newLevel}`);
+        const newLevel = currentLevel + 1;
+        console.log(`[XP DEBUG] Leveling up! ${currentLevel} -> ${newLevel}`);
         
         // The XP gets reset in the handleLevelUp function
-        handleLevelUp(newLevel, gameState.awarenessLevel);
+        handleLevelUp(newLevel, currentLevel);
     }
 }
 
@@ -1173,10 +1181,8 @@ function handleCommuterClick(event) {
         // Increment changes found counter
         gameState.changesFound++;
 
-        // Calculate awareness gain based on difficulty
-        const baseGain = AWARENESS_CONFIG.baseXpForFindingChange;
-        const difficultyMultiplier = 1 + (gameState.day - 4) * 0.1; // 10% increase per day
-        const awarenessGain = Math.floor(baseGain * difficultyMultiplier);
+        // Get awareness gain from central calculation function
+        const awarenessGain = calculateAwarenessXP();
 
         // Increase awareness
         addAwarenessXP(awarenessGain);
@@ -1424,4 +1430,24 @@ function updateAwarenessLevel() {
     }
     
     return gameState.awarenessLevel;
+}
+
+/**
+ * Calculate awareness XP gain based on current day/difficulty
+ * @returns {number} - The amount of XP to award
+ */
+function calculateAwarenessXP() {
+    // Simplified to just return the base amount
+    const xpAmount = AWARENESS_CONFIG.baseXpForFindingChange;
+    console.log(`Awarding fixed XP amount: ${xpAmount}`);
+    return xpAmount;
+}
+
+/**
+ * Calculate awareness XP gain for taking the train (no changes found)
+ * This is a simpler calculation since it's just a base amount
+ * @returns {number} - The amount of XP to award
+ */
+function calculateTrainXP() {
+    return AWARENESS_CONFIG.baseXpForTakingTrain;
 }
