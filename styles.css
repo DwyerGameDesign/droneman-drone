@@ -530,3 +530,65 @@ body.mobile .mobile-controls {
         transform: translateX(-50%) scale(0.8);
     }
 }
+
+/* Base set dressing sprite styling */
+.set-dressing-sprite {
+    position: absolute;
+    cursor: pointer;
+    z-index: 5; /* Lower than commuters but above background */
+    display: block !important;
+    transform: translateX(-50%);
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: bottom center !important;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Set dressing hover effect */
+.set-dressing-sprite:hover {
+    transform: translateX(-50%) scale(1.05);
+}
+
+/* Set dressing animation for new elements */
+@keyframes set-dressing-add {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.5);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+}
+
+.set-dressing-add {
+    animation: set-dressing-add 1s ease-out forwards;
+}
+
+/* Set dressing animations for changes */
+@keyframes set-dressing-change {
+    0% {
+        filter: brightness(1.5) contrast(0.8);
+    }
+    50% {
+        filter: brightness(1.2) contrast(1.2);
+    }
+    100% {
+        filter: brightness(1) contrast(1);
+    }
+}
+
+.set-dressing-change {
+    animation: set-dressing-change 1s ease-out forwards;
+}
+
+/* Mobile responsiveness for set dressing */
+@media (max-width: 820px) {
+    .set-dressing-sprite {
+        transform: translateX(-50%) scale(0.9);
+    }
+    
+    .set-dressing-sprite:hover {
+        transform: translateX(-50%) scale(0.95);
+    }
+}

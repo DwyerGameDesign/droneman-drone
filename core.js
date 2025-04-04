@@ -219,7 +219,8 @@ window.core = {
     addAwarenessXP,
     setupMobileSupport,
     enhanceTouchTargets,
-    handleCommuterClick
+    handleCommuterClick,
+    createDailyChange
 };
 
 /**
@@ -278,6 +279,12 @@ async function init() {
     // Initialize commuters - wait for variations to be detected
     await commuters.detectCommuterVariations();
     commuters.addInitialCommuter();
+
+    // Initialize set dressing - ADD THIS CODE
+    if (window.setDressing && window.setDressing.detectSetDressingVariations) {
+        await window.setDressing.detectSetDressingVariations();
+        window.setDressing.addInitialSetDressing(2); // Start with 2 set dressing elements
+    }
 
     // Initialize doober system
     if (window.dooberSystem && window.dooberSystem.init) {
@@ -519,7 +526,11 @@ function takeTrain() {
     // Check if there's an unfound change to highlight
     if (gameState.currentChange && !gameState.currentChange.found) {
         // Highlight missed change
-        commuters.highlightMissedChange();
+        if (!gameState.currentChange.changeType || gameState.currentChange.changeType === 'commuter') {
+            commuters.highlightMissedChange();
+        } else if (gameState.currentChange.changeType === 'setDressing' && window.setDressing) {
+            window.setDressing.highlightMissedChange();
+        }
 
         // Proceed to next day after highlighting
         setTimeout(() => {
@@ -551,20 +562,21 @@ function proceedToNextDay() {
         // Reset current change
         gameState.currentChange = null;
 
-        // Determine number of changes for today
-        const changesToCreate = determineChangesForDay();
-
-        // Create new change
+        // Create changes for the new day
         if (gameState.day === 4) {
-            // First change is on day 4
+            // First change is always on day 4 - always a commuter
+            gameState.currentChange = { changeType: 'commuter' };
             commuters.createFirstChange();
         } else if (gameState.day > 4) {
-            // For later days, create random changes
-            commuters.createRandomChange(changesToCreate);
+            // For later days, choose between different types of changes
+            createDailyChange();
         }
 
         // Enable clicking since there's something to find (if day >= 4)
         gameState.canClick = gameState.day >= 4;
+
+        // Check for lyrics or special day text
+        window.ui.checkForLyrics();
 
         // Fade back in
         setTimeout(() => {
@@ -593,19 +605,19 @@ function proceedToNextDay() {
  * Determine the number of changes to create for the current day
  */
 function determineChangesForDay() {
-    // Determine how many changes to create based on the current level
-    const baseChanges = Math.min(
-        gameState.awarenessLevel + 1,
-        5 // Max 5 changes per day
-    );
-
-    // For early game, start with just 1 change
+    // Early game, gradually introduce changes
     if (gameState.day < 6) {
-        return 1;
+        return gameState.day >= 4 ? 1 : 0;  // Start with day 4
     }
-
-    // Later in the game, add more changes based on progression
-    return baseChanges;
+    
+    // Determine chance of change based on awareness level
+    const awarenessLevel = gameState.awarenessLevel || 1;
+    
+    // As awareness increases, so does the chance of having a change
+    const changeProb = Math.min(0.9, 0.5 + (awarenessLevel * 0.05));
+    
+    // Randomly determine if there should be a change today
+    return Math.random() < changeProb ? 1 : 0;
 }
 
 /**
@@ -830,32 +842,92 @@ function showHint() {
         return;
     }
 
-    // Find the commuter for the current change
-    const commuter = commuters.allCommuters.find(c => c.id === gameState.currentChange.commuterId);
+    if (!gameState.currentChange.changeType || gameState.currentChange.changeType === 'commuter') {
+        // Find the commuter for the current change
+        const commuter = commuters.allCommuters.find(c => c.id === gameState.currentChange.commuterId);
 
-    if (commuter && commuter.element && !gameState.currentChange.found) {
-        // Determine which quadrant the change is in
-        const rect = commuter.element.getBoundingClientRect();
-        const sceneRect = gameState.elements.sceneContainer.getBoundingClientRect();
+        if (commuter && commuter.element && !gameState.currentChange.found) {
+            // Determine which quadrant the change is in
+            const rect = commuter.element.getBoundingClientRect();
+            const sceneRect = gameState.elements.sceneContainer.getBoundingClientRect();
 
-        const isTop = rect.top < (sceneRect.top + sceneRect.height / 2);
-        const isLeft = rect.left < (sceneRect.left + sceneRect.width / 2);
+            const isTop = rect.top < (sceneRect.top + sceneRect.height / 2);
+            const isLeft = rect.left < (sceneRect.left + sceneRect.width / 2);
 
-        let location = isTop ? 'top' : 'bottom';
-        location += isLeft ? ' left' : ' right';
+            let location = isTop ? 'top' : 'bottom';
+            location += isLeft ? ' left' : ' right';
 
-        // Show hint message
-        window.ui.showMessage(`Look for a change in the ${location} area`, 2000);
+            // Show hint message
+            window.ui.showMessage(`Look for a change in the ${location} area`, 2000);
+        }
+    } else if (gameState.currentChange.changeType === 'setDressing' && window.setDressing) {
+        // Find the set dressing element for the current change
+        const setDressing = window.setDressing.allSetDressing.find(s => s.id === gameState.currentChange.elementId);
 
-        // Disable hint button temporarily
-        const hintButton = document.getElementById('hint-button');
-        if (hintButton) {
-            hintButton.disabled = true;
-            setTimeout(() => {
-                hintButton.disabled = false;
-            }, 5000);
+        if (setDressing && setDressing.element && !gameState.currentChange.found) {
+            // Determine which quadrant the set dressing is in
+            const rect = setDressing.element.getBoundingClientRect();
+            const sceneRect = gameState.elements.sceneContainer.getBoundingClientRect();
+
+            const isTop = rect.top < (sceneRect.top + sceneRect.height / 2);
+            const isLeft = rect.left < (sceneRect.left + sceneRect.width / 2);
+
+            let location = isTop ? 'top' : 'bottom';
+            location += isLeft ? ' left' : ' right';
+            
+            // Provide a hint based on the change action
+            let hintText = '';
+            if (gameState.currentChange.changeAction === 'add') {
+                hintText = `Look for something new in the ${location} area`;
+            } else {
+                hintText = `Look for a change in the ${location} area`;
+            }
+
+            // Show hint message
+            window.ui.showMessage(hintText, 2000);
+        }
+    }
+
+    // Disable hint button temporarily
+    const hintButton = document.getElementById('hint-button');
+    if (hintButton) {
+        hintButton.disabled = true;
+        setTimeout(() => {
+            hintButton.disabled = false;
+        }, 5000);
+    }
+}
+
+function createDailyChange() {
+    // For all days after day 4, randomly select between commuter change, set dressing change, or no change
+    const randomValue = Math.random();
+    
+    // As awareness increases, increase the probability of changes
+    const awarenessLevel = gameState.awarenessLevel || 1;
+    const changeProb = Math.min(0.8, 0.4 + (awarenessLevel * 0.05)); // 40% base chance, increasing with awareness
+    const commuterProb = changeProb * 0.5; // Half of change probability is commuter changes
+    const setDressingProb = changeProb * 0.5; // Half of change probability is set dressing changes
+    
+    if (randomValue < commuterProb) {
+        // Create commuter change
+        console.log("Creating commuter change for today");
+        gameState.currentChange = { changeType: 'commuter' };
+        commuters.createRandomChange(1);
+    } else if (randomValue < commuterProb + setDressingProb && window.setDressing) {
+        // Create set dressing change
+        console.log("Creating set dressing change for today");
+        const change = window.setDressing.createSetDressingChange();
+        if (change) {
+            // Set dressing change created successfully
+            gameState.currentChange = change;
+        } else {
+            // Fallback to commuter change if set dressing change fails
+            gameState.currentChange = { changeType: 'commuter' };
+            commuters.createRandomChange(1);
         }
     } else {
-        window.ui.showMessage("No unfound changes left today", 1500);
+        // No change today
+        console.log("No change for today");
+        gameState.currentChange = null;
     }
 }
