@@ -622,13 +622,29 @@ function proceedToNextDay() {
         // Reset current change
         gameState.currentChange = null;
 
-        // Create changes for the new day
+        // Create changes for the new day based on specific pattern
         if (gameState.day === 2) {
-            // First change is now on day 2 - always a commuter
+            // On day 2, add a set dressing piece
+            console.log("Day 2: Adding a set dressing piece");
+            if (window.setDressing) {
+                const change = window.setDressing.createNewSetDressingElement();
+                if (change) {
+                    gameState.currentChange = change;
+                    console.log("Created set dressing change:", change);
+                } else {
+                    // Fallback if set dressing fails
+                    console.log("Failed to create set dressing, falling back to commuter change");
+                    gameState.currentChange = { changeType: 'commuter' };
+                    commuters.createFirstChange();
+                }
+            }
+        } else if (gameState.day === 3) {
+            // On day 3, change a commuter
+            console.log("Day 3: Changing a commuter");
             gameState.currentChange = { changeType: 'commuter' };
-            commuters.createFirstChange();
-        } else if (gameState.day > 2) {
-            // For later days, always create a change (commuter or set dressing)
+            commuters.createRandomChange();
+        } else if (gameState.day > 3) {
+            // For later days, randomly choose between commuter or set dressing changes
             createDailyChange();
         }
 
