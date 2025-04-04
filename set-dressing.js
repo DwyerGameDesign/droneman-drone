@@ -8,14 +8,14 @@ const MAX_SET_DRESSING = 8;
 
 // Positions for each set dressing element [left%, bottom%]
 const SET_DRESSING_POSITIONS = [
-    [20, 18],  // far left, platform
-    [40, 20],  // left-center, platform
-    [60, 22],  // right-center, platform
-    [80, 24],  // far right, platform
-    [15, 18],  // far left, platform higher
-    [35, 20],  // left-center, platform higher
-    [65, 22],  // right-center, platform higher
-    [85, 24]   // far right, platform higher
+    [20, 21],  // far left, platform
+    [40, 23],  // left-center, platform
+    [60, 25],  // right-center, platform
+    [80, 22],  // far right, platform
+    [15, 24],  // far left, platform higher
+    [35, 21],  // left-center, platform higher
+    [65, 25],  // right-center, platform higher
+    [85, 23]   // far right, platform higher
 ];
 
 // Types of set dressing elements - updated to match your available sprites
@@ -349,8 +349,12 @@ function handleSetDressingClick(event) {
 
         // Calculate awareness gain based on difficulty
         const baseGain = AWARENESS_CONFIG.baseXpForFindingChange;
-        const difficultyMultiplier = 1 + (gameState.day - 4) * 0.1; // 10% increase per day
+        // Ensure difficultyMultiplier doesn't go negative in early days
+        const dayFactor = Math.max(0, gameState.day - 4);
+        const difficultyMultiplier = 1 + (dayFactor * 0.1); // 10% increase per day
         const awarenessGain = Math.floor(baseGain * difficultyMultiplier);
+        
+        console.log(`Awarding ${awarenessGain} XP (base: ${baseGain}, multiplier: ${difficultyMultiplier})`);
 
         // Increase awareness
         window.core.addAwarenessXP(awarenessGain);

@@ -221,8 +221,12 @@ function handleCommuterClick(event) {
 
         // Calculate awareness gain based on difficulty
         const baseGain = AWARENESS_CONFIG.baseXpForFindingChange;
-        const difficultyMultiplier = 1 + (gameState.day - 4) * 0.1; // 10% increase per day
+        // Ensure difficultyMultiplier doesn't go negative in early days
+        const dayFactor = Math.max(0, gameState.day - 4);
+        const difficultyMultiplier = 1 + (dayFactor * 0.1); // 10% increase per day
         const awarenessGain = Math.floor(baseGain * difficultyMultiplier);
+        
+        console.log(`Awarding ${awarenessGain} XP (base: ${baseGain}, multiplier: ${difficultyMultiplier})`);
 
         // Increase awareness
         window.core.addAwarenessXP(awarenessGain);

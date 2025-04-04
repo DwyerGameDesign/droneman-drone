@@ -834,22 +834,21 @@ function determineChangesForDay() {
  * @param {number} amount - Amount of XP to add
  */
 function addAwarenessXP(amount) {
-    const oldAwarenessLevel = gameState.awarenessLevel;
+    // Log initial state for debugging
+    console.log(`Adding ${amount} XP. Current: Level ${gameState.awarenessLevel}, XP ${gameState.awarenessXP}`);
     
     // Add XP
     gameState.awarenessXP += amount;
     
     // Check if we've reached the next level's XP requirement
     const xpRequirements = AWARENESS_CONFIG.xpRequirements;
-    const requiredXP = xpRequirements[gameState.awarenessLevel];
+    const requiredXP = xpRequirements[gameState.awarenessLevel]; // Get required XP for NEXT level
+    
+    console.log(`Current XP: ${gameState.awarenessXP}, Required for next level: ${requiredXP}`);
     
     // Update the XP display
     if (gameState.awarenessMeter) {
-        // Always show the current XP progress within the current level
-        // This ensures the meter fills up from 0 to 100% for each level
-        const displayXP = gameState.awarenessXP;
-        
-        gameState.awarenessMeter.setProgress(gameState.awarenessLevel, displayXP);
+        gameState.awarenessMeter.setProgress(gameState.awarenessLevel, gameState.awarenessXP);
     }
     
     // Show floating XP text
@@ -861,6 +860,7 @@ function addAwarenessXP(amount) {
     if (gameState.awarenessXP >= requiredXP && gameState.awarenessLevel < xpRequirements.length - 1) {
         // Level up!
         const newLevel = gameState.awarenessLevel + 1;
+        console.log(`Leveling up! ${gameState.awarenessLevel} -> ${newLevel}`);
         
         // The XP gets reset in the handleLevelUp function
         handleLevelUp(newLevel, gameState.awarenessLevel);

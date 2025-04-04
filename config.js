@@ -130,30 +130,30 @@ const AWARENESS_CONFIG = {
     // Hardcoded XP requirements for each level
     xpRequirements: [
         null,   // Level 0 (not used)
-        100,    // XP needed to reach level 2 from level 1
-        150,    // XP needed to reach level 3 from level 2
-        225,    // XP needed to reach level 4 from level 3
-        340,    // XP needed to reach level 5 from level 4
-        510,    // XP needed to reach level 6 from level 5
-        765,    // XP needed to reach level 7 from level 6
-        1150,   // XP needed to reach level 8 from level 7
-        1725,   // XP needed to reach level 9 from level 8
-        2590,   // XP needed to reach level 10 from level 9
-        3885    // XP needed to complete level 10 (game completion)
+        65,    // XP needed to reach level 2 from level 1
+        115,    // XP needed to reach level 3 from level 2
+        190,    // XP needed to reach level 4 from level 3
+        265,    // XP needed to reach level 5 from level 4
+        350,    // XP needed to reach level 6 from level 5
+        450,    // XP needed to reach level 7 from level 6
+        550,   // XP needed to reach level 8 from level 7
+        650,   // XP needed to reach level 9 from level 8
+        800,   // XP needed to reach level 10 from level 9
+        1000    // XP needed to complete level 10 (game completion)
     ],
     
     // XP multipliers based on the current level (makes finding changes more valuable at higher levels)
     xpMultiplierByLevel: [
         null, // Index 0 not used
         1.0,  // Level 1
-        1.2,  // Level 2
-        1.5,  // Level 3
-        1.7,  // Level 4
-        1.9,  // Level 5
-        2.1,  // Level 6
-        2.3,  // Level 7
-        2.5,  // Level 8
-        2.7,  // Level 9
-        3.0   // Level 10
+        1.0,  // Level 2
+        1.0,  // Level 3
+        1.0,  // Level 4
+        1.0,  // Level 5
+        1.0,  // Level 6
+        1.0,  // Level 7
+        1.0,  // Level 8
+        1.0,  // Level 9
+        1.0   // Level 10
     ]
 };
