@@ -24,7 +24,7 @@ class AwarenessMeter {
         
         // Get requirements for level 1
         const currentLevelMinXP = 0; // For level 1, min XP is 0
-        const nextLevelRequirement = AWARENESS_CONFIG.xpRequirements[0]; // XP to reach level 2
+        const nextLevelRequirement = AWARENESS_CONFIG.xpRequirements[1]; // XP to reach level 2
         
         // Calculate XP needed to reach the next level
         this.xpToNextLevel = nextLevelRequirement - currentLevelMinXP;
@@ -140,7 +140,7 @@ class AwarenessMeter {
         console.log(`[ADD XP] Added ${amount} XP. Now at Level ${this.currentLevel}: ${this.currentXP}/${this.xpToNextLevel}`);
         
         // Get the next level requirement
-        const nextLevelRequirement = AWARENESS_CONFIG.xpRequirements[this.currentLevel - 1];
+        const nextLevelRequirement = AWARENESS_CONFIG.xpRequirements[this.currentLevel];
         
         // Check if we've gained a level
         let leveledUp = false;
@@ -156,8 +156,8 @@ class AwarenessMeter {
             console.log(`[LEVEL UP] ${previousLevel} -> ${this.currentLevel}, Excess XP: ${excessXP}`);
             
             // Get new level requirements
-            const newLevelMinXP = AWARENESS_CONFIG.xpRequirements[this.currentLevel - 2]; // Previous level's requirement
-            const newLevelNextXP = AWARENESS_CONFIG.xpRequirements[this.currentLevel - 1]; // Current level's next requirement
+            const newLevelMinXP = AWARENESS_CONFIG.xpRequirements[this.currentLevel - 1]; // Previous level's requirement
+            const newLevelNextXP = AWARENESS_CONFIG.xpRequirements[this.currentLevel]; // Current level's next requirement
             
             // Calculate XP needed for this new level
             this.xpToNextLevel = newLevelNextXP - newLevelMinXP;
@@ -187,8 +187,8 @@ class AwarenessMeter {
             setTimeout(() => {
                 // Calculate level requirements again to ensure they're correct
                 const currentLevelMinXP = this.currentLevel > 1 ? 
-                    AWARENESS_CONFIG.xpRequirements[this.currentLevel - 2] : 0;
-                const nextLevelRequirement = AWARENESS_CONFIG.xpRequirements[this.currentLevel - 1];
+                    AWARENESS_CONFIG.xpRequirements[this.currentLevel - 1] : 0;
+                const nextLevelRequirement = AWARENESS_CONFIG.xpRequirements[this.currentLevel];
                 
                 // Recalculate XP needed for current level
                 this.xpToNextLevel = nextLevelRequirement - currentLevelMinXP;
@@ -210,7 +210,7 @@ class AwarenessMeter {
         
         // Get current level min XP (minimum XP to be at this level)
         const currentLevelMinXP = this.currentLevel > 1 ? 
-            AWARENESS_CONFIG.xpRequirements[this.currentLevel - 2] : 0;
+            AWARENESS_CONFIG.xpRequirements[this.currentLevel - 1] : 0;
             
         // Calculate XP progress within current level
         const levelProgress = this.currentXP - currentLevelMinXP;
@@ -241,11 +241,13 @@ class AwarenessMeter {
         this.currentXP = xp;
         
         // Get the requirement for the current level (minimum XP to be at this level)
+        // For level 1, this is 0. For level 2, this is the requirement for level 1 (index 1), etc.
         const currentLevelMinXP = this.currentLevel > 1 ? 
-            AWARENESS_CONFIG.xpRequirements[this.currentLevel - 2] : 0;
+            AWARENESS_CONFIG.xpRequirements[this.currentLevel - 1] : 0;
             
         // Get the requirement for the next level (XP needed to level up)
-        const nextLevelRequirement = AWARENESS_CONFIG.xpRequirements[this.currentLevel - 1];
+        // For level 1, this is the requirement for level 2 (index 1). For level 2, it's level 3 (index 2), etc.
+        const nextLevelRequirement = AWARENESS_CONFIG.xpRequirements[this.currentLevel];
         
         // Calculate XP needed from current level to next level
         this.xpToNextLevel = nextLevelRequirement - currentLevelMinXP;

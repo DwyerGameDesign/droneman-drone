@@ -501,13 +501,13 @@ function handleLevelUp(newLevel, previousLevel) {
 
     // Get XP requirements
     const prevLevelRequirement = previousLevel > 0 ? 
-        AWARENESS_CONFIG.xpRequirements[previousLevel - 1] : 0;
-    const newLevelRequirement = AWARENESS_CONFIG.xpRequirements[newLevel - 1];
+        AWARENESS_CONFIG.xpRequirements[previousLevel] : 0;
+    const newLevelRequirement = AWARENESS_CONFIG.xpRequirements[newLevel];
     
     // Calculate excess XP beyond what was needed for level up
-    const excessXP = Math.max(0, gameState.awarenessXP - newLevelRequirement);
+    const excessXP = Math.max(0, gameState.awarenessXP - prevLevelRequirement);
     
-    console.log(`[LEVEL UP] Current XP: ${gameState.awarenessXP}, New level req: ${newLevelRequirement}, Excess XP: ${excessXP}`);
+    console.log(`[LEVEL UP] Current XP: ${gameState.awarenessXP}, Previous level req: ${prevLevelRequirement}, New level req: ${newLevelRequirement}, Excess XP: ${excessXP}`);
     
     // Update game state
     gameState.awarenessLevel = newLevel;
@@ -939,7 +939,6 @@ function removeAwarenessXP(amount) {
         
         // Update the XP display
         if (gameState.awarenessMeter) {
-            const requiredXP = AWARENESS_CONFIG.xpRequirements[currentLevel];
             gameState.awarenessMeter.setProgress(currentLevel, newXP);
         }
         
