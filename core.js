@@ -519,7 +519,14 @@ function handleLevelUp(newLevel, previousLevel) {
     
     // Update the XP display
     if (gameState.awarenessMeter) {
+        console.log(`[LEVEL UP] Setting awareness meter to Level ${newLevel}, XP ${excessXP}`);
         gameState.awarenessMeter.setProgress(newLevel, excessXP);
+        
+        // Force the meter to update after a short delay to ensure level-up callback is complete
+        setTimeout(() => {
+            console.log(`[LEVEL UP] Refreshing meter after delay: Level ${newLevel}, XP ${gameState.awarenessXP}`);
+            gameState.awarenessMeter.setProgress(newLevel, gameState.awarenessXP);
+        }, 100);
     }
     
     // Hide train button temporarily
@@ -888,8 +895,9 @@ function addAwarenessXP(amount) {
     
     console.log(`[XP DEBUG] After adding: XP ${gameState.awarenessXP}, Required for next level: ${requiredXP}`);
     
-    // Update the XP display
+    // Update the XP display - make sure to pass the updated XP value
     if (gameState.awarenessMeter) {
+        console.log(`[XP DEBUG] Updating meter: Level ${currentLevel}, XP ${gameState.awarenessXP}`);
         gameState.awarenessMeter.setProgress(currentLevel, gameState.awarenessXP);
     }
     
