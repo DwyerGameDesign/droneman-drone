@@ -135,6 +135,7 @@ function addSetDressing() {
     setDressingElement.id = setDressingId;
     setDressingElement.className = 'set-dressing-sprite';
     setDressingElement.dataset.setDressingType = selectedType;
+    setDressingElement.dataset.setDressingId = activeSetDressing;
 
     // Calculate actual position
     const containerWidth = gameState.elements.sceneContainer.offsetWidth;
@@ -157,35 +158,35 @@ function addSetDressing() {
     setDressingElement.style.zIndex = `${5 + activeSetDressing}`;
     setDressingElement.style.cursor = 'pointer';
     
-    // Size based on type
+    // Size based on type - increase sizes by 20% to improve visibility
     switch(selectedType) {
         case 'bench':
-            setDressingElement.style.width = '80px';
-            setDressingElement.style.height = '30px';
+            setDressingElement.style.width = '96px';  // 80px * 1.2
+            setDressingElement.style.height = '36px'; // 30px * 1.2
             break;
         case 'bottle':
-            setDressingElement.style.width = '20px';
-            setDressingElement.style.height = '30px';
+            setDressingElement.style.width = '24px';  // 20px * 1.2
+            setDressingElement.style.height = '36px'; // 30px * 1.2
             break;
         case 'caution':
-            setDressingElement.style.width = '40px';
-            setDressingElement.style.height = '60px';
+            setDressingElement.style.width = '48px';  // 40px * 1.2
+            setDressingElement.style.height = '72px'; // 60px * 1.2
             break;
         case 'crack':
-            setDressingElement.style.width = '70px';
-            setDressingElement.style.height = '40px';
+            setDressingElement.style.width = '84px';  // 70px * 1.2
+            setDressingElement.style.height = '48px'; // 40px * 1.2
             break;
         case 'trash':
-            setDressingElement.style.width = '30px';
-            setDressingElement.style.height = '25px';
+            setDressingElement.style.width = '36px';  // 30px * 1.2
+            setDressingElement.style.height = '30px'; // 25px * 1.2
             break;
         case 'trashcan':
-            setDressingElement.style.width = '35px';
-            setDressingElement.style.height = '45px';
+            setDressingElement.style.width = '42px';  // 35px * 1.2
+            setDressingElement.style.height = '54px'; // 45px * 1.2
             break;
         default:
-            setDressingElement.style.width = '40px';
-            setDressingElement.style.height = '40px';
+            setDressingElement.style.width = '48px';  // 40px * 1.2
+            setDressingElement.style.height = '48px'; // 40px * 1.2
     }
 
     // Add to DOM
@@ -211,7 +212,7 @@ function addSetDressing() {
     // Increment active set dressing count
     activeSetDressing++;
 
-    console.log(`Added ${selectedType} at position ${position}`);
+    console.log(`Added ${selectedType} at position [${position}]`);
     return setDressing;
 }
 
@@ -221,8 +222,9 @@ function addSetDressing() {
 function handleSetDressingClick(event) {
     const setDressingElement = event.currentTarget;
     const setDressingId = setDressingElement.id;
+    const setDressingType = setDressingElement.dataset.setDressingType;
 
-    console.log(`Clicked set dressing: ${setDressingId}`);
+    console.log(`Clicked set dressing: ${setDressingId} (${setDressingType})`);
 
     // Check if we're transitioning
     if (gameState.isTransitioning) {
@@ -273,9 +275,9 @@ function handleSetDressingClick(event) {
 
         // Show appropriate message based on change action
         if (gameState.currentChange.changeAction === 'add') {
-            window.ui.showMessage("Something new appeared!", 1500);
+            window.ui.showMessage(`You found the new ${setDressingType}!`, 2000);
         } else {
-            window.ui.showMessage("That changed!", 1500);
+            window.ui.showMessage(`You noticed the ${setDressingType} changed!`, 2000);
         }
 
         // Disable further clicking until next day
@@ -298,7 +300,7 @@ function createSetDressingChange() {
     // Randomly decide between adding a new element or changing an existing one
     // Force adding a new element more often, especially if we have few elements
     const shouldAddNew = (allSetDressing.length < MAX_SET_DRESSING) && 
-                         (Math.random() < 0.7 || allSetDressing.length < 3);
+                         (Math.random() < 0.8 || allSetDressing.length < 4);
 
     if (shouldAddNew) {
         console.log("Will add a new set dressing element");
@@ -309,12 +311,20 @@ function createSetDressingChange() {
             return null;
         }
 
-        // Mark as newly added and add animation class for visibility
+        // Mark as newly added
         newElement.isNewlyAdded = true;
+        
+        // Add animation class for visibility
         newElement.element.classList.add('set-dressing-add');
         
-        // Apply a pulsing effect to make it more noticeable
-        newElement.element.style.animation = 'set-dressing-add 1s ease-out forwards, commuter-pulse 2s 2s infinite';
+        // Make sure it's displayed on top of other elements
+        newElement.element.style.zIndex = '20';
+        
+        // Apply combined animations for maximum visibility
+        newElement.element.style.animation = 'set-dressing-add 1.5s ease-out forwards, set-dressing-pulse 2s 2s infinite';
+        
+        // Add a subtle shadow for better visibility
+        newElement.element.style.filter = 'drop-shadow(0 0 5px rgba(255, 255, 255, 0.5))';
 
         // Create change object
         const change = {

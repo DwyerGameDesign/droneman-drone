@@ -948,39 +948,29 @@ function createDailyChange() {
  * Initialize debug controls
  */
 function initDebugControls() {
-    const debugNoChange = document.getElementById('debug-no-change');
-    const debugCommuterChange = document.getElementById('debug-commuter-change');
-    const debugSetDressingChange = document.getElementById('debug-setdressing-change');
-
-    if (debugNoChange) {
-        debugNoChange.addEventListener('click', () => {
-            if (gameState.isTransitioning) return;
-            debugTakeTrain('none');
-        });
+    // Debug buttons
+    const debugCommuterBtn = document.getElementById('debug-commuter-change');
+    const debugSetDressingBtn = document.getElementById('debug-setdressing-change');
+    
+    // Add event listeners to debug buttons
+    if (debugCommuterBtn) {
+        debugCommuterBtn.addEventListener('click', () => debugTakeTrain('commuter'));
     }
-
-    if (debugCommuterChange) {
-        debugCommuterChange.addEventListener('click', () => {
-            if (gameState.isTransitioning) return;
-            debugTakeTrain('commuter');
-        });
-    }
-
-    if (debugSetDressingChange) {
-        debugSetDressingChange.addEventListener('click', () => {
-            if (gameState.isTransitioning) return;
-            debugTakeTrain('setDressing');
-        });
+    
+    if (debugSetDressingBtn) {
+        debugSetDressingBtn.addEventListener('click', () => debugTakeTrain('setDressing'));
     }
 }
 
 /**
  * Debug version of takeTrain that forces a specific change type
- * @param {string} changeType - 'none', 'commuter', or 'setDressing'
  */
 function debugTakeTrain(changeType) {
     // Prevent multiple clicks during transition
-    if (gameState.isTransitioning) return;
+    if (gameState.isTransitioning) {
+        console.log("Game is transitioning, ignoring debug button click");
+        return;
+    }
 
     console.log(`Debug: Taking train with change type: ${changeType}`);
     gameState.isTransitioning = true;
@@ -1016,7 +1006,7 @@ function debugTakeTrain(changeType) {
 
 /**
  * Debug version of proceedToNextDay that forces a specific change type
- * @param {string} changeType - 'none', 'commuter', or 'setDressing'
+ * @param {string} changeType - 'commuter' or 'setDressing'
  */
 function proceedToNextDayWithChangeType(changeType) {
     // Fade out
@@ -1052,13 +1042,10 @@ function proceedToNextDayWithChangeType(changeType) {
                 
                 gameState.currentChange = change;
             } else {
-                console.warn("Failed to create set dressing change, falling back to no change");
-                gameState.currentChange = null;
+                console.warn("Failed to create set dressing change, falling back to commuter change");
+                gameState.currentChange = { changeType: 'commuter' };
+                commuters.createRandomChange(1);
             }
-        } else {
-            // No change
-            console.log("Debug: No change for today");
-            gameState.currentChange = null;
         }
 
         // Enable clicking since there's something to find (if day >= 2)
