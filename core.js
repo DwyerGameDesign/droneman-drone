@@ -292,6 +292,7 @@ window.core = {
     showThoughtBubbleAtElement,
     updateAwarenessLevel,
     handleLevelUp,
+    continueWithLevelUp,
     handleCommuterClick,
     highlightMissedChange,
     initTypewriter,
@@ -498,12 +499,110 @@ function handleLevelUp(newLevel, previousLevel) {
 
     // Update game state
     gameState.awarenessLevel = newLevel;
-
+    
+    // Reset the awareness XP to 0 for the new level
+    gameState.awarenessXP = 0;
+    
     // Hide train button temporarily
     if (gameState.elements.trainButton) {
         gameState.elements.trainButton.style.display = 'none';
     }
+    
+    // Show level up effect
+    const meterElement = document.querySelector('.awareness-meter');
+    if (meterElement) {
+        xpEffects.showLevelUp(meterElement, newLevel);
+    }
 
+    // Create level up popup
+    const levelUpPopup = document.createElement('div');
+    levelUpPopup.className = 'level-up-popup';
+    levelUpPopup.innerHTML = `
+        <div class="level-up-content">
+            <h2>Level Up</h2>
+            <div class="level-info">
+                <p>Awareness Level: <span class="level-number">${newLevel}</span></p>
+            </div>
+            <button id="continue-level-up">Continue</button>
+        </div>
+    `;
+    
+    // Add styles
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+        .level-up-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .level-up-content {
+            background-color: #222;
+            border: 2px solid #4e4eb2;
+            border-radius: 10px;
+            padding: 20px 30px;
+            text-align: center;
+            color: #eee;
+            max-width: 80%;
+            box-shadow: 0 0 30px rgba(78, 78, 178, 0.5);
+        }
+        .level-up-content h2 {
+            color: #4e4eb2;
+            margin-top: 0;
+        }
+        .level-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4e4eb2;
+        }
+        #continue-level-up {
+            background-color: #4e4eb2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        #continue-level-up:hover {
+            background-color: #3a3a8e;
+        }
+    `;
+    document.head.appendChild(styleElement);
+    
+    // Add popup to body
+    document.body.appendChild(levelUpPopup);
+    
+    // Add event listener to continue button
+    const continueButton = document.getElementById('continue-level-up');
+    if (continueButton) {
+        continueButton.addEventListener('click', () => {
+            // Remove the popup
+            document.body.removeChild(levelUpPopup);
+            
+            // Continue with the level up process
+            continueWithLevelUp(newLevel);
+        });
+    }
+    
+    // Check for game completion (if maxLevel reached)
+    if (newLevel >= AWARENESS_CONFIG.maxLevel) {
+        gameComplete();
+    }
+}
+
+/**
+ * Continue with level up process after popup is closed
+ */
+function continueWithLevelUp(newLevel) {
     // Play the level up effect
     if (window.shaderEffects && window.shaderEffects.playEffect) {
         // Start the shader effect
@@ -548,17 +647,6 @@ function handleLevelUp(newLevel, previousLevel) {
         if (gameState.elements.trainButton) {
             gameState.elements.trainButton.style.display = 'block';
         }
-    }
-
-    // Show level up effect
-    const meterElement = document.querySelector('.awareness-meter');
-    if (meterElement) {
-        xpEffects.showLevelUp(meterElement, newLevel);
-    }
-
-    // Check for game completion (if maxLevel reached)
-    if (newLevel >= AWARENESS_CONFIG.maxLevel) {
-        gameComplete();
     }
 }
 
@@ -756,7 +844,8 @@ function addAwarenessXP(amount) {
     
     // If levelup occurred, handle it
     if (gameState.awarenessLevel > oldAwarenessLevel) {
-        handleLevelUp(gameState.awarenessLevel);
+        // The XP gets reset in the handleLevelUp function
+        handleLevelUp(gameState.awarenessLevel, oldAwarenessLevel);
     }
 }
 
