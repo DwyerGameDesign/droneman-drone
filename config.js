@@ -121,7 +121,7 @@ const AWARENESS_CONFIG = {
     // XP requirements for each level (amount needed to progress from previous level)
     xpRequirements: [
         null,   // Level 0 (not used)
-        50,     // XP needed for level 1 → level 2
+        65,     // XP needed for level 1 → level 2
         50,     // XP needed for level 2 → level 3
         75,     // XP needed for level 3 → level 4
         75,     // XP needed for level 4 → level 5

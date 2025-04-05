@@ -167,8 +167,23 @@ function addSetDressing() {
     const randomTypeIndex = Math.floor(Math.random() * availableTypes.length);
     const selectedType = availableTypes[randomTypeIndex];
 
-    // Get position for this set dressing element
-    const position = SET_DRESSING_POSITIONS[activeSetDressing] || [50, 45];
+    // Find available positions that aren't already occupied
+    const occupiedPositions = allSetDressing.map(item => item.position);
+    const availablePositions = SET_DRESSING_POSITIONS.filter(position => 
+        !occupiedPositions.some(occupied => 
+            occupied[0] === position[0] && occupied[1] === position[1]
+        )
+    );
+
+    // If no positions are available, use a fallback position
+    if (availablePositions.length === 0) {
+        console.log("No available positions, using fallback position");
+        return null;
+    }
+
+    // Select a random available position
+    const randomPositionIndex = Math.floor(Math.random() * availablePositions.length);
+    const position = availablePositions[randomPositionIndex];
 
     // Create the set dressing element
     const setDressingId = `set-dressing-${activeSetDressing}`;
@@ -213,15 +228,16 @@ function addSetDressing() {
     let attempts = 0;
     const maxAttempts = 10;
     
-    // Try to find a position without overlap
+    // Try to find a position without overlap within the selected position area
     do {
         // Get base position
         const baseX = position[0];
         const baseY = position[1];
         
-        // Add randomness to positions (±5% for Y, ±3% for X)
-        const randomXOffset = (Math.random() * 6 - 3);
-        const randomYOffset = (Math.random() * 10 - 5);
+        // Add minor randomness to positions (±2% for Y, ±1% for X)
+        // Reduced randomness to stay closer to the selected position
+        const randomXOffset = (Math.random() * 2 - 1);
+        const randomYOffset = (Math.random() * 4 - 2);
         
         const adjustedXPercent = baseX + randomXOffset;
         adjustedYPercent = baseY + randomYOffset;
@@ -236,7 +252,7 @@ function addSetDressing() {
         console.log(`Couldn't find non-overlapping position for ${selectedType} after ${maxAttempts} attempts`);
     }
     
-    console.log(`Placing ${selectedType} at position [${xPos}px, ${yPos}px] (attempt ${attempts})`);
+    console.log(`Placing ${selectedType} at position [${xPos}px, ${yPos}px] (attempt ${attempts}) using position index ${randomPositionIndex}`);
 
     // Set styles
     setDressingElement.style.position = 'absolute';
@@ -402,44 +418,28 @@ function handleSetDressingClick(event) {
 }
 
 /**
- * Create a new set dressing element change
- */
-function createSetDressingChange() {
-    console.log("Creating set dressing change");
-
-    // If no set dressing elements exist yet, always add a new one
-    if (allSetDressing.length === 0) {
-        console.log("No set dressing elements exist yet, adding the first one");
-        return createNewSetDressingElement();
-    }
-
-    // Randomly decide between adding a new element or changing an existing one
-    // Force adding a new element more often, especially if we have few elements
-    const shouldAddNew = (allSetDressing.length < MAX_SET_DRESSING) && 
-                         (Math.random() < 0.8 || allSetDressing.length < 4);
-
-    if (shouldAddNew) {
-        console.log("Will add a new set dressing element");
-        return createNewSetDressingElement();
-    } else {
-        // Change an existing set dressing element
-        console.log("Will change an existing set dressing element");
-        const changedElement = changeExistingSetDressing();
-        
-        // If changing an existing element fails, fall back to adding a new one
-        if (!changedElement && allSetDressing.length < MAX_SET_DRESSING) {
-            console.log("Changing existing set dressing failed, falling back to adding a new one");
-            return createNewSetDressingElement();
-        }
-        
-        return changedElement;
-    }
-}
-
-/**
  * Create a new set dressing element and return the change object
  */
 function createNewSetDressingElement() {
+    // Check if we've reached the maximum number of set dressing elements
+    if (activeSetDressing >= MAX_SET_DRESSING) {
+        console.warn("Maximum number of set dressing elements reached");
+        return null;
+    }
+    
+    // Check if there are any available positions
+    const occupiedPositions = allSetDressing.map(item => item.position);
+    const availablePositions = SET_DRESSING_POSITIONS.filter(position => 
+        !occupiedPositions.some(occupied => 
+            occupied[0] === position[0] && occupied[1] === position[1]
+        )
+    );
+    
+    if (availablePositions.length === 0) {
+        console.warn("No available positions for new set dressing element");
+        return null;
+    }
+    
     // Add a new set dressing element
     const newElement = addSetDressing();
     if (!newElement) {
@@ -472,6 +472,41 @@ function createNewSetDressingElement() {
 
     console.log("Successfully created new set dressing element:", newElement.type);
     return change;
+}
+
+/**
+ * Create a set dressing element change
+ */
+function createSetDressingChange() {
+    console.log("Creating set dressing change");
+
+    // If no set dressing elements exist yet, always add a new one
+    if (allSetDressing.length === 0) {
+        console.log("No set dressing elements exist yet, adding the first one");
+        return createNewSetDressingElement();
+    }
+
+    // Randomly decide between adding a new element or changing an existing one
+    // Force adding a new element more often, especially if we have few elements
+    const shouldAddNew = (allSetDressing.length < MAX_SET_DRESSING) && 
+                       (Math.random() < 0.8 || allSetDressing.length < 4);
+
+    if (shouldAddNew) {
+        console.log("Will add a new set dressing element");
+        return createNewSetDressingElement();
+    } else {
+        // Change an existing set dressing element
+        console.log("Will change an existing set dressing element");
+        const changedElement = changeExistingSetDressing();
+        
+        // If changing an existing element fails, fall back to adding a new one
+        if (!changedElement && allSetDressing.length < MAX_SET_DRESSING) {
+            console.log("Changing existing set dressing failed, falling back to adding a new one");
+            return createNewSetDressingElement();
+        }
+        
+        return changedElement;
+    }
 }
 
 /**
