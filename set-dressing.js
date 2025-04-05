@@ -7,15 +7,16 @@
 const MAX_SET_DRESSING = 8;
 
 // Positions for each set dressing element [left%, bottom%]
+// Positioned in columns offset from commuter positions to prevent overlapping
 const SET_DRESSING_POSITIONS = [
-    [20, 21],  // far left, platform
-    [40, 23],  // left-center, platform
-    [60, 25],  // right-center, platform
-    [80, 22],  // far right, platform
-    [15, 24],  // far left, platform higher
-    [35, 21],  // left-center, platform higher
-    [65, 25],  // right-center, platform higher
-    [85, 23]   // far right, platform higher
+    [22, 15],   // Column 1.5 - Between far left and left
+    [45, 16],   // Column 2.5 - Between left and center
+    [65, 15],   // Column 3.5 - Between center and right
+    [80, 14],   // Column 4.5 - Between right and far right
+    [95, 15],   // Column 5.5 - Rightmost edge
+    [8, 16],    // Column 0.5 - Leftmost edge
+    [35, 17],   // Column 2.25 - Between left and left-center
+    [55, 15]    // Column 3.25 - Between center and right-center
 ];
 
 // Types of set dressing elements - updated to match your available sprites
@@ -103,7 +104,7 @@ function addInitialSetDressing(count = 3) {
 }
 
 /**
- * Check if a position would overlap with existing set dressing
+ * Check if a position would overlap with existing set dressing or commuters
  * @param {number} xPos - X position in pixels
  * @param {number} yPos - Y position in pixels
  * @param {number} width - Width of new element
@@ -111,7 +112,7 @@ function addInitialSetDressing(count = 3) {
  * @param {number} buffer - Additional buffer space to prevent close placement
  * @returns {boolean} - True if position overlaps with existing elements
  */
-function checkForOverlap(xPos, yPos, width, height, buffer = 10) {
+function checkForOverlap(xPos, yPos, width, height, buffer = 20) {
     // Add buffer to dimensions to prevent elements from being too close
     const adjustedWidth = width + buffer;
     const adjustedHeight = height + buffer;
@@ -138,6 +139,37 @@ function checkForOverlap(xPos, yPos, width, height, buffer = 10) {
             yPos > elementBottom - buffer
         ) {
             return true; // Overlap detected
+        }
+    }
+    
+    // Check against all commuters as well
+    if (window.commuters && window.commuters.allCommuters) {
+        for (const commuter of window.commuters.allCommuters) {
+            if (!commuter.element) continue;
+            
+            // Get element position and size
+            const rect = commuter.element.getBoundingClientRect();
+            const sceneRect = gameState.elements.sceneContainer.getBoundingClientRect();
+            
+            // Convert to same coordinate system as new element
+            const elementLeft = rect.left - sceneRect.left;
+            const elementBottom = sceneRect.bottom - rect.bottom;
+            const elementWidth = rect.width;
+            const elementHeight = rect.height;
+            
+            // Use a larger buffer for commuters since they're more important
+            const commuterBuffer = buffer * 1.5;
+            
+            // Check for overlap using rectangles
+            if (
+                xPos - adjustedWidth/2 < elementLeft + elementWidth/2 + commuterBuffer &&
+                xPos + adjustedWidth/2 > elementLeft - elementWidth/2 - commuterBuffer &&
+                yPos - adjustedHeight < elementBottom + elementHeight + commuterBuffer &&
+                yPos > elementBottom - commuterBuffer
+            ) {
+                console.log(`Overlap detected with commuter ${commuter.id}`);
+                return true; // Overlap detected
+            }
         }
     }
     
