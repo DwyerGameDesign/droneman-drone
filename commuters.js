@@ -212,8 +212,9 @@ function addCommuter() {
 function handleCommuterClick(event) {
     const commuterElement = event.currentTarget;
     const commuterId = commuterElement.id;
+    const commuterType = commuterElement.dataset.commuterType;
 
-    console.log(`Clicked commuter: ${commuterId}`);
+    console.log(`Clicked commuter: ${commuterId} (type: ${commuterType})`);
 
     // Check if we're transitioning
     if (gameState.isTransitioning) {
@@ -228,6 +229,9 @@ function handleCommuterClick(event) {
         return;
     }
 
+    // Show all commuters for debugging
+    console.log(`All commuters: ${allCommuters.map(c => `${c.type} (${c.id})`).join(', ')}`);
+
     // Debug information about the current change
     if (gameState.currentChange) {
         console.log(`Current change: ${JSON.stringify(gameState.currentChange)}`);
@@ -241,7 +245,10 @@ function handleCommuterClick(event) {
         gameState.currentChange.changeType === 'commuter' && 
         gameState.currentChange.commuterId === commuterId;
     
-    console.log(`Is correct commuter? ${isCorrectCommuter} (Clicked: ${commuterId}, Expected: ${gameState.currentChange ? gameState.currentChange.commuterId : 'none'})`);
+    console.log(`Is correct commuter? ${isCorrectCommuter}`);
+    console.log(`Clicked: ${commuterId}, Expected: ${gameState.currentChange ? gameState.currentChange.commuterId : 'none'}`);
+    console.log(`Change type: ${gameState.currentChange ? gameState.currentChange.changeType : 'none'}`);
+    console.log(`Already found? ${gameState.currentChange ? gameState.currentChange.found : 'N/A'}`);
     
     if (isCorrectCommuter) {
         console.log("Correct commuter clicked!");
@@ -282,21 +289,30 @@ function handleCommuterClick(event) {
         // Show positive thought bubble from a random commuter
         window.core.showRandomThoughtBubble(true);
 
-        // Force show train button - direct DOM approach as backup
-        const trainButton = document.getElementById('train-button');
+        // CRITICAL FIX: Always show train button both ways
+        console.log("Showing train button after correct commuter clicked");
         
-        // Try gameState first
-        if (gameState.elements.trainButton) {
-            console.log("Showing train button after correct commuter clicked (via gameState)");
+        // Try getting from gameState first
+        if (gameState.elements && gameState.elements.trainButton) {
+            console.log("Using gameState.elements.trainButton");
             gameState.elements.trainButton.style.display = 'block';
-        } 
-        // Fall back to direct DOM access
-        else if (trainButton) {
-            console.log("Showing train button after correct commuter clicked (via direct DOM)");
+        }
+        
+        // Also try direct DOM access to be 100% sure
+        const trainButton = document.getElementById('train-button');
+        if (trainButton) {
+            console.log("Using direct DOM access to train-button");
             trainButton.style.display = 'block';
-        } 
-        else {
-            console.error("Train button not found in gameState.elements or DOM!");
+        }
+        
+        // Worst case, try to find by class or other means
+        if (!trainButton && (!gameState.elements || !gameState.elements.trainButton)) {
+            console.error("Train button not found by ID or gameState - trying alternative methods");
+            const trainButtons = document.querySelectorAll('.train-button');
+            if (trainButtons.length > 0) {
+                console.log("Found train button by class");
+                trainButtons[0].style.display = 'block';
+            }
         }
         
         // Disable clicking until next day
@@ -385,6 +401,9 @@ function createRandomChange(count = 1) {
         return;
     }
 
+    // Log all available commuters for debugging
+    console.log(`Available commuters for changes: ${availableCommuters.map(c => `${c.type} (${c.id})`).join(', ')}`);
+
     // Select a random commuter
     const randomIndex = Math.floor(Math.random() * availableCommuters.length);
     const commuter = availableCommuters[randomIndex];
@@ -421,6 +440,14 @@ function createRandomChange(count = 1) {
         toVariation: newVariation,
         found: false
     };
+    
+    // Verify the DOM element exists
+    const commuterElement = document.getElementById(commuter.id);
+    if (commuterElement) {
+        console.log(`DOM element for ${commuter.id} exists and is valid`);
+    } else {
+        console.error(`DOM element for ${commuter.id} NOT FOUND - this will cause click detection to fail!`);
+    }
     
     console.log(`Created commuter change: ${commuter.type} (${commuter.id}) from ${currentVariation} to ${newVariation}`);
     console.log(`Change object: ${JSON.stringify(gameState.currentChange)}`);
@@ -463,12 +490,19 @@ function highlightElement(element) {
  * Highlight missed change at the end of a day
  */
 function highlightMissedChange() {
-    if (!gameState.currentChange) return;
+    if (!gameState.currentChange) {
+        console.warn("Cannot highlight missed change - no currentChange exists");
+        return;
+    }
+
+    console.log(`Highlighting missed change: ${JSON.stringify(gameState.currentChange)}`);
 
     // Find the commuter
     const commuter = allCommuters.find(c => c.id === gameState.currentChange.commuterId);
 
     if (commuter && commuter.element) {
+        console.log(`Found commuter to highlight: ${commuter.type} (${commuter.id})`);
+        
         // Add missed highlight class
         commuter.element.classList.add('highlight-missed');
 
@@ -476,6 +510,9 @@ function highlightMissedChange() {
         setTimeout(() => {
             commuter.element.classList.remove('highlight-missed');
         }, 1500);
+    } else {
+        console.error(`Could not find commuter with ID ${gameState.currentChange.commuterId} to highlight!`);
+        console.log(`Available commuters: ${allCommuters.map(c => `${c.type} (${c.id})`).join(', ')}`);
     }
 }
 
