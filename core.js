@@ -305,7 +305,8 @@ window.core = {
     createDailyChange,
     showHint,
     gameComplete,
-    showGameOverSummary
+    showGameOverSummary,
+    diagnoseBtnVisibility
 };
 
 /**
@@ -323,6 +324,18 @@ async function init() {
     gameState.isTransitioning = false;
     gameState.changesFound = 0;
 
+    // BUGFIX: Always ensure train button exists
+    const trainButton = document.getElementById('train-button');
+    if (!trainButton) {
+        console.error("Train button not found in the DOM! Creating it...");
+        // Create train button if it doesn't exist
+        const newTrainButton = document.createElement('button');
+        newTrainButton.id = 'train-button';
+        newTrainButton.className = 'train-button';
+        newTrainButton.textContent = 'Take Train';
+        document.body.appendChild(newTrainButton);
+    }
+
     // Initialize UI elements
     gameState.elements = {
         sceneContainer: document.getElementById('scene-container'),
@@ -332,6 +345,12 @@ async function init() {
         message: document.getElementById('message'),
         thoughtBubble: document.getElementById('thought-bubble')
     };
+
+    // BUGFIX: Double check train button was found
+    if (!gameState.elements.trainButton) {
+        console.error("Train button still not found after initialization! Trying again...");
+        gameState.elements.trainButton = document.getElementById('train-button');
+    }
 
     // Initialize train platform background
     initializeTrainPlatformBackground();
@@ -350,7 +369,12 @@ async function init() {
     createAwarenessMeter();
 
     // Add event listeners
-    gameState.elements.trainButton.addEventListener('click', takeTrain);
+    if (gameState.elements.trainButton) {
+        console.log("Adding click listener to train button");
+        gameState.elements.trainButton.addEventListener('click', takeTrain);
+    } else {
+        console.error("CRITICAL ERROR: Train button not found, can't add click listener!");
+    }
 
     // Initialize commuters - wait for variations to be detected
     commuters.detectCommuterVariations().then(() => {
@@ -1122,10 +1146,34 @@ function handleCommuterClick(event) {
         // Show positive thought bubble from a random commuter
         showRandomThoughtBubble(true);
 
-        // Enable train button so player can proceed
+        // CRITICAL FIX: SHOW TRAIN BUTTON - multiple methods
+        console.log("Core.js: Showing train button after correct commuter");
+        
+        // Run diagnostic to help trace the issue
+        diagnoseBtnVisibility();
+        
+        // Method 1: Direct style update
         if (gameState.elements.trainButton) {
-            gameState.elements.trainButton.disabled = false;
+            console.log("Core.js: Setting train button display to block");
+            gameState.elements.trainButton.style.display = 'block';
         }
+        
+        // Method 2: DOM direct access
+        const trainButton = document.getElementById('train-button');
+        if (trainButton) {
+            console.log("Core.js: Direct DOM access to train button");
+            trainButton.style.display = 'block';
+        }
+        
+        // Method 3: Delayed check (sometimes first attempt fails)
+        setTimeout(() => {
+            console.log("Core.js: Delayed train button check");
+            const delayedButton = document.getElementById('train-button');
+            if (delayedButton && delayedButton.style.display !== 'block') {
+                console.log("Core.js: Fixing train button in delayed check");
+                delayedButton.style.display = 'block';
+            }
+        }, 100);
         
         // Update narrative text
         window.ui.updateNarrativeText();
@@ -1394,4 +1442,53 @@ function calculateTrainXP() {
     console.log(`Awarding fixed train XP amount: ${xpAmount}`);
     
     return xpAmount;
+}
+
+/**
+ * Add this new diagnostic function at the end of the file
+ */
+// Diagnostic function to help trace train button issues
+function diagnoseBtnVisibility() {
+    console.log("===== TRAIN BUTTON DIAGNOSTIC =====");
+    
+    // Check if train button exists in gameState
+    console.log("gameState.elements.trainButton exists:", 
+        gameState.elements && gameState.elements.trainButton ? "YES" : "NO");
+    
+    // Get direct DOM reference
+    const trainBtn = document.getElementById('train-button');
+    console.log("DOM train-button exists:", trainBtn ? "YES" : "NO");
+    
+    // Check display status
+    if (trainBtn) {
+        console.log("DOM train-button display:", trainBtn.style.display);
+        console.log("DOM train-button computed display:", 
+            window.getComputedStyle(trainBtn).display);
+        console.log("DOM train-button disabled:", trainBtn.disabled);
+        console.log("DOM train-button visible:", 
+            trainBtn.offsetWidth > 0 && trainBtn.offsetHeight > 0 ? "YES" : "NO");
+    }
+    
+    // Check if gameState trainButton matches DOM
+    if (gameState.elements && gameState.elements.trainButton) {
+        console.log("gameState trainButton matches DOM:", 
+            gameState.elements.trainButton === trainBtn ? "YES" : "NO");
+    }
+    
+    // Check for any CSS that might be affecting the button
+    if (trainBtn) {
+        console.log("Classes on train-button:", trainBtn.className);
+        console.log("Parent element:", trainBtn.parentElement ? 
+            trainBtn.parentElement.tagName + "#" + trainBtn.parentElement.id : "NONE");
+    }
+    
+    console.log("==================================");
+    
+    // Force the button to be visible 
+    if (trainBtn) {
+        trainBtn.style.display = 'block';
+        trainBtn.disabled = false;
+        // Remove any classes that might hide it
+        trainBtn.classList.remove('hidden');
+    }
 }

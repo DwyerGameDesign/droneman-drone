@@ -210,6 +210,8 @@ function addCommuter() {
  * Handle commuter click events
  */
 function handleCommuterClick(event) {
+    console.log("=== COMMUTERS.JS handleCommuterClick called ===");
+    
     const commuterElement = event.currentTarget;
     const commuterId = commuterElement.id;
     const commuterType = commuterElement.dataset.commuterType;
@@ -288,6 +290,12 @@ function handleCommuterClick(event) {
 
         // Show positive thought bubble from a random commuter
         window.core.showRandomThoughtBubble(true);
+
+        // Call diagnostic function first
+        console.log("Commuters.js: Calling diagnostic function");
+        if (window.core.diagnoseBtnVisibility) {
+            window.core.diagnoseBtnVisibility();
+        }
 
         // SUPER CRITICAL FIX: Use FOUR redundant methods to ensure train button is shown
         console.log("Showing train button after correct commuter clicked - USING ALL METHODS");
