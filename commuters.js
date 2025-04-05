@@ -333,7 +333,7 @@ function createFirstChange() {
     const newVariation = otherVariations[0];
 
     // Apply the change
-    applyVariation(firstCommuter, newVariation);
+    applyCommuterVariation(firstCommuter, newVariation);
 
     // Create change object
     gameState.currentChange = {
@@ -379,7 +379,7 @@ function createRandomChange(count = 1) {
     const newVariation = otherVariations[Math.floor(Math.random() * otherVariations.length)];
 
     // Apply the change
-    applyVariation(commuter, newVariation);
+    applyCommuterVariation(commuter, newVariation);
 
     // Create change object
     gameState.currentChange = {
@@ -393,7 +393,7 @@ function createRandomChange(count = 1) {
 /**
  * Apply a variation to a commuter
  */
-function applyVariation(commuter, variation) {
+function applyCommuterVariation(commuter, variation) {
     if (!commuter || !variation) return;
 
     // Update the background image
@@ -402,7 +402,7 @@ function applyVariation(commuter, variation) {
     // Update the current variation
     commuter.currentVariation = variation;
 
-    console.log(`Applied variation ${variation} to ${commuter.id}`);
+    console.log(`[COMMUTER] Applied variation ${variation} to ${commuter.id} (type: ${commuter.type})`);
 }
 
 /**
@@ -488,7 +488,7 @@ window.commuters = {
     handleCommuterClick,
     createFirstChange,
     createRandomChange,
-    applyVariation,
+    applyCommuterVariation,
     highlightElement,
     highlightMissedChange,
     allCommuters,

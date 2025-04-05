@@ -533,7 +533,7 @@ function changeExistingSetDressing() {
     const newVariation = otherVariations[Math.floor(Math.random() * otherVariations.length)];
 
     // Apply the change
-    applyVariation(setDressing, newVariation);
+    applySetDressingVariation(setDressing, newVariation);
 
     // Create change object
     const change = {
@@ -551,7 +551,7 @@ function changeExistingSetDressing() {
 /**
  * Apply a variation to a set dressing element
  */
-function applyVariation(setDressing, variation) {
+function applySetDressingVariation(setDressing, variation) {
     if (!setDressing || !variation) return;
 
     // Update the background image
@@ -560,7 +560,7 @@ function applyVariation(setDressing, variation) {
     // Update the current variation
     setDressing.currentVariation = variation;
 
-    console.log(`Applied variation ${variation} to ${setDressing.id}`);
+    console.log(`[SET DRESSING] Applied variation ${variation} to ${setDressing.id} (type: ${setDressing.type})`);
 }
 
 /**
@@ -616,7 +616,7 @@ window.setDressing = {
     createSetDressingChange,
     createNewSetDressingElement,
     changeExistingSetDressing,
-    applyVariation,
+    applySetDressingVariation,
     highlightElement,
     highlightMissedChange,
     allSetDressing,
