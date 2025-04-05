@@ -118,18 +118,18 @@ const AWARENESS_CONFIG = {
     baseXpForFindingChange: 25,   // Base XP for finding a change
     baseXpForTakingTrain: 10,     // Base XP for taking the train (when no change was present)
     
-    // Hardcoded XP requirements for each level
+    // XP requirements for each level (amount needed to progress from previous level)
     xpRequirements: [
         null,   // Level 0 (not used)
-        50,    // XP needed to reach level 2 from level 1
-        100,    // XP needed to reach level 3 from level 2
-        175,    // XP needed to reach level 4 from level 3
-        250,    // XP needed to reach level 5 from level 4
-        350,    // XP needed to reach level 6 from level 5
-        450,    // XP needed to reach level 7 from level 6
-        600,   // XP needed to reach level 8 from level 7
-        800,   // XP needed to reach level 9 from level 8
-        1000,   // XP needed to reach level 10 from level 9
-        1250    // XP needed to complete level 10 (game completion)
+        50,     // XP needed for level 1 → level 2
+        50,     // XP needed for level 2 → level 3
+        75,     // XP needed for level 3 → level 4
+        75,     // XP needed for level 4 → level 5
+        100,    // XP needed for level 5 → level 6
+        100,    // XP needed for level 6 → level 7
+        150,    // XP needed for level 7 → level 8
+        200,    // XP needed for level 8 → level 9
+        200,    // XP needed for level 9 → level 10
+        250     // XP needed to complete level 10 (game completion)
     ]
 };

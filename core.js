@@ -492,30 +492,15 @@ function createAwarenessMeter() {
 function handleLevelUp(newLevel, previousLevel) {
     console.log(`[LEVEL UP] ${previousLevel} -> ${newLevel}`);
     
-    const xpRequirements = AWARENESS_CONFIG.xpRequirements;
-    const prevLevelRequirement = previousLevel > 0 ? xpRequirements[previousLevel] : 0;
-    
-    // Calculate excess XP
-    const excessXP = gameState.awarenessXP - prevLevelRequirement;
-    
-    console.log(`[LEVEL UP] Current XP: ${gameState.awarenessXP}, New level req: ${prevLevelRequirement}, Excess XP: ${excessXP}`);
-    
-    // Reset XP to just the excess amount
-    gameState.awarenessXP = excessXP;
-    gameState.awarenessLevel = newLevel;
-    
-    console.log(`[LEVEL UP] Updated: Level ${gameState.awarenessLevel}, XP reset to ${gameState.awarenessXP}`);
-    
-    // Update the awareness meter to match
+    // Note: With individual level requirements, we don't need to calculate
+    // excess XP here since the meter already handles it
+
+    // Update game state to match awareness meter
     if (gameState.awarenessMeter) {
-        console.log(`[LEVEL UP] Setting awareness meter to Level ${newLevel}, XP ${excessXP}`);
-        gameState.awarenessMeter.setProgress(newLevel, excessXP);
+        gameState.awarenessLevel = newLevel;
+        gameState.awarenessXP = gameState.awarenessMeter.getCurrentXP();
         
-        // Refresh the meter after a short delay (to ensure animations work correctly)
-        setTimeout(() => {
-            console.log(`[LEVEL UP] Refreshing meter after delay: Level ${newLevel}, XP ${gameState.awarenessXP}`);
-            gameState.awarenessMeter.setProgress(newLevel, gameState.awarenessXP);
-        }, 100);
+        console.log(`[LEVEL UP] Updated gameState: Level ${gameState.awarenessLevel}, XP reset to ${gameState.awarenessXP}`);
     }
     
     // Hide train button temporarily
@@ -827,7 +812,7 @@ function checkForLevelUp() {
     const currentLevel = gameState.awarenessLevel;
     const xpRequirements = AWARENESS_CONFIG.xpRequirements;
     
-    // Get required XP for next level
+    // Get required XP for current level
     const requiredXP = xpRequirements[currentLevel];
     
     // Check if we've reached the next level
