@@ -631,6 +631,12 @@ function takeTrain() {
     console.log("Taking the train");
     gameState.isTransitioning = true;
 
+    // Ensure train button reference is fresh before hiding
+    if (!gameState.elements.trainButton || !document.contains(gameState.elements.trainButton)) {
+        console.log("Train button reference needs refresh");
+        gameState.elements.trainButton = document.getElementById('train-button');
+    }
+
     // Hide train button during transition
     if (gameState.elements.trainButton) {
         gameState.elements.trainButton.style.display = 'none';
@@ -664,6 +670,9 @@ function takeTrain() {
  * Function to handle the transition to the next day
  */
 function proceedToNextDay() {
+    // Refresh train button reference to prevent stale references
+    gameState.elements.trainButton = document.getElementById('train-button');
+    
     // Fade out
     gameState.elements.sceneContainer.classList.add('fading');
 

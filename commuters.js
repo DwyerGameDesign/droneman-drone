@@ -289,31 +289,41 @@ function handleCommuterClick(event) {
         // Show positive thought bubble from a random commuter
         window.core.showRandomThoughtBubble(true);
 
-        // CRITICAL FIX: Always show train button both ways
-        console.log("Showing train button after correct commuter clicked");
+        // SUPER CRITICAL FIX: Use FOUR redundant methods to ensure train button is shown
+        console.log("Showing train button after correct commuter clicked - USING ALL METHODS");
         
-        // Try getting from gameState first
+        // Method 1: Using gameState.elements.trainButton
         if (gameState.elements && gameState.elements.trainButton) {
-            console.log("Using gameState.elements.trainButton");
+            console.log("Method 1: Using gameState.elements.trainButton");
             gameState.elements.trainButton.style.display = 'block';
         }
         
-        // Also try direct DOM access to be 100% sure
+        // Method 2: Direct DOM access by ID
         const trainButton = document.getElementById('train-button');
         if (trainButton) {
-            console.log("Using direct DOM access to train-button");
+            console.log("Method 2: Using direct DOM ID access");
             trainButton.style.display = 'block';
         }
         
-        // Worst case, try to find by class or other means
+        // Method 3: Query selector fallback
         if (!trainButton && (!gameState.elements || !gameState.elements.trainButton)) {
-            console.error("Train button not found by ID or gameState - trying alternative methods");
+            console.log("Method 3: Using querySelector fallback");
             const trainButtons = document.querySelectorAll('.train-button');
             if (trainButtons.length > 0) {
-                console.log("Found train button by class");
                 trainButtons[0].style.display = 'block';
+            } else {
+                console.error("Could not find train button by class");
             }
         }
+        
+        // Method 4: Create a fallback timer to double-check button visibility
+        setTimeout(() => {
+            const delayedButton = document.getElementById('train-button');
+            if (delayedButton && delayedButton.style.display !== 'block') {
+                console.log("Method 4: Delayed fallback - button was still hidden!");
+                delayedButton.style.display = 'block';
+            }
+        }, 100);
         
         // Disable clicking until next day
         gameState.canClick = false;
