@@ -12,10 +12,10 @@ const COMMUTER_POSITIONS = [
     [50, 20],  // Column 3 - Center (first commuter)
     [30, 21],  // Column 2 - Left
     [70, 20],  // Column 4 - Right
-    [15, 20],  // Column 1 - Far left
-    [85, 20],  // Column 5 - Far right
+    [15, 23],  // Column 1 - Far left
+    [85, 24],  // Column 5 - Far right
     [40, 22],  // Column 2.5 - Left-center
-    [60, 21],  // Column 3.5 - Right-center
+    [60, 24],  // Column 3.5 - Right-center
     [75, 23]   // Column 4.5 - Between right and far right
 ];
 
