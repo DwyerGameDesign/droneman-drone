@@ -1380,21 +1380,12 @@ function updateAwarenessLevel() {
  * @returns {number} - The amount of XP to award
  */
 function calculateAwarenessXP() {
-    // Start with base XP amount
-    let xpAmount = AWARENESS_CONFIG.baseXpForFindingChange;
+    // Use fixed XP amount with no modifiers
+    const xpAmount = AWARENESS_CONFIG.baseXpForFindingChange;
     
-    // Add bonus based on day (higher days = harder to spot changes)
-    const dayBonus = Math.min(10, Math.floor(gameState.day / 2));
+    console.log(`Awarding fixed XP amount: ${xpAmount}`);
     
-    // Add bonus based on current level (higher levels = diminishing returns)
-    const levelMultiplier = Math.max(0.8, 1.2 - (gameState.awarenessLevel * 0.05));
-    
-    // Calculate final amount
-    const finalXP = Math.round(xpAmount * levelMultiplier) + dayBonus;
-    
-    console.log(`Calculating XP: Base=${xpAmount}, Day Bonus=${dayBonus}, Level Multiplier=${levelMultiplier.toFixed(2)}, Final=${finalXP}`);
-    
-    return finalXP;
+    return xpAmount;
 }
 
 /**
@@ -1403,16 +1394,10 @@ function calculateAwarenessXP() {
  * @returns {number} - The amount of XP to award
  */
 function calculateTrainXP() {
-    // Base XP for taking the train
-    let xpAmount = AWARENESS_CONFIG.baseXpForTakingTrain;
+    // Use fixed XP amount with no modifiers
+    const xpAmount = AWARENESS_CONFIG.baseXpForTakingTrain;
     
-    // Add small bonus based on day (higher days = more observant)
-    const dayBonus = Math.min(5, Math.floor(gameState.day / 3));
+    console.log(`Awarding fixed train XP amount: ${xpAmount}`);
     
-    // Calculate final amount
-    const finalXP = xpAmount + dayBonus;
-    
-    console.log(`Calculating Train XP: Base=${xpAmount}, Day Bonus=${dayBonus}, Final=${finalXP}`);
-    
-    return finalXP;
+    return xpAmount;
 }
