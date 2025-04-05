@@ -101,6 +101,8 @@ function addCommuter() {
 
     let commuterType;
     let position;
+    // Randomly decide if commuter faces left or right (except for first commuter)
+    const facingRight = activeCommuters === 0 ? true : Math.random() > 0.5;
 
     // First commuter should always be commuter1
     if (activeCommuters === 0) {
@@ -159,6 +161,7 @@ function addCommuter() {
     commuterElement.id = commuterId;
     commuterElement.className = 'commuter-sprite';
     commuterElement.dataset.commuterType = commuterType;
+    commuterElement.dataset.facingRight = facingRight.toString();
 
     // Calculate actual position
     const containerWidth = gameState.elements.sceneContainer.offsetWidth;
@@ -170,7 +173,13 @@ function addCommuter() {
     commuterElement.style.position = 'absolute';
     commuterElement.style.left = `${xPos}px`;
     commuterElement.style.bottom = `${yPos}px`;
-    commuterElement.style.transform = 'translateX(-50%)';
+    
+    // Set transform based on direction (flip horizontally if facing left)
+    if (facingRight) {
+        commuterElement.style.transform = 'translateX(-50%)';
+    } else {
+        commuterElement.style.transform = 'translateX(-50%) scaleX(-1)';
+    }
 
     // Use the first variation as default
     const defaultVariation = commuterVariations[commuterType][0];
@@ -194,7 +203,8 @@ function addCommuter() {
         type: commuterType,
         currentVariation: defaultVariation,
         position: position,
-        index: activeCommuters
+        index: activeCommuters,
+        facingRight: facingRight // Store direction
     };
 
     // Add to commuters array
@@ -203,7 +213,7 @@ function addCommuter() {
     // Increment active commuters count
     activeCommuters++;
 
-    console.log(`Added ${commuterType} at position [${position[0]}%, ${position[1]}%] (position index: ${COMMUTER_POSITIONS.indexOf(position)})`);
+    console.log(`Added ${commuterType} at position [${position[0]}%, ${position[1]}%] (position index: ${COMMUTER_POSITIONS.indexOf(position)}, facing ${facingRight ? 'right' : 'left'})`);
     return commuter;
 }
 
@@ -392,6 +402,7 @@ function createFirstChange() {
     gameState.currentChange = {
         changeType: 'commuter',
         commuterId: firstCommuter.id,
+        changeSubType: 'sprite',
         fromVariation: currentVariation,
         toVariation: newVariation,
         found: false
@@ -429,37 +440,73 @@ function createRandomChange(count = 1) {
 
     console.log(`Selected commuter for change: ${commuter.type} (${commuter.id}), index: ${randomIndex}`);
 
-    // Get variations for this commuter
-    const variations = commuterVariations[commuter.type];
-    if (!variations || variations.length <= 1) {
-        console.warn(`No variations available for ${commuter.type}`);
-        return;
+    // Decide between changing the variation or the direction
+    // For the first commuter (center), always change variation instead of direction to avoid confusion
+    const changeDirection = commuter.index !== 0 && Math.random() < 0.3; // 30% chance to change direction
+
+    if (changeDirection) {
+        // Change the commuter's direction
+        const oldDirection = commuter.facingRight;
+        commuter.facingRight = !oldDirection;
+
+        // Update the element transform
+        if (commuter.facingRight) {
+            commuter.element.style.transform = 'translateX(-50%)';
+        } else {
+            commuter.element.style.transform = 'translateX(-50%) scaleX(-1)';
+        }
+        
+        // Update the dataset
+        commuter.element.dataset.facingRight = commuter.facingRight.toString();
+
+        // Create change object - store the direction change
+        gameState.currentChange = {
+            changeType: 'commuter',
+            commuterId: commuter.id,
+            changeSubType: 'direction',
+            fromDirection: oldDirection,
+            toDirection: commuter.facingRight,
+            currentVariation: commuter.currentVariation, // Keep track of the current variation
+            found: false
+        };
+        
+        console.log(`Created commuter direction change: ${commuter.type} (${commuter.id}) from facing ${oldDirection ? 'right' : 'left'} to facing ${commuter.facingRight ? 'right' : 'left'}`);
+    } else {
+        // Get variations for this commuter
+        const variations = commuterVariations[commuter.type];
+        if (!variations || variations.length <= 1) {
+            console.warn(`No variations available for ${commuter.type}`);
+            return;
+        }
+
+        // Select a different variation than the current one
+        const currentVariation = commuter.currentVariation;
+        const otherVariations = variations.filter(v => v !== currentVariation);
+
+        if (otherVariations.length === 0) {
+            console.warn(`No alternative variations for ${commuter.type}`);
+            return;
+        }
+
+        // Select a random variation
+        const newVariation = otherVariations[Math.floor(Math.random() * otherVariations.length)];
+
+        // Apply the change
+        applyCommuterVariation(commuter, newVariation);
+
+        // Create change object - store the commuter ID properly
+        gameState.currentChange = {
+            changeType: 'commuter',
+            commuterId: commuter.id, // Make sure this matches the DOM element ID
+            changeSubType: 'sprite',
+            fromVariation: currentVariation,
+            toVariation: newVariation,
+            found: false
+        };
+        
+        console.log(`Created commuter sprite change: ${commuter.type} (${commuter.id}) from ${currentVariation} to ${newVariation}`);
     }
 
-    // Select a different variation than the current one
-    const currentVariation = commuter.currentVariation;
-    const otherVariations = variations.filter(v => v !== currentVariation);
-
-    if (otherVariations.length === 0) {
-        console.warn(`No alternative variations for ${commuter.type}`);
-        return;
-    }
-
-    // Select a random variation
-    const newVariation = otherVariations[Math.floor(Math.random() * otherVariations.length)];
-
-    // Apply the change
-    applyCommuterVariation(commuter, newVariation);
-
-    // Create change object - store the commuter ID properly
-    gameState.currentChange = {
-        changeType: 'commuter',
-        commuterId: commuter.id, // Make sure this matches the DOM element ID
-        fromVariation: currentVariation,
-        toVariation: newVariation,
-        found: false
-    };
-    
     // Verify the DOM element exists
     const commuterElement = document.getElementById(commuter.id);
     if (commuterElement) {
@@ -468,7 +515,6 @@ function createRandomChange(count = 1) {
         console.error(`DOM element for ${commuter.id} NOT FOUND - this will cause click detection to fail!`);
     }
     
-    console.log(`Created commuter change: ${commuter.type} (${commuter.id}) from ${currentVariation} to ${newVariation}`);
     console.log(`Change object: ${JSON.stringify(gameState.currentChange)}`);
     
     // Enable clicking to find the change
@@ -487,7 +533,15 @@ function applyCommuterVariation(commuter, variation) {
     // Update the current variation
     commuter.currentVariation = variation;
 
-    console.log(`[COMMUTER] Applied variation ${variation} to ${commuter.id} (type: ${commuter.type})`);
+    // Ensure the direction is preserved
+    const facingRight = commuter.facingRight;
+    if (facingRight) {
+        commuter.element.style.transform = 'translateX(-50%)';
+    } else {
+        commuter.element.style.transform = 'translateX(-50%) scaleX(-1)';
+    }
+
+    console.log(`[COMMUTER] Applied variation ${variation} to ${commuter.id} (type: ${commuter.type}, facing ${facingRight ? 'right' : 'left'})`);
 }
 
 /**
@@ -524,6 +578,12 @@ function highlightMissedChange() {
         
         // Add missed highlight class
         commuter.element.classList.add('highlight-missed');
+
+        // If it was a direction change, display a special message
+        if (gameState.currentChange.changeSubType === 'direction') {
+            const directionChange = gameState.currentChange.fromDirection ? 'turned around' : 'changed direction';
+            window.ui.showMessage(`This commuter ${directionChange}!`, 2000);
+        }
 
         // Remove after animation completes
         setTimeout(() => {
