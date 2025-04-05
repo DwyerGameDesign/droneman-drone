@@ -22,12 +22,15 @@ class AwarenessMeter {
         this.currentLevel = 1;     // Current level (starts at 1)
         this.maxLevel = options.maxLevel || AWARENESS_CONFIG.maxLevel || 10;
         
-        // XP needed to reach the next level is the difference between requirements
-        this.nextLevelRequirement = AWARENESS_CONFIG.xpRequirements[this.currentLevel];
+        // Get XP requirements from config
+        const xpRequirements = AWARENESS_CONFIG.xpRequirements;
+        
+        // XP needed to reach the next level (level 1 → level 2) is at index 1
+        this.nextLevelRequirement = xpRequirements[this.currentLevel];
         this.currentLevelRequirement = 0; // At level 1, previous requirement is 0
         
         // Calculate XP needed from current level to next level
-        this.xpToNextLevel = this.nextLevelRequirement - this.currentLevelRequirement;
+        this.xpToNextLevel = this.nextLevelRequirement || 50; // Default to 50 if not found
         
         console.log(`[INIT] Level ${this.currentLevel}: XP ${this.currentXP}/${this.xpToNextLevel} needed for next level`);
         
@@ -143,7 +146,7 @@ class AwarenessMeter {
         let leveledUp = false;
         
         // Get next level requirement
-        this.nextLevelRequirement = this.getXPRequiredForLevel(this.currentLevel);
+        const xpRequirements = AWARENESS_CONFIG.xpRequirements;
         
         // Check if we need to level up (possibly multiple times)
         while (this.currentXP >= this.nextLevelRequirement && this.currentLevel < this.maxLevel) {
@@ -154,10 +157,12 @@ class AwarenessMeter {
             
             // Update requirements after level up
             this.currentLevelRequirement = this.nextLevelRequirement;
-            this.nextLevelRequirement = this.getXPRequiredForLevel(this.currentLevel);
+            this.nextLevelRequirement = xpRequirements[this.currentLevel];
             
             // Calculate XP needed for this new level
-            this.xpToNextLevel = this.nextLevelRequirement - this.currentLevelRequirement;
+            this.xpToNextLevel = this.nextLevelRequirement 
+                ? this.nextLevelRequirement - this.currentLevelRequirement
+                : 100; // Default if not defined
             
             console.log(`[NEW LEVEL] ${this.currentLevel}: XP needed for next level: ${this.xpToNextLevel}, Current XP: ${this.currentXP}`);
             
@@ -166,7 +171,7 @@ class AwarenessMeter {
         
         // Cap XP at max for highest level
         if (this.currentLevel >= this.maxLevel) {
-            this.currentXP = Math.min(this.currentXP, this.nextLevelRequirement);
+            this.currentXP = Math.min(this.currentXP, this.nextLevelRequirement || Infinity);
         }
         
         // Update display
@@ -190,10 +195,10 @@ class AwarenessMeter {
         
         // Calculate progress percentage based on current XP relative to level requirements
         const xpInCurrentLevel = this.currentXP - this.currentLevelRequirement;
-        const progressPercent = (xpInCurrentLevel / this.xpToNextLevel) * 100;
+        const progressPercent = this.xpToNextLevel > 0 ? (xpInCurrentLevel / this.xpToNextLevel) * 100 : 100;
         const cappedProgress = Math.min(Math.max(0, progressPercent), 100); // Keep between 0-100%
         
-        console.log(`[UPDATE DISPLAY] Level ${this.currentLevel}: XP ${this.currentXP}, In-level progress: ${xpInCurrentLevel}/${this.xpToNextLevel}, Progress: ${cappedProgress.toFixed(1)}%`);
+        console.log(`[METER] Level: ${this.currentLevel}, XP: ${this.currentXP}, Min XP for this level: ${this.currentLevelRequirement}, XP for next level: ${this.nextLevelRequirement}, XP needed: ${this.xpToNextLevel}, Progress: ${cappedProgress.toFixed(1)}%`);
         
         // Update progress bar width
         this.progressElement.style.width = `${cappedProgress}%`;
@@ -211,12 +216,22 @@ class AwarenessMeter {
         // Store current XP
         this.currentXP = Math.max(0, totalXP);
         
+        // Get XP requirements from config
+        const xpRequirements = AWARENESS_CONFIG.xpRequirements;
+        
         // Update requirements for current level
-        this.currentLevelRequirement = this.getXPRequiredForLevel(this.currentLevel - 1) || 0;
-        this.nextLevelRequirement = this.getXPRequiredForLevel(this.currentLevel);
+        this.currentLevelRequirement = (this.currentLevel > 1 && xpRequirements[this.currentLevel - 1]) 
+            ? xpRequirements[this.currentLevel - 1] 
+            : 0;
+            
+        this.nextLevelRequirement = xpRequirements[this.currentLevel];
         
         // Calculate XP needed for next level
-        this.xpToNextLevel = this.nextLevelRequirement - this.currentLevelRequirement;
+        this.xpToNextLevel = this.nextLevelRequirement 
+            ? this.nextLevelRequirement - this.currentLevelRequirement
+            : 100; // Default to 100 if not defined
+        
+        console.log(`[SET PROGRESS] Level: ${this.currentLevel}, XP: ${this.currentXP}, Min XP: ${this.currentLevelRequirement}, Next level req: ${this.nextLevelRequirement}, XP needed: ${this.xpToNextLevel}`);
         
         // Update the display
         this.updateDisplay();

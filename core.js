@@ -492,6 +492,34 @@ function createAwarenessMeter() {
 function handleLevelUp(newLevel, previousLevel) {
     console.log(`[LEVEL UP] ${previousLevel} -> ${newLevel}`);
     
+    const xpRequirements = AWARENESS_CONFIG.xpRequirements;
+    const prevLevelRequirement = previousLevel > 0 && xpRequirements[previousLevel] 
+        ? xpRequirements[previousLevel] 
+        : 0;
+    
+    // Calculate excess XP
+    const excessXP = Math.max(0, gameState.awarenessXP - prevLevelRequirement);
+    
+    console.log(`[LEVEL UP] Current XP: ${gameState.awarenessXP}, New level req: ${prevLevelRequirement}, Excess XP: ${excessXP}`);
+    
+    // Reset XP to just the excess amount
+    gameState.awarenessXP = excessXP;
+    gameState.awarenessLevel = newLevel;
+    
+    console.log(`[LEVEL UP] Updated: Level ${gameState.awarenessLevel}, XP reset to ${gameState.awarenessXP}`);
+    
+    // Update the awareness meter to match
+    if (gameState.awarenessMeter) {
+        console.log(`[LEVEL UP] Setting awareness meter to Level ${newLevel}, XP ${excessXP}`);
+        gameState.awarenessMeter.setProgress(newLevel, excessXP);
+        
+        // Refresh the meter after a short delay (to ensure animations work correctly)
+        setTimeout(() => {
+            console.log(`[LEVEL UP] Refreshing meter after delay: Level ${newLevel}, XP ${gameState.awarenessXP}`);
+            gameState.awarenessMeter.setProgress(newLevel, gameState.awarenessXP);
+        }, 100);
+    }
+    
     // Hide train button temporarily
     if (gameState.elements.trainButton) {
         gameState.elements.trainButton.style.display = 'none';
@@ -780,6 +808,13 @@ function addAwarenessXP(amount) {
         checkForLevelUp();
     }
     
+    // Get next level requirement for logging
+    const xpRequirements = AWARENESS_CONFIG.xpRequirements;
+    const nextLevelReq = xpRequirements[currentLevel];
+    
+    console.log(`[XP DEBUG] After adding: XP ${gameState.awarenessXP}, Required for next level: ${nextLevelReq}`);
+    console.log(`[XP DEBUG] Updating meter: Level ${gameState.awarenessLevel}, XP ${gameState.awarenessXP}`);
+    
     // Show floating XP text
     if (window.xpEffects && window.xpEffects.showXPGain) {
         window.xpEffects.showXPGain(amount);
@@ -797,21 +832,31 @@ function checkForLevelUp() {
     // Get required XP for next level
     const requiredXP = xpRequirements[currentLevel];
     
+    if (!requiredXP) {
+        console.log(`[XP DEBUG] No XP requirement found for level ${currentLevel}`);
+        return;
+    }
+    
     // Check if we've reached the next level
-    if (gameState.awarenessXP >= requiredXP && currentLevel < xpRequirements.length - 1) {
+    if (gameState.awarenessXP >= requiredXP && currentLevel < AWARENESS_CONFIG.maxLevel) {
         // Level up!
         const newLevel = currentLevel + 1;
         console.log(`[XP DEBUG] Leveling up! ${currentLevel} -> ${newLevel}`);
+        
+        // Calculate excess XP
+        const excessXP = gameState.awarenessXP - requiredXP;
         
         // Update level
         gameState.awarenessLevel = newLevel;
         
         // Keep excess XP
-        const excessXP = gameState.awarenessXP - requiredXP;
         gameState.awarenessXP = excessXP;
         
         // Handle level-up visual effects
         handleLevelUp(newLevel, currentLevel);
+        
+        // Check for additional level-ups with the excess XP
+        checkForLevelUp();
     }
 }
 
