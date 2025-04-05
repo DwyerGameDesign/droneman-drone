@@ -191,20 +191,15 @@ class AwarenessMeter {
         // Update level text
         this.levelDisplay.textContent = `Level ${this.currentLevel}`;
         
-        // Get XP within current level (ensure it's at least 0)
-        let xpInCurrentLevel = Math.max(0, this.currentXP - this.currentLevelRequirement);
+        // Calculate progress percentage based on current XP relative to level requirements
+        const xpInCurrentLevel = this.currentXP - this.currentLevelRequirement;
         
-        // Make sure XP in current level doesn't exceed what's needed for next level
-        xpInCurrentLevel = Math.min(xpInCurrentLevel, this.xpToNextLevel);
-        
-        // Calculate progress percentage
-        const progressPercent = (this.xpToNextLevel > 0) 
-            ? (xpInCurrentLevel / this.xpToNextLevel) * 100 
-            : 100;
-            
+        // Ensure we don't divide by zero or null
+        const xpNeeded = this.xpToNextLevel || 50; // Default to 50 if not properly set
+        const progressPercent = (xpInCurrentLevel / xpNeeded) * 100;
         const cappedProgress = Math.min(Math.max(0, progressPercent), 100); // Keep between 0-100%
         
-        console.log(`[METER] Level: ${this.currentLevel}, XP: ${this.currentXP}, Min XP for this level: ${this.currentLevelRequirement}, XP for next level: ${this.nextLevelRequirement}, XP needed: ${this.xpToNextLevel}, Progress: ${cappedProgress.toFixed(1)}%`);
+        console.log(`[METER] Level: ${this.currentLevel}, XP: ${this.currentXP}, Min XP for this level: ${this.currentLevelRequirement}, XP for next level: ${this.nextLevelRequirement}, XP needed: ${xpNeeded}, Progress: ${cappedProgress.toFixed(1)}%`);
         
         // Update progress bar width
         this.progressElement.style.width = `${cappedProgress}%`;
@@ -226,7 +221,6 @@ class AwarenessMeter {
         const xpRequirements = AWARENESS_CONFIG.xpRequirements;
         
         // Update requirements for current level
-        // For level N, the min XP is the requirement for level N-1 to N
         this.currentLevelRequirement = (this.currentLevel > 1) 
             ? xpRequirements[this.currentLevel - 1] 
             : 0;

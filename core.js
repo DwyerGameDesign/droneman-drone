@@ -17,7 +17,6 @@ let gameState = {
     typewriter: null,
     awarenessMeter: null,
     changesFound: 0,
-    inLevelUpTransition: false,
     elements: {
         // Elements will be defined in init()
     }
@@ -379,7 +378,7 @@ async function init() {
                 gameState.canClick = gameState.day >= 2;
                 
                 // Set up mobile support
-                setupMobileSupport();
+    setupMobileSupport();
             });
         }
     });
@@ -550,22 +549,6 @@ function handleLevelUp(newLevel, previousLevel) {
             // Remove the popup
             document.body.removeChild(levelUpPopup);
             
-            // Remove any click blockers that might have been added
-            const clickBlockers = document.querySelectorAll('.click-blocker');
-            clickBlockers.forEach(blocker => {
-                if (blocker.parentNode) {
-                    blocker.parentNode.removeChild(blocker);
-                }
-            });
-            
-            // Show train button so player can proceed to next day
-            if (gameState.elements.trainButton) {
-                gameState.elements.trainButton.style.display = 'block';
-            }
-            
-            // Re-enable clicking
-            gameState.canClick = true;
-            
             // Continue with the level up process
             continueWithLevelUp(newLevel);
         });
@@ -581,22 +564,15 @@ function handleLevelUp(newLevel, previousLevel) {
  * Continue with level up process after popup is closed
  */
 function continueWithLevelUp(newLevel) {
-    // Set a flag to indicate we're in the middle of a level-up
-    gameState.inLevelUpTransition = true;
-    
     // Play the level up effect
     if (window.shaderEffects && window.shaderEffects.playEffect) {
         // Start the shader effect
         setTimeout(() => {
             window.shaderEffects.playEffect('wave', () => {
-                // Shader effect is done
-                // Only show the train button if it was hidden by something other than the level-up sequence
-                if (gameState.elements.trainButton && !gameState.inLevelUpTransition) {
+                // Shader effect is done, show train button again
+                if (gameState.elements.trainButton) {
                     gameState.elements.trainButton.style.display = 'block';
                 }
-                
-                // End level-up transition state
-                gameState.inLevelUpTransition = false;
             });
 
             // Show narrative text after shader starts
@@ -606,7 +582,7 @@ function continueWithLevelUp(newLevel) {
                 // Add and animate the new commuter
                 setTimeout(() => {
                     const newCommuter = commuters.addCommuter();
-                    if (newCommuter) {
+        if (newCommuter) {
                         console.log(`Added commuter ${newCommuter.type} for level ${newLevel}`);
                         // Add the new-commuter class for the animation
                         newCommuter.element.classList.add('new-commuter');
@@ -628,8 +604,10 @@ function continueWithLevelUp(newLevel) {
             commuters.highlightElement(newCommuter.element);
         }
         
-        // End level-up transition state
-        gameState.inLevelUpTransition = false;
+        // Show train button again
+        if (gameState.elements.trainButton) {
+            gameState.elements.trainButton.style.display = 'block';
+        }
     }
 }
 
