@@ -241,7 +241,7 @@ function handleCommuterClick(event) {
         gameState.currentChange.changeType === 'commuter' && 
         gameState.currentChange.commuterId === commuterId;
     
-    console.log(`Is correct commuter? ${isCorrectCommuter}`);
+    console.log(`Is correct commuter? ${isCorrectCommuter} (Clicked: ${commuterId}, Expected: ${gameState.currentChange ? gameState.currentChange.commuterId : 'none'})`);
     
     if (isCorrectCommuter) {
         console.log("Correct commuter clicked!");
@@ -282,12 +282,21 @@ function handleCommuterClick(event) {
         // Show positive thought bubble from a random commuter
         window.core.showRandomThoughtBubble(true);
 
-        // Show train button so player can proceed - with explicit log
+        // Force show train button - direct DOM approach as backup
+        const trainButton = document.getElementById('train-button');
+        
+        // Try gameState first
         if (gameState.elements.trainButton) {
-            console.log("Showing train button after correct commuter clicked");
+            console.log("Showing train button after correct commuter clicked (via gameState)");
             gameState.elements.trainButton.style.display = 'block';
-        } else {
-            console.warn("Train button not found in gameState.elements");
+        } 
+        // Fall back to direct DOM access
+        else if (trainButton) {
+            console.log("Showing train button after correct commuter clicked (via direct DOM)");
+            trainButton.style.display = 'block';
+        } 
+        else {
+            console.error("Train button not found in gameState.elements or DOM!");
         }
         
         // Disable clicking until next day
@@ -371,21 +380,32 @@ function createRandomChange(count = 1) {
     // For now we only handle one change at a time
     // Later you can expand this to handle multiple changes
 
-    if (availableCommuters.length === 0) return;
+    if (availableCommuters.length === 0) {
+        console.warn("No commuters available to change");
+        return;
+    }
 
     // Select a random commuter
     const randomIndex = Math.floor(Math.random() * availableCommuters.length);
     const commuter = availableCommuters[randomIndex];
 
+    console.log(`Selected commuter for change: ${commuter.type} (${commuter.id}), index: ${randomIndex}`);
+
     // Get variations for this commuter
     const variations = commuterVariations[commuter.type];
-    if (!variations || variations.length <= 1) return;
+    if (!variations || variations.length <= 1) {
+        console.warn(`No variations available for ${commuter.type}`);
+        return;
+    }
 
     // Select a different variation than the current one
     const currentVariation = commuter.currentVariation;
     const otherVariations = variations.filter(v => v !== currentVariation);
 
-    if (otherVariations.length === 0) return;
+    if (otherVariations.length === 0) {
+        console.warn(`No alternative variations for ${commuter.type}`);
+        return;
+    }
 
     // Select a random variation
     const newVariation = otherVariations[Math.floor(Math.random() * otherVariations.length)];
@@ -393,16 +413,20 @@ function createRandomChange(count = 1) {
     // Apply the change
     applyCommuterVariation(commuter, newVariation);
 
-    // Create change object
+    // Create change object - store the commuter ID properly
     gameState.currentChange = {
         changeType: 'commuter',
-        commuterId: commuter.id,
+        commuterId: commuter.id, // Make sure this matches the DOM element ID
         fromVariation: currentVariation,
         toVariation: newVariation,
         found: false
     };
     
     console.log(`Created commuter change: ${commuter.type} (${commuter.id}) from ${currentVariation} to ${newVariation}`);
+    console.log(`Change object: ${JSON.stringify(gameState.currentChange)}`);
+    
+    // Enable clicking to find the change
+    gameState.canClick = true;
 }
 
 /**
