@@ -347,48 +347,41 @@ async function init() {
     xpEffects.init();
 
     // Initialize awareness meter
-    gameState.awarenessMeter = new AwarenessMeter({
-        container: document.getElementById('awareness-container'),
-        maxLevel: AWARENESS_CONFIG.maxLevel,
-        meterWidth: 200,
-        meterHeight: 15,
-        activeColor: '#4e4eb2',
-        inactiveColor: '#3a3a3a',
-        borderColor: '#666',
-        onLevelUp: handleLevelUp
-    });
+    createAwarenessMeter();
 
     // Add event listeners
     gameState.elements.trainButton.addEventListener('click', takeTrain);
 
     // Initialize commuters - wait for variations to be detected
-    await commuters.detectCommuterVariations();
-    commuters.addInitialCommuter();
-
-    // Initialize set dressing detection (but don't add any pieces on day 1)
-    if (window.setDressing && window.setDressing.detectSetDressingVariations) {
-        await window.setDressing.detectSetDressingVariations();
-        // No initial set dressing - only add them as changes
-    }
-
-    // Initialize doober system
-    if (window.dooberSystem && window.dooberSystem.init) {
-        window.dooberSystem.init();
-    }
-
-    // Initialize shader effects
-    if (window.shaderEffects && window.shaderEffects.init) {
-        window.shaderEffects.init();
-    }
-
-    // Set initial narrative text
-    window.ui.updateNarrativeText();
-
-    // Enable clicking if we're on day 2 or later
-    gameState.canClick = gameState.day >= 2;
-
-    // Set up mobile support
-    setupMobileSupport();
+    commuters.detectCommuterVariations().then(() => {
+        commuters.addInitialCommuter();
+        
+        // Initialize set dressing detection (but don't add any pieces on day 1)
+        if (window.setDressing && window.setDressing.detectSetDressingVariations) {
+            window.setDressing.detectSetDressingVariations().then(() => {
+                // No initial set dressing - only add them as changes
+                
+                // Initialize doober system
+                if (window.dooberSystem && window.dooberSystem.init) {
+                    window.dooberSystem.init();
+                }
+                
+                // Initialize shader effects
+                if (window.shaderEffects && window.shaderEffects.init) {
+                    window.shaderEffects.init();
+                }
+                
+                // Set initial narrative text
+                window.ui.updateNarrativeText();
+                
+                // Enable clicking if we're on day 2 or later
+                gameState.canClick = gameState.day >= 2;
+                
+                // Set up mobile support
+                setupMobileSupport();
+            });
+        }
+    });
 }
 
 /**
@@ -486,7 +479,7 @@ function createAwarenessMeter() {
             onLevelUp: handleLevelUp
         });
 
-        // Initial update
+        // Initial update with correct values
         gameState.awarenessMeter.setProgress(gameState.awarenessLevel, gameState.awarenessXP);
     } else {
         console.warn("AwarenessMeter class not found, awareness will be tracked internally only");
@@ -498,36 +491,6 @@ function createAwarenessMeter() {
  */
 function handleLevelUp(newLevel, previousLevel) {
     console.log(`[LEVEL UP] ${previousLevel} -> ${newLevel}`);
-
-    // Get XP requirements
-    const prevLevelRequirement = previousLevel > 0 ? 
-        AWARENESS_CONFIG.xpRequirements[previousLevel] : 0;
-    const newLevelRequirement = AWARENESS_CONFIG.xpRequirements[newLevel];
-    
-    // Calculate excess XP beyond what was needed for level up
-    const excessXP = Math.max(0, gameState.awarenessXP - prevLevelRequirement);
-    
-    console.log(`[LEVEL UP] Current XP: ${gameState.awarenessXP}, Previous level req: ${prevLevelRequirement}, New level req: ${newLevelRequirement}, Excess XP: ${excessXP}`);
-    
-    // Update game state
-    gameState.awarenessLevel = newLevel;
-    
-    // Reset the XP to just the excess amount (to start the new level with)
-    gameState.awarenessXP = excessXP;
-    
-    console.log(`[LEVEL UP] Updated: Level ${newLevel}, XP reset to ${excessXP}`);
-    
-    // Update the XP display
-    if (gameState.awarenessMeter) {
-        console.log(`[LEVEL UP] Setting awareness meter to Level ${newLevel}, XP ${excessXP}`);
-        gameState.awarenessMeter.setProgress(newLevel, excessXP);
-        
-        // Force the meter to update after a short delay to ensure level-up callback is complete
-        setTimeout(() => {
-            console.log(`[LEVEL UP] Refreshing meter after delay: Level ${newLevel}, XP ${gameState.awarenessXP}`);
-            gameState.awarenessMeter.setProgress(newLevel, gameState.awarenessXP);
-        }, 100);
-    }
     
     // Hide train button temporarily
     if (gameState.elements.trainButton) {
@@ -536,8 +499,8 @@ function handleLevelUp(newLevel, previousLevel) {
     
     // Show level up effect
     const meterElement = document.querySelector('.awareness-meter');
-    if (meterElement) {
-        xpEffects.showLevelUp(meterElement, newLevel);
+    if (meterElement && window.xpEffects) {
+        window.xpEffects.showLevelUp(meterElement, newLevel);
     }
 
     // Create level up popup
@@ -549,94 +512,6 @@ function handleLevelUp(newLevel, previousLevel) {
         <p>Awareness Level: <span class="level-number">${newLevel}</span></p>
         <button id="continue-level-up">Continue</button>
     `;
-    
-    // Add styles
-    const styleElement = document.createElement('style');
-    styleElement.textContent = `
-        .level-up-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.85);
-            color: #d4d4c8;
-            padding: 20px;
-            text-align: center;
-            z-index: 1500;
-            border-radius: 5px;
-            box-shadow: 0 0 15px rgba(78, 78, 178, 0.7);
-            font-family: 'Courier New', monospace;
-            max-width: 80%;
-            width: 400px;
-            filter: none !important;
-        }
-        
-        .level-up-popup h2 {
-            margin-top: 0;
-            color: #4e4eb2;
-            font-size: 24px;
-            letter-spacing: 2px;
-        }
-        
-        .level-up-popup p {
-            margin: 10px 0;
-            font-size: 16px;
-        }
-        
-        .level-number {
-            font-size: 24px;
-            font-weight: bold;
-            color: #4e4eb2;
-        }
-        
-        #continue-level-up {
-            background-color: #2a2a2a;
-            color: #d4d4c8;
-            border: 2px solid #4e4eb2;
-            border-radius: 0;
-            padding: 10px 20px;
-            cursor: pointer;
-            margin-top: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 4px 4px 0 #111;
-            position: relative;
-            transition: all 0.2s ease;
-            image-rendering: pixelated;
-        }
-        
-        #continue-level-up:hover {
-            background-color: #3a3a3a;
-            transform: translate(-2px, -2px);
-            box-shadow: 6px 6px 0 #111;
-        }
-        
-        #continue-level-up:active {
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0 #111;
-        }
-        
-        #continue-level-up::before, #continue-level-up::after {
-            content: '';
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background-color: #4e4eb2;
-        }
-        
-        #continue-level-up::before {
-            top: -2px;
-            left: -2px;
-        }
-        
-        #continue-level-up::after {
-            bottom: -2px;
-            right: -2px;
-        }
-    `;
-    document.head.appendChild(styleElement);
     
     // Add popup to body
     document.body.appendChild(levelUpPopup);
@@ -879,40 +754,63 @@ function determineChangesForDay() {
  * @param {number} amount - Amount of XP to add
  */
 function addAwarenessXP(amount) {
-    // Get the current level and XP
+    // Get the current level and XP before adding
     const currentLevel = gameState.awarenessLevel;
     const currentXP = gameState.awarenessXP;
     
     // Log initial state for debugging
     console.log(`[XP DEBUG] Adding ${amount} XP. Current: Level ${currentLevel}, XP ${currentXP}`);
     
-    // Add XP
+    // Add XP to game state
     gameState.awarenessXP += amount;
     
-    // Check if we've reached the next level's XP requirement
-    const xpRequirements = AWARENESS_CONFIG.xpRequirements;
-    const requiredXP = xpRequirements[currentLevel]; // Get required XP for NEXT level
-    
-    console.log(`[XP DEBUG] After adding: XP ${gameState.awarenessXP}, Required for next level: ${requiredXP}`);
-    
-    // Update the XP display - make sure to pass the updated XP value
+    // Update the awareness meter if it exists
     if (gameState.awarenessMeter) {
-        console.log(`[XP DEBUG] Updating meter: Level ${currentLevel}, XP ${gameState.awarenessXP}`);
-        gameState.awarenessMeter.setProgress(currentLevel, gameState.awarenessXP);
+        // Pass the updated total XP to the meter - it will handle level-up logic internally
+        const leveledUp = gameState.awarenessMeter.addXP(amount);
+        
+        // Sync game state with meter state if level changed
+        if (leveledUp) {
+            // Update game state to match meter (the level up visuals are handled by the meter's callback)
+            gameState.awarenessLevel = gameState.awarenessMeter.getCurrentLevel();
+            gameState.awarenessXP = gameState.awarenessMeter.getCurrentXP();
+        }
+    } else {
+        // No meter exists, handle level-up logic here
+        checkForLevelUp();
     }
     
     // Show floating XP text
     if (window.xpEffects && window.xpEffects.showXPGain) {
         window.xpEffects.showXPGain(amount);
     }
+}
+
+/**
+ * Check if player has leveled up and handle the level-up process
+ * This is used when no meter exists
+ */
+function checkForLevelUp() {
+    const currentLevel = gameState.awarenessLevel;
+    const xpRequirements = AWARENESS_CONFIG.xpRequirements;
     
-    // Check for level up
+    // Get required XP for next level
+    const requiredXP = xpRequirements[currentLevel];
+    
+    // Check if we've reached the next level
     if (gameState.awarenessXP >= requiredXP && currentLevel < xpRequirements.length - 1) {
         // Level up!
         const newLevel = currentLevel + 1;
         console.log(`[XP DEBUG] Leveling up! ${currentLevel} -> ${newLevel}`);
         
-        // The XP gets reset in the handleLevelUp function
+        // Update level
+        gameState.awarenessLevel = newLevel;
+        
+        // Keep excess XP
+        const excessXP = gameState.awarenessXP - requiredXP;
+        gameState.awarenessXP = excessXP;
+        
+        // Handle level-up visual effects
         handleLevelUp(newLevel, currentLevel);
     }
 }
@@ -923,23 +821,18 @@ function addAwarenessXP(amount) {
  * @param {number} amount - Amount of XP to remove
  */
 function removeAwarenessXP(amount) {
-    // Store current level to prevent decreasing it
-    const currentLevel = gameState.awarenessLevel;
-    const currentXP = gameState.awarenessXP;
-    
-    // Calculate minimum XP for the current level (XP required for previous level)
-    const prevLevelXP = currentLevel > 1 ? AWARENESS_CONFIG.xpRequirements[currentLevel - 1] : 0;
-    
-    // Calculate new XP, ensuring it doesn't go below minimum for current level or below 0
-    const newXP = Math.max(prevLevelXP, Math.max(0, currentXP - amount));
+    // Calculate new XP, ensuring it doesn't go below 0
+    const newXP = Math.max(0, gameState.awarenessXP - amount);
     
     // Only proceed if there's an actual change
-    if (newXP < currentXP) {
+    if (newXP < gameState.awarenessXP) {
+        // Update game state
         gameState.awarenessXP = newXP;
         
-        // Update the XP display
+        // Update the awareness meter
         if (gameState.awarenessMeter) {
-            gameState.awarenessMeter.setProgress(currentLevel, newXP);
+            // Set total XP (the meter will handle the rest)
+            gameState.awarenessMeter.setProgress(gameState.awarenessLevel, newXP);
         }
         
         // Show floating XP loss text
@@ -1422,9 +1315,9 @@ function updateAwarenessLevel() {
     let newLevel = 1;
     
     // Find the highest level that we meet the XP requirement for
-    for (let i = 1; i < xpRequirements.length - 1; i++) {
-        if (gameState.awarenessXP >= xpRequirements[i]) {
-            newLevel = i + 1;
+    for (let i = 1; i < xpRequirements.length; i++) {
+        if (gameState.awarenessXP >= xpRequirements[i-1]) {
+            newLevel = i;
         } else {
             break;
         }
@@ -1436,6 +1329,11 @@ function updateAwarenessLevel() {
         gameState.awarenessLevel = newLevel;
     }
     
+    // Update meter if it exists
+    if (gameState.awarenessMeter) {
+        gameState.awarenessMeter.setProgress(gameState.awarenessLevel, gameState.awarenessXP);
+    }
+    
     return gameState.awarenessLevel;
 }
 
@@ -1444,10 +1342,21 @@ function updateAwarenessLevel() {
  * @returns {number} - The amount of XP to award
  */
 function calculateAwarenessXP() {
-    // Simplified to just return the base amount
-    const xpAmount = AWARENESS_CONFIG.baseXpForFindingChange;
-    console.log(`Awarding fixed XP amount: ${xpAmount}`);
-    return xpAmount;
+    // Start with base XP amount
+    let xpAmount = AWARENESS_CONFIG.baseXpForFindingChange;
+    
+    // Add bonus based on day (higher days = harder to spot changes)
+    const dayBonus = Math.min(10, Math.floor(gameState.day / 2));
+    
+    // Add bonus based on current level (higher levels = diminishing returns)
+    const levelMultiplier = Math.max(0.8, 1.2 - (gameState.awarenessLevel * 0.05));
+    
+    // Calculate final amount
+    const finalXP = Math.round(xpAmount * levelMultiplier) + dayBonus;
+    
+    console.log(`Calculating XP: Base=${xpAmount}, Day Bonus=${dayBonus}, Level Multiplier=${levelMultiplier.toFixed(2)}, Final=${finalXP}`);
+    
+    return finalXP;
 }
 
 /**
@@ -1456,5 +1365,16 @@ function calculateAwarenessXP() {
  * @returns {number} - The amount of XP to award
  */
 function calculateTrainXP() {
-    return AWARENESS_CONFIG.baseXpForTakingTrain;
+    // Base XP for taking the train
+    let xpAmount = AWARENESS_CONFIG.baseXpForTakingTrain;
+    
+    // Add small bonus based on day (higher days = more observant)
+    const dayBonus = Math.min(5, Math.floor(gameState.day / 3));
+    
+    // Calculate final amount
+    const finalXP = xpAmount + dayBonus;
+    
+    console.log(`Calculating Train XP: Base=${xpAmount}, Day Bonus=${dayBonus}, Final=${finalXP}`);
+    
+    return finalXP;
 }
