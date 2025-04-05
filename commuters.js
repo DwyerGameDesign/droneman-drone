@@ -228,11 +228,22 @@ function handleCommuterClick(event) {
         return;
     }
 
-    // Check if this is the current change
-    if (gameState.currentChange && 
+    // Debug information about the current change
+    if (gameState.currentChange) {
+        console.log(`Current change: ${JSON.stringify(gameState.currentChange)}`);
+    } else {
+        console.log("No current change exists");
+    }
+
+    // Check if this is the current change - more detailed condition checking
+    const isCorrectCommuter = gameState.currentChange && 
         !gameState.currentChange.found &&
-        (gameState.currentChange.changeType !== 'setDressing') && 
-        gameState.currentChange.commuterId === commuterId) {
+        gameState.currentChange.changeType === 'commuter' && 
+        gameState.currentChange.commuterId === commuterId;
+    
+    console.log(`Is correct commuter? ${isCorrectCommuter}`);
+    
+    if (isCorrectCommuter) {
         console.log("Correct commuter clicked!");
         
         // Mark as found
@@ -271,9 +282,12 @@ function handleCommuterClick(event) {
         // Show positive thought bubble from a random commuter
         window.core.showRandomThoughtBubble(true);
 
-        // Show train button so player can proceed
+        // Show train button so player can proceed - with explicit log
         if (gameState.elements.trainButton) {
+            console.log("Showing train button after correct commuter clicked");
             gameState.elements.trainButton.style.display = 'block';
+        } else {
+            console.warn("Train button not found in gameState.elements");
         }
         
         // Disable clicking until next day
@@ -290,7 +304,7 @@ function handleCommuterClick(event) {
         // Highlight the actual change if it's a commuter change
         if (gameState.currentChange && 
             !gameState.currentChange.found && 
-            gameState.currentChange.changeType !== 'setDressing') {
+            gameState.currentChange.changeType === 'commuter') {
             highlightMissedChange();
         } else if (gameState.currentChange && 
             !gameState.currentChange.found && 
@@ -337,11 +351,14 @@ function createFirstChange() {
 
     // Create change object
     gameState.currentChange = {
+        changeType: 'commuter',
         commuterId: firstCommuter.id,
         fromVariation: currentVariation,
         toVariation: newVariation,
         found: false
     };
+    
+    console.log(`Created first commuter change: ${firstCommuter.type} (${firstCommuter.id}) from ${currentVariation} to ${newVariation}`);
 
     // Enable clicking since this is day 4 and we have a change to find
     gameState.canClick = true;
@@ -383,11 +400,14 @@ function createRandomChange(count = 1) {
 
     // Create change object
     gameState.currentChange = {
+        changeType: 'commuter',
         commuterId: commuter.id,
         fromVariation: currentVariation,
         toVariation: newVariation,
         found: false
     };
+    
+    console.log(`Created commuter change: ${commuter.type} (${commuter.id}) from ${currentVariation} to ${newVariation}`);
 }
 
 /**
