@@ -89,6 +89,7 @@ function addInitialCommuter() {
 
 /**
  * Add a new commuter to the scene
+ * @returns {Object|null} - The created commuter object or null if failed
  */
 function addCommuter() {
     // Check if we've reached the maximum number of commuters
@@ -97,17 +98,59 @@ function addCommuter() {
         return null;
     }
 
-    const commuterIndex = activeCommuters + 1;
-    const commuterType = `commuter${commuterIndex}`;
+    let commuterType;
+    let position;
+
+    // First commuter should always be commuter1
+    if (activeCommuters === 0) {
+        commuterType = "commuter1";
+        position = COMMUTER_POSITIONS[0]; // Use the first position for commuter1
+    } else {
+        // For subsequent commuters, randomly select type and position
+        
+        // Get already used commuter types to avoid duplicates
+        const usedTypes = allCommuters.map(commuter => commuter.type);
+        
+        // Find available commuter types (that have variations)
+        const availableTypes = Object.keys(commuterVariations)
+            .filter(type => 
+                !usedTypes.includes(type) && 
+                commuterVariations[type] && 
+                commuterVariations[type].length > 0
+            );
+            
+        if (availableTypes.length === 0) {
+            console.log("No available commuter types left");
+            return null;
+        }
+        
+        // Randomly select a commuter type
+        const randomTypeIndex = Math.floor(Math.random() * availableTypes.length);
+        commuterType = availableTypes[randomTypeIndex];
+        
+        // Find available positions that aren't already occupied
+        const occupiedPositions = allCommuters.map(commuter => commuter.position);
+        const availablePositions = COMMUTER_POSITIONS.filter(pos => 
+            !occupiedPositions.some(occupied => 
+                occupied[0] === pos[0] && occupied[1] === pos[1]
+            )
+        );
+        
+        if (availablePositions.length === 0) {
+            console.log("No available positions for commuters");
+            return null;
+        }
+        
+        // Randomly select a position
+        const randomPositionIndex = Math.floor(Math.random() * availablePositions.length);
+        position = availablePositions[randomPositionIndex];
+    }
 
     // Check if we have variations for this commuter
     if (!commuterVariations[commuterType] || commuterVariations[commuterType].length === 0) {
         console.log(`No variations found for ${commuterType}`);
         return null;
     }
-
-    // Get position for this commuter
-    const position = COMMUTER_POSITIONS[activeCommuters] || [50, 20];
 
     // Create the commuter element
     const commuterId = `commuter-${activeCommuters}`;
@@ -159,7 +202,7 @@ function addCommuter() {
     // Increment active commuters count
     activeCommuters++;
 
-    console.log(`Added ${commuterType} at position ${position}`);
+    console.log(`Added ${commuterType} at position [${position[0]}%, ${position[1]}%] (position index: ${COMMUTER_POSITIONS.indexOf(position)})`);
     return commuter;
 }
 
