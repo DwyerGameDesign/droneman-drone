@@ -154,13 +154,18 @@ function addSetDressing() {
         return null;
     }
 
-    // Choose a set dressing type that has variations available
+    // Get types of set dressing elements already in use
+    const usedTypes = allSetDressing.map(item => item.type);
+    
+    // Choose a set dressing type that has variations available and isn't already used
     const availableTypes = SET_DRESSING_TYPES.filter(type => 
-        setDressingVariations[type] && setDressingVariations[type].length > 0
+        !usedTypes.includes(type) &&
+        setDressingVariations[type] && 
+        setDressingVariations[type].length > 0
     );
 
     if (availableTypes.length === 0) {
-        console.log("No set dressing types available");
+        console.log("No unique set dressing types available");
         return null;
     }
 
@@ -299,7 +304,7 @@ function addSetDressing() {
     // Increment active set dressing count
     activeSetDressing++;
 
-    console.log(`Added ${selectedType} at position [${position}]`);
+    console.log(`Added ${selectedType} at position [${position}] (unique type: not already in use)`);
     return setDressing;
 }
 
@@ -486,10 +491,20 @@ function createSetDressingChange() {
         return createNewSetDressingElement();
     }
 
-    // Randomly decide between adding a new element or changing an existing one
-    // Force adding a new element more often, especially if we have few elements
+    // Get types of set dressing elements already in use
+    const usedTypes = allSetDressing.map(item => item.type);
+    
+    // Check if we still have unused types available
+    const unusedTypes = SET_DRESSING_TYPES.filter(type => 
+        !usedTypes.includes(type) &&
+        setDressingVariations[type] && 
+        setDressingVariations[type].length > 0
+    );
+    
+    // Determine whether to add a new element or change an existing one
+    // If we still have unique types available, prefer adding new elements
     const shouldAddNew = (allSetDressing.length < MAX_SET_DRESSING) && 
-                       (Math.random() < 0.8 || allSetDressing.length < 4);
+                       (unusedTypes.length > 0 || Math.random() < 0.8 || allSetDressing.length < 4);
 
     if (shouldAddNew) {
         console.log("Will add a new set dressing element");
