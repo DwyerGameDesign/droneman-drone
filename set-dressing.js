@@ -182,8 +182,8 @@ function addSetDressing() {
     let width, height;
     switch(selectedType) {
         case 'bench':
-            width = 96;
-            height = 36;
+            width = 144;
+            height = 54;
             break;
         case 'bottle':
             width = 18;
