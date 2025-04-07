@@ -1288,31 +1288,29 @@ function showGameOverSummary(message) {
         }, 100);
     }
     
-    // Create and show the summary popup
-    setTimeout(() => {
-        const summaryPopup = document.createElement('div');
-        summaryPopup.className = 'game-over-summary';
-        
-        summaryPopup.innerHTML = `
-            <h2>AWARENESS LOST</h2>
-            <p>${message}</p>
-            <p>Days on the train: ${gameState.day}</p>
-            <p>Awareness level: ${gameState.awarenessLevel}</p>
-            <p>Changes found: ${gameState.changesFound}</p>
-            <button id="replay-button">Take the Train Again</button>
-        `;
-        
-        // Add to document body instead of scene container
-        document.body.appendChild(summaryPopup);
-        
-        // Add event listener to replay button
-        const replayButton = document.getElementById('replay-button');
-        if (replayButton) {
-            replayButton.addEventListener('click', () => {
-                location.reload(); // Reload the page to restart the game
-            });
-        }
-    }, 2000);
+    // Create and show the summary popup immediately
+    const summaryPopup = document.createElement('div');
+    summaryPopup.className = 'game-over-summary';
+    
+    summaryPopup.innerHTML = `
+        <h2>AWARENESS LOST</h2>
+        <p>${message}</p>
+        <p>Days on the train: ${gameState.day}</p>
+        <p>Awareness level: ${gameState.awarenessLevel}</p>
+        <p>Changes found: ${gameState.changesFound}</p>
+        <button id="replay-button">Take the Train Again</button>
+    `;
+    
+    // Add to document body instead of scene container
+    document.body.appendChild(summaryPopup);
+    
+    // Add event listener to replay button
+    const replayButton = document.getElementById('replay-button');
+    if (replayButton) {
+        replayButton.addEventListener('click', () => {
+            location.reload(); // Reload the page to restart the game
+        });
+    }
 }
 
 /**
