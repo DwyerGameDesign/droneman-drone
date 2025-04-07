@@ -274,7 +274,7 @@ h1 {
 }
 
 .highlight-missed {
-    animation: highlight-missed 1.5s 3;
+    animation: highlight-missed 1.5s 1;
     outline: 2px solid #d9534f;
     z-index: 100 !important;
     position: relative; /* Ensure the element stays in place */
@@ -621,7 +621,7 @@ body.mobile .mobile-controls {
 
 /* Update to ensure highlight-missed animation works on set dressing elements */
 .set-dressing-sprite.highlight-missed {
-    animation: highlight-missed 1.5s 3;
+    animation: highlight-missed 1.5s 1;
     outline: 2px solid #d9534f;
     z-index: 100 !important;
 }
@@ -974,7 +974,7 @@ body.mobile .mobile-controls {
 /* Specific overrides for commuter sprites when highlighted */
 .commuter-sprite.highlight-missed {
     transform: translateX(-50%) !important; /* Force maintain the original transform */
-    animation: highlight-missed 1.5s 3;
+    animation: highlight-missed 1.5s 1;
     outline: 2px solid #d9534f;
     z-index: 100 !important;
 }
