@@ -985,3 +985,11 @@ body.mobile .mobile-controls {
 .commuter-sprite.no-hover:hover {
     transform: translateX(-50%) !important;
 }
+
+/* Specific style for commuter sprites when found (maintains position) */
+.commuter-sprite.found-change {
+    transform: translateX(-50%) !important; /* Maintain correct centering */
+    box-shadow: 0 0 15px 5px rgba(233, 203, 95, 0.8);
+    outline: 2px solid #e9cb5f;
+    z-index: 80 !important;
+}

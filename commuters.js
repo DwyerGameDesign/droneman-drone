@@ -266,6 +266,9 @@ function handleCommuterClick(event) {
         setTimeout(() => {
             commuterElement.classList.add('found-change');
             
+            // Explicitly maintain correct transform to prevent shifting
+            commuterElement.style.transform = 'translateX(-50%)';
+            
             // Create and add click blocker to prevent further interactions
             const clickBlocker = document.createElement('div');
             clickBlocker.className = 'click-blocker';
@@ -506,6 +509,14 @@ function highlightElement(element) {
 
     // Use no-hover class just to disable hover transform effects, not clicks
     element.classList.add('no-hover');
+    
+    // Ensure proper positioning by maintaining transform
+    element.style.transform = 'translateX(-50%)';
+    
+    // Remove new-commuter class if it exists to prevent animation
+    if (element.classList.contains('new-commuter')) {
+        element.classList.remove('new-commuter');
+    }
 
     // Add highlight class for subtle glow effect
     element.classList.add('highlight-pulse');
@@ -513,6 +524,9 @@ function highlightElement(element) {
     // Remove highlight after animation completes, but keep no-hover since we'll add found-change later
     setTimeout(() => {
         element.classList.remove('highlight-pulse');
+        
+        // Make sure transform is still maintained
+        element.style.transform = 'translateX(-50%)';
     }, 1500);
 }
 
