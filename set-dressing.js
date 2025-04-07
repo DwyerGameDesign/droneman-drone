@@ -379,10 +379,8 @@ function handleSetDressingClick(event) {
         // Highlight the set dressing element with temporary pulse effect
         highlightElement(setDressingElement);
         
-        // Add permanent glow effect after the initial highlight animation
+        // Just create a click blocker without adding permanent found-change class
         setTimeout(() => {
-            setDressingElement.classList.add('found-change');
-            
             // Create and add click blocker to prevent further interactions
             const clickBlocker = document.createElement('div');
             clickBlocker.className = 'click-blocker';
