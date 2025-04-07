@@ -167,10 +167,13 @@ class AwarenessMeter {
         // Update display
         this.updateDisplay();
         
-        // If level increased and callback exists, call it
+        // If level increased and callback exists, call it after a delay
         if (leveledUp && this.options.onLevelUp) {
-            // Call the callback
-            this.options.onLevelUp(this.currentLevel, previousLevel);
+            // Add a delay before showing the level-up popup
+            setTimeout(() => {
+                // Call the callback after delay
+                this.options.onLevelUp(this.currentLevel, previousLevel);
+            }, 2000); // 2 second delay
         }
         
         return leveledUp;
