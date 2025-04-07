@@ -293,6 +293,171 @@ function showHint() {
     }
 }
 
+/**
+ * Create debug button for testing positions
+ */
+function createDebugButton() {
+    // Create the debug button
+    const debugButton = document.createElement('button');
+    debugButton.id = 'debug-positions-button';
+    debugButton.textContent = 'Debug Positions';
+    
+    // Add the button to the document
+    document.body.appendChild(debugButton);
+    
+    // Add click event listener
+    debugButton.addEventListener('click', debugPositions);
+}
+
+/**
+ * Debug function to show all positions
+ */
+function debugPositions() {
+    console.log("Debugging positions - displaying all commuters and set dressing");
+    
+    // Clear existing elements
+    clearAllElements();
+    
+    // Add all commuters in their positions
+    for (let i = 0; i < window.commuters.COMMUTER_POSITIONS.length; i++) {
+        // Create the commuter element
+        const commuterId = `debug-commuter-${i}`;
+        const commuterElement = document.createElement('div');
+        commuterElement.id = commuterId;
+        commuterElement.className = 'commuter-sprite debug-element';
+        
+        // Add label to show position index
+        const label = document.createElement('div');
+        label.textContent = `C${i}`;
+        label.className = 'debug-label debug-commuter-label';
+        commuterElement.appendChild(label);
+        
+        // Calculate actual position
+        const position = window.commuters.COMMUTER_POSITIONS[i];
+        const containerWidth = gameState.elements.sceneContainer.offsetWidth;
+        const containerHeight = gameState.elements.sceneContainer.offsetHeight;
+        const xPos = (position[0] / 100) * containerWidth;
+        const yPos = (position[1] / 100) * containerHeight;
+        
+        // Set styles
+        commuterElement.style.position = 'absolute';
+        commuterElement.style.left = `${xPos}px`;
+        commuterElement.style.bottom = `${yPos}px`;
+        commuterElement.style.transform = 'translateX(-50%)';
+        
+        // Use a default commuter sprite for visualization
+        const commuterType = i === 0 ? 'commuter1' : `commuter${((i % 7) + 1)}`;
+        commuterElement.style.backgroundImage = `url(assets/sprites/${commuterType}.png)`;
+        commuterElement.style.backgroundSize = 'contain';
+        commuterElement.style.backgroundRepeat = 'no-repeat';
+        commuterElement.style.backgroundPosition = 'bottom center';
+        commuterElement.style.zIndex = `${10 + i}`;
+        commuterElement.style.width = '54px';
+        commuterElement.style.height = '128px';
+        
+        // Add to DOM
+        gameState.elements.sceneContainer.appendChild(commuterElement);
+    }
+    
+    // Add all set dressing in their positions
+    for (let i = 0; i < window.setDressing.SET_DRESSING_POSITIONS.length; i++) {
+        // Create the set dressing element
+        const setDressingId = `debug-set-dressing-${i}`;
+        const setDressingElement = document.createElement('div');
+        setDressingElement.id = setDressingId;
+        setDressingElement.className = 'set-dressing-sprite debug-element';
+        
+        // Add label to show position index
+        const label = document.createElement('div');
+        label.textContent = `S${i}`;
+        label.className = 'debug-label debug-setdressing-label';
+        setDressingElement.appendChild(label);
+        
+        // Calculate actual position
+        const position = window.setDressing.SET_DRESSING_POSITIONS[i];
+        const containerWidth = gameState.elements.sceneContainer.offsetWidth;
+        const containerHeight = gameState.elements.sceneContainer.offsetHeight;
+        const xPos = (position[0] / 100) * containerWidth;
+        const yPos = (position[1] / 100) * containerHeight;
+        
+        // Set styles
+        setDressingElement.style.position = 'absolute';
+        setDressingElement.style.left = `${xPos}px`;
+        setDressingElement.style.bottom = `${yPos}px`;
+        setDressingElement.style.transform = 'translateX(-50%)';
+        
+        // Use a different set dressing type for each position
+        const types = window.setDressing.SET_DRESSING_TYPES;
+        const setDressingType = types[i % types.length];
+        setDressingElement.style.backgroundImage = `url(assets/sprites/${setDressingType}.png)`;
+        setDressingElement.style.backgroundSize = 'contain';
+        setDressingElement.style.backgroundRepeat = 'no-repeat';
+        setDressingElement.style.backgroundPosition = 'bottom center';
+        setDressingElement.style.zIndex = '5';
+        
+        // Set dimensions based on type
+        let width, height;
+        switch(setDressingType) {
+            case 'bench':
+                width = 144;
+                height = 54;
+                break;
+            case 'bottle':
+                width = 18;
+                height = 27;
+                break;
+            case 'caution':
+                width = 36;
+                height = 54;
+                break;
+            case 'trash':
+                width = 30;
+                height = 24;
+                break;
+            case 'trashcan':
+                width = 36;
+                height = 45;
+                break;
+            default:
+                width = 36;
+                height = 36;
+        }
+        
+        setDressingElement.style.width = `${width}px`;
+        setDressingElement.style.height = `${height}px`;
+        
+        // Add to DOM
+        gameState.elements.sceneContainer.appendChild(setDressingElement);
+    }
+    
+    // Create a clear button
+    const clearButton = document.createElement('button');
+    clearButton.id = 'debug-clear-button';
+    clearButton.textContent = 'Clear Debug Elements';
+    
+    // Add the clear button to the document
+    document.body.appendChild(clearButton);
+    
+    // Add click event listener
+    clearButton.addEventListener('click', clearAllElements);
+}
+
+/**
+ * Clear all debug elements
+ */
+function clearAllElements() {
+    // Remove all debug elements
+    document.querySelectorAll('.debug-element').forEach(element => {
+        element.remove();
+    });
+    
+    // Remove clear button if it exists
+    const clearButton = document.getElementById('debug-clear-button');
+    if (clearButton) {
+        clearButton.remove();
+    }
+}
+
 // Export UI functions to window object
 window.ui = {
     updateAwarenessDisplay,
@@ -304,5 +469,8 @@ window.ui = {
     updateTypewriterText,
     gameComplete,
     showSegmentConnectionNarrative,
-    showHint
+    showHint,
+    createDebugButton,
+    debugPositions,
+    clearAllElements
 };
