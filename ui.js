@@ -14,13 +14,27 @@ function updateAwarenessDisplay() {
 }
 
 /**
- * Update the narrative text based on the current day
+ * Update the narrative text based on the current awareness level
  */
 function updateNarrativeText() {
     if (!gameState.typewriter) return;
 
-    // Get the narrative text from config
-    let text = DAY_NARRATIVES[gameState.day] || DAY_NARRATIVES.default;
+    // Choose the appropriate narrative set based on awareness level
+    let narrativeSet = 'early';
+    if (gameState.awarenessLevel >= 8) {
+        narrativeSet = 'final';
+    } else if (gameState.awarenessLevel >= 5) {
+        narrativeSet = 'late';
+    } else if (gameState.awarenessLevel >= 3) {
+        narrativeSet = 'mid';
+    }
+    
+    // Get narratives from config
+    const narratives = DAY_NARRATIVES[narrativeSet];
+    
+    // Select a random narrative from the appropriate set
+    const randomIndex = Math.floor(Math.random() * narratives.length);
+    const text = narratives[randomIndex];
 
     gameState.typewriter.type(text);
 }
@@ -31,9 +45,24 @@ function updateNarrativeText() {
 function showSegmentNarrative(segmentNumber) {
     if (!gameState.typewriter) return;
 
-    // Get the narrative text from config
-    let text = LEVEL_UP_NARRATIVES[segmentNumber] || LEVEL_UP_NARRATIVES.default;
-
+    // Choose the appropriate narrative set based on level
+    let narrativeSet = 'early';
+    if (segmentNumber >= 8) {
+        narrativeSet = 'final';
+    } else if (segmentNumber >= 5) {
+        narrativeSet = 'late';
+    } else if (segmentNumber >= 3) {
+        narrativeSet = 'mid';
+    }
+    
+    // Get narratives from config
+    const narratives = LEVEL_UP_NARRATIVES[narrativeSet];
+    
+    // Select a random narrative from the appropriate set
+    const randomIndex = Math.floor(Math.random() * narratives.length);
+    const text = narratives[randomIndex];
+    
+    // Display the narrative
     gameState.typewriter.stop();
     gameState.elements.narrativeText.textContent = '';
     setTimeout(() => {

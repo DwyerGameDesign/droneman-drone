@@ -54,47 +54,93 @@ const THOUGHTS = {
     ]
 };
 
-// Day-based narrative text
+// Day-based narrative text grouped by awareness level
 const DAY_NARRATIVES = {
-    1: "Everyday the same...",
-    2: "Everyday the same... but something feels different",
-    3: "Something's not quite right...",
-    4: "Wait... did that commuter just change?",
-    5: "I need to pay more attention...",
-    6: "The changes are becoming more obvious...",
-    7: "I'm starting to notice patterns...",
-    8: "The world is shifting around me...",
-    9: "I can see the changes clearly now...",
-    10: "The veil is lifting...",
+    // Early awareness levels (1-2)
+    early: [
+        "Everyday the same...",
+        "Everyday the same... but something feels different",
+        "Something's not quite right...",
+        "Is this day different somehow?",
+        "The routine feels... off today."
+    ],
+    // Mid awareness levels (3-4)
+    mid: [
+        "Wait... did that commuter just change?",
+        "I need to pay more attention...",
+        "The changes are becoming more obvious...",
+        "My eyes are starting to open...",
+        "The pattern is changing subtly..."
+    ],
+    // Late awareness levels (5-7)
+    late: [
+        "I'm starting to notice patterns...",
+        "The world is shifting around me...",
+        "I can see the changes clearly now...",
+        "The platform isn't static anymore...",
+        "Reality seems more fluid today..."
+    ],
+    // Final awareness levels (8-10)
+    final: [
+        "The veil is lifting...",
+        "I'm beginning to see beyond the surface...",
+        "The illusion is breaking down...",
+        "My perception expands with each passing day...",
+        "The train isn't just a train anymore..."
+    ],
+    // Default backup narrative
     default: "The world keeps changing..."
 };
 
-// Level-up narrative text
+// Level-up narratives grouped by awareness stage
 const LEVEL_UP_NARRATIVES = {
-    1: "I notice someone new on the platform...",
-    2: "Another person stands out from the crowd...",
-    3: "I'm starting to recognize faces in the crowd...",
-    4: "The commuters are becoming more distinct...",
-    5: "I can see more details in each person now...",
-    6: "The world is becoming more vibrant...",
-    7: "I'm seeing connections between people...",
-    8: "The veil is lifting, I can see clearly now...",
-    9: "Everything is coming into focus...",
-    10: "I am fully aware now. I am not just a drone...",
-    default: "Something feels different about the crowd..."
+    // Early stage (levels 1-2)
+    early: [
+        "I notice someone new on the platform...",
+        "Another person stands out from the crowd...",
+        "Wait... is that someone new? They weren't here yesterday...",
+        "Another commuter has appeared... but they seem different somehow.",
+        "I'm starting to recognize more distinct faces in the crowd..."
+    ],
+    // Mid stage (levels 3-4)
+    mid: [
+        "I'm starting to recognize faces in the crowd...",
+        "The commuters are becoming more distinct...",
+        "I can see more details in each person now...",
+        "The world is becoming more vibrant...",
+        "The people around me are taking shape, becoming individuals...",
+        "The fog is lifting from my perception..."
+    ],
+    // Late stage (levels 5-7)
+    late: [
+        "I'm seeing connections between people...",
+        "The veil is lifting, I can see clearly now...",
+        "Everything is coming into focus...",
+        "The patterns are revealing themselves...",
+        "My awareness stretches beyond the platform now...",
+        "The boundaries between us all are thinning..."
+    ],
+    // Final stage (levels 8-10)
+    final: [
+        "I am fully aware now. I am not just a drone...",
+        "My perception has expanded beyond the mundane...",
+        "I can see the truth of this daily ritual now...",
+        "The illusion is breaking down around me...",
+        "I am becoming more than I was..."
+    ]
 };
 
 // Game over texts
 const GAME_OVER_TEXTS = [
-    "The pattern continues without you...",
     "Back to being a drone...",
     "Your brief moment of clarity fades...",
     "The routine claims you once more...",
     "The commuters all look the same again...",
     "Your awareness flickers and dims...",
     "The cycle of sameness resumes...",
-    "The train arrives, just like yesterday...",
-    "Your perception blurs back to normal..."
+    "Your perception blurs back to normal...",
+    "Back to being another passenger...",
+    "The numbness returns, familiar and comforting...",
 ];
 
 // Game settings
