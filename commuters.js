@@ -372,7 +372,7 @@ function handleCommuterClick(event) {
         // End the game with a summary after showing the highlight
         setTimeout(() => {
             window.core.showGameOverSummary("Your awareness wasn't strong enough to notice the changes.");
-        }, 2500); // Changed from 4.5s to 2.5s delay
+        }, 0); // Immediate display without delay
     }
 }
 
