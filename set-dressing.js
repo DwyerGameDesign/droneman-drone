@@ -630,13 +630,17 @@ function highlightMissedChange() {
     if (setDressing && setDressing.element) {
         console.log(`Highlighting missed set dressing change: ${setDressing.type} (${gameState.currentChange.changeAction})`);
         
+        // Add no-hover class to prevent position shifts
+        setDressing.element.classList.add('no-hover');
+        
         // Add missed highlight class - this will use the same style as commuters
         setDressing.element.classList.add('highlight-missed');
 
         // Remove after animation completes
         setTimeout(() => {
             setDressing.element.classList.remove('highlight-missed');
-        }, 1500);
+            setDressing.element.classList.remove('no-hover');
+        }, 4500); // Match the 3 animation cycles (1.5s × 3)
     }
 }
 

@@ -315,7 +315,7 @@ window.core = {
  */
 async function init() {
     console.log("Initializing Drone: The Daily Commute");
-    
+
     // Game elements should be hidden initially via CSS
     // The loading-overlay will be visible instead
 
@@ -406,7 +406,7 @@ async function init() {
             }
             
             // Set up mobile support
-            setupMobileSupport();
+    setupMobileSupport();
             
             // All systems initialized, now reveal the game
             // Small delay to ensure everything is ready

@@ -736,11 +736,11 @@ body.mobile .mobile-controls {
 /* Highlight missed change animation */
 @keyframes missed-pulse {
     0% { 
-        box-shadow: 0 0 0 0 rgba(217, 83, 79, 0.8);
-        filter: brightness(1);
+        box-shadow: 0 0 0 0 rgba(217, 83, 79, 0.7);
+        filter: brightness(1.1);
     }
     50% { 
-        box-shadow: 0 0 20px 5px rgba(217, 83, 79, 0.8);
+        box-shadow: 0 0 20px 5px rgba(217, 83, 79, 0.7);
         filter: brightness(1.3);
     }
     100% { 
@@ -749,18 +749,12 @@ body.mobile .mobile-controls {
     }
 }
 
-.highlight-missed {
-    animation: missed-pulse 0.8s 3;
-    outline: 2px solid #d9534f;
-    z-index: 100 !important;
-}
-
 /* Found change persistent glow effect */
 .found-change {
     animation: none !important;
     box-shadow: 0 0 15px 5px rgba(233, 203, 95, 0.7) !important;
     outline: 2px solid rgba(233, 203, 95, 0.9) !important;
-    transform: translateX(-50%) scale(1.05) !important;
+    filter: brightness(1.2) !important;
     z-index: 200 !important;
     transition: all 0.3s ease !important;
     pointer-events: none !important; /* Prevent further clicks on this element */
@@ -928,4 +922,22 @@ body.mobile .mobile-controls {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+/* Utility class to disable hover effects */
+.no-hover {
+    pointer-events: none !important;
+}
+
+.no-hover:hover {
+    transform: none !important;
+}
+
+/* Specific no-hover overrides for sprites */
+.commuter-sprite.no-hover:hover {
+    transform: translateX(-50%) !important;
+}
+
+.set-dressing-sprite.no-hover:hover {
+    transform: translateX(-50%) !important;
 }

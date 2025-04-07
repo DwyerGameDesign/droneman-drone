@@ -496,12 +496,16 @@ function applyCommuterVariation(commuter, variation) {
 function highlightElement(element) {
     if (!element) return;
 
+    // Temporarily disable hover effects
+    element.classList.add('no-hover');
+
     // Add highlight class for subtle glow effect
     element.classList.add('highlight-pulse');
 
     // Remove after animation completes
     setTimeout(() => {
         element.classList.remove('highlight-pulse');
+        // Keep the no-hover class since we'll add found-change later
     }, 1500);
 }
 
@@ -522,13 +526,22 @@ function highlightMissedChange() {
     if (commuter && commuter.element) {
         console.log(`Found commuter to highlight: ${commuter.type} (${commuter.id})`);
         
+        // Temporarily disable hover effects to prevent shifts
+        commuter.element.classList.add('no-hover');
+        
         // Add missed highlight class
         commuter.element.classList.add('highlight-missed');
+        
+        // Ensure the commuter appears above other elements during highlighting
+        const originalZIndex = commuter.element.style.zIndex;
+        commuter.element.style.zIndex = '100';
 
         // Remove after animation completes
         setTimeout(() => {
             commuter.element.classList.remove('highlight-missed');
-        }, 1500);
+            commuter.element.classList.remove('no-hover');
+            commuter.element.style.zIndex = originalZIndex;
+        }, 4500); // Match the 3 animation cycles (1.5s × 3)
     } else {
         console.error(`Could not find commuter with ID ${gameState.currentChange.commuterId} to highlight!`);
         console.log(`Available commuters: ${allCommuters.map(c => `${c.type} (${c.id})`).join(', ')}`);
