@@ -366,9 +366,6 @@ function handleCommuterClick(event) {
             }
         }
         
-        // Show negative thought bubble from a random commuter
-        window.core.showRandomThoughtBubble(false);
-        
         // End the game with a summary after showing the highlight
         setTimeout(() => {
             window.core.showGameOverSummary("Your awareness wasn't strong enough to notice the changes.");
