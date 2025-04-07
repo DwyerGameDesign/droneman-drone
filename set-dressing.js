@@ -406,13 +406,6 @@ function handleSetDressingClick(event) {
         // Increase awareness
         window.core.addAwarenessXP(awarenessGain);
 
-        // Show appropriate message based on change action
-        if (gameState.currentChange.changeAction === 'add') {
-            window.ui.showMessage(`You found the new ${setDressingType}!`, 2000);
-        } else {
-            window.ui.showMessage(`You noticed the ${setDressingType} changed!`, 2000);
-        }
-
         // Show positive thought bubble from a random commuter
         window.core.showRandomThoughtBubble(true);
         
@@ -639,13 +632,6 @@ function highlightMissedChange() {
         
         // Add missed highlight class - this will use the same style as commuters
         setDressing.element.classList.add('highlight-missed');
-        
-        // Show a message pointing out the missed element
-        if (gameState.currentChange.changeAction === 'add') {
-            window.ui.showMessage(`You missed a new ${setDressing.type} that appeared!`, 2000);
-        } else {
-            window.ui.showMessage(`You missed that the ${setDressing.type} changed!`, 2000);
-        }
 
         // Remove after animation completes
         setTimeout(() => {
