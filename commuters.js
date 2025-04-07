@@ -359,6 +359,11 @@ function handleCommuterClick(event) {
         
         // Show negative thought bubble from a random commuter
         window.core.showRandomThoughtBubble(false);
+        
+        // End the game with a summary after showing the highlight
+        setTimeout(() => {
+            window.core.showGameOverSummary("Your awareness wasn't strong enough to notice the changes.");
+        }, 4500); // Match the highlight animation duration
     }
 }
 
@@ -496,16 +501,15 @@ function applyCommuterVariation(commuter, variation) {
 function highlightElement(element) {
     if (!element) return;
 
-    // Temporarily disable hover effects
+    // Use no-hover class just to disable hover transform effects, not clicks
     element.classList.add('no-hover');
 
     // Add highlight class for subtle glow effect
     element.classList.add('highlight-pulse');
 
-    // Remove after animation completes
+    // Remove highlight after animation completes, but keep no-hover since we'll add found-change later
     setTimeout(() => {
         element.classList.remove('highlight-pulse');
-        // Keep the no-hover class since we'll add found-change later
     }, 1500);
 }
 
@@ -526,7 +530,7 @@ function highlightMissedChange() {
     if (commuter && commuter.element) {
         console.log(`Found commuter to highlight: ${commuter.type} (${commuter.id})`);
         
-        // Temporarily disable hover effects to prevent shifts
+        // Use no-hover class just to prevent hover animations, not clicks
         commuter.element.classList.add('no-hover');
         
         // Add missed highlight class

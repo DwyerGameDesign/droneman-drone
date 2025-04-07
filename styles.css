@@ -924,9 +924,9 @@ body.mobile .mobile-controls {
     to { transform: rotate(360deg); }
 }
 
-/* Utility class to disable hover effects */
+/* Utility class to disable hover effects but still allow clicks */
 .no-hover {
-    pointer-events: none !important;
+    cursor: pointer !important;
 }
 
 .no-hover:hover {

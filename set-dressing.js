@@ -443,7 +443,7 @@ function handleSetDressingClick(event) {
         // End the game with a summary after showing the highlight
         setTimeout(() => {
             window.core.showGameOverSummary("Your awareness wasn't strong enough to notice the changes.");
-        }, 1500);
+        }, 4500); // Match the highlight animation duration
     }
 }
 
@@ -630,16 +630,21 @@ function highlightMissedChange() {
     if (setDressing && setDressing.element) {
         console.log(`Highlighting missed set dressing change: ${setDressing.type} (${gameState.currentChange.changeAction})`);
         
-        // Add no-hover class to prevent position shifts
+        // Add no-hover class just to prevent hover animations, not clicks
         setDressing.element.classList.add('no-hover');
         
         // Add missed highlight class - this will use the same style as commuters
         setDressing.element.classList.add('highlight-missed');
+        
+        // Ensure the set dressing appears above other elements during highlighting
+        const originalZIndex = setDressing.element.style.zIndex;
+        setDressing.element.style.zIndex = '100';
 
         // Remove after animation completes
         setTimeout(() => {
             setDressing.element.classList.remove('highlight-missed');
             setDressing.element.classList.remove('no-hover');
+            setDressing.element.style.zIndex = originalZIndex;
         }, 4500); // Match the 3 animation cycles (1.5s × 3)
     }
 }
