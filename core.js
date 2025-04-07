@@ -1312,7 +1312,7 @@ function showGameOverSummary(message) {
                 location.reload(); // Reload the page to restart the game
             });
         }
-    }, 2000);
+    }, 0); // Immediate display without delay
 }
 
 /**
