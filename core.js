@@ -1238,7 +1238,7 @@ function handleCommuterClick(event) {
         if (gameState.currentChange && 
             !gameState.currentChange.found && 
             gameState.currentChange.changeType !== 'setDressing') {
-            highlightMissedChange();
+            window.commuters.highlightMissedChange();
         } else if (gameState.currentChange && 
             !gameState.currentChange.found && 
             gameState.currentChange.changeType === 'setDressing' &&
@@ -1252,7 +1252,7 @@ function handleCommuterClick(event) {
         // End the game with a summary after showing the highlight
         setTimeout(() => {
             showGameOverSummary("Your awareness wasn't strong enough to notice the changes.");
-        }, 1500);
+        }, 4500); // Match the highlight animation duration
     }
 }
 
