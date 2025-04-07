@@ -749,11 +749,21 @@ body.mobile .mobile-controls {
     }
 }
 
-/* Found change persistent glow effect */
-.found-change {
+/* Found change persistent glow effect for commuters only */
+.commuter-sprite.found-change {
     animation: none !important;
     box-shadow: 0 0 15px 5px rgba(233, 203, 95, 0.7) !important;
     outline: 2px solid rgba(233, 203, 95, 0.9) !important;
+    filter: brightness(1.2) !important;
+    z-index: 200 !important;
+    transition: all 0.3s ease !important;
+    pointer-events: none !important; /* Prevent further clicks on this element */
+}
+
+/* Found change effect for set dressing - no yellow outline */
+.set-dressing-sprite.found-change {
+    animation: none !important;
+    box-shadow: 0 0 15px 5px rgba(233, 203, 95, 0.7) !important;
     filter: brightness(1.2) !important;
     z-index: 200 !important;
     transition: all 0.3s ease !important;
