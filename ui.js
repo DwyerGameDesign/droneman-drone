@@ -19,6 +19,13 @@ function updateAwarenessDisplay() {
 function updateNarrativeText() {
     if (!gameState.typewriter) return;
 
+    // For day 1, always use the specific text
+    if (gameState.day === 1) {
+        console.log("Day 1: Using specific narrative text 'everyday the same...'");
+        gameState.typewriter.type("everyday the same...");
+        return;
+    }
+
     // Choose the appropriate narrative set based on awareness level
     let narrativeSet = 'early';
     if (gameState.awarenessLevel >= 8) {
@@ -36,6 +43,7 @@ function updateNarrativeText() {
     const randomIndex = Math.floor(Math.random() * narratives.length);
     const text = narratives[randomIndex];
 
+    console.log(`Day ${gameState.day}: Using '${narrativeSet}' narrative: "${text}"`);
     gameState.typewriter.type(text);
 }
 
