@@ -26,6 +26,8 @@ body {
     flex-direction: column;
     height: auto;
     min-height: 600px; /* Ensures minimum height for the entire game */
+    opacity: 1;
+    transition: opacity 1s ease-in;
 }
 
 h1 {
@@ -917,4 +919,48 @@ body.mobile .mobile-controls {
 #continue-level-up::after {
     bottom: -2px;
     right: -2px;
+}
+
+/* Loading state and fade-in effect */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1a1a1a;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+    transition: opacity 1s ease-out;
+}
+
+.loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.game-container.hidden {
+    opacity: 0;
+}
+
+.game-container {
+    opacity: 1;
+    transition: opacity 1s ease-in;
+}
+
+/* Optional loading spinner */
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(78, 78, 178, 0.3);
+    border-radius: 50%;
+    border-top-color: #4e4eb2;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }

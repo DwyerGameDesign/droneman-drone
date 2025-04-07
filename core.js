@@ -306,7 +306,8 @@ window.core = {
     showHint,
     gameComplete,
     showGameOverSummary,
-    diagnoseBtnVisibility
+    diagnoseBtnVisibility,
+    revealGame
 };
 
 /**
@@ -314,6 +315,9 @@ window.core = {
  */
 async function init() {
     console.log("Initializing Drone: The Daily Commute");
+    
+    // Game elements should be hidden initially via CSS
+    // The loading-overlay will be visible instead
 
     // Initialize game state
     gameState.day = 1;
@@ -376,36 +380,83 @@ async function init() {
         console.error("CRITICAL ERROR: Train button not found, can't add click listener!");
     }
 
-    // Initialize commuters - wait for variations to be detected
-    commuters.detectCommuterVariations().then(() => {
+    // Hide narrative text initially - we'll show it after fade-in
+    if (gameState.elements.narrativeText) {
+        gameState.elements.narrativeText.style.opacity = '0';
+    }
+
+    // Load all assets and initialize systems
+    try {
+        // Initialize commuters - wait for variations to be detected
+        await commuters.detectCommuterVariations();
         commuters.addInitialCommuter();
         
-        // Initialize set dressing detection (but don't add any pieces on day 1)
+        // Initialize set dressing detection
         if (window.setDressing && window.setDressing.detectSetDressingVariations) {
-            window.setDressing.detectSetDressingVariations().then(() => {
-                // No initial set dressing - only add them as changes
-                
-                // Initialize doober system
-                if (window.dooberSystem && window.dooberSystem.init) {
-                    window.dooberSystem.init();
-                }
-                
-                // Initialize shader effects
-                if (window.shaderEffects && window.shaderEffects.init) {
-                    window.shaderEffects.init();
-                }
-                
-                // Set initial narrative text
-                window.ui.updateNarrativeText();
-                
-                // Enable clicking if we're on day 2 or later
-                gameState.canClick = gameState.day >= 2;
-                
-                // Set up mobile support
-    setupMobileSupport();
-            });
+            await window.setDressing.detectSetDressingVariations();
+            
+            // Initialize doober system
+            if (window.dooberSystem && window.dooberSystem.init) {
+                window.dooberSystem.init();
+            }
+            
+            // Initialize shader effects
+            if (window.shaderEffects && window.shaderEffects.init) {
+                window.shaderEffects.init();
+            }
+            
+            // Set up mobile support
+            setupMobileSupport();
+            
+            // All systems initialized, now reveal the game
+            // Small delay to ensure everything is ready
+            setTimeout(revealGame, 500);
         }
-    });
+    } catch (error) {
+        console.error("Error initializing game:", error);
+        // Still try to reveal the game even if there was an error
+        revealGame();
+    }
+}
+
+/**
+ * Reveal the game after loading is complete
+ */
+function revealGame() {
+    console.log("All assets loaded, revealing game...");
+    
+    // Remove the loading overlay
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+        loadingOverlay.classList.add('hidden');
+        
+        // Remove from DOM after animation completes
+        setTimeout(() => {
+            if (loadingOverlay.parentNode) {
+                loadingOverlay.parentNode.removeChild(loadingOverlay);
+            }
+        }, 1000);
+    }
+    
+    // Show the game container
+    const gameContainer = document.getElementById('game-container');
+    if (gameContainer) {
+        gameContainer.classList.remove('hidden');
+    }
+    
+    // Fade in the narrative text after a brief delay
+    setTimeout(() => {
+        if (gameState.elements.narrativeText) {
+            gameState.elements.narrativeText.style.transition = 'opacity 1s ease-in';
+            gameState.elements.narrativeText.style.opacity = '1';
+            
+            // Update narrative text only after fade-in
+            window.ui.updateNarrativeText();
+        }
+        
+        // Enable clicking if we're on day 2 or later
+        gameState.canClick = gameState.day >= 2;
+    }, 1000);
 }
 
 /**
