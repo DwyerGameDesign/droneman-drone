@@ -264,10 +264,13 @@ function handleCommuterClick(event) {
         
         // Add permanent glow effect after the initial highlight animation
         setTimeout(() => {
-            commuterElement.classList.add('found-change');
+            // Remove new-commuter class if it exists to prevent animation
+            if (commuterElement.classList.contains('new-commuter')) {
+                commuterElement.classList.remove('new-commuter');
+            }
             
-            // Explicitly maintain correct transform to prevent shifting
-            commuterElement.style.transform = 'translateX(-50%)';
+            // Add found-change class - CSS will handle positioning and styling
+            commuterElement.classList.add('found-change');
             
             // Create and add click blocker to prevent further interactions
             const clickBlocker = document.createElement('div');
@@ -507,26 +510,12 @@ function applyCommuterVariation(commuter, variation) {
 function highlightElement(element) {
     if (!element) return;
 
-    // Use no-hover class just to disable hover transform effects, not clicks
-    element.classList.add('no-hover');
-    
-    // Ensure proper positioning by maintaining transform
-    element.style.transform = 'translateX(-50%)';
-    
-    // Remove new-commuter class if it exists to prevent animation
-    if (element.classList.contains('new-commuter')) {
-        element.classList.remove('new-commuter');
-    }
-
-    // Add highlight class for subtle glow effect
+    // Simply add highlight class for glow effect - CSS handles positioning
     element.classList.add('highlight-pulse');
 
-    // Remove highlight after animation completes, but keep no-hover since we'll add found-change later
+    // Remove highlight after animation completes
     setTimeout(() => {
         element.classList.remove('highlight-pulse');
-        
-        // Make sure transform is still maintained
-        element.style.transform = 'translateX(-50%)';
     }, 1500);
 }
 
@@ -547,35 +536,17 @@ function highlightMissedChange() {
     if (commuter && commuter.element) {
         console.log(`Found commuter to highlight: ${commuter.type} (${commuter.id})`);
         
-        // Use no-hover class just to prevent hover animations, not clicks
-        commuter.element.classList.add('no-hover');
-        
-        // Store original transform to prevent position shifting
-        const originalTransform = commuter.element.style.transform;
-        
-        // Always ensure the translateX(-50%) is applied to maintain position
-        commuter.element.style.transform = 'translateX(-50%)';
-        
-        // Add missed highlight class
-        commuter.element.classList.add('highlight-missed');
-        
         // Remove new-commuter class if it exists to prevent animation
         if (commuter.element.classList.contains('new-commuter')) {
             commuter.element.classList.remove('new-commuter');
         }
         
-        // Ensure the commuter appears above other elements during highlighting
-        const originalZIndex = commuter.element.style.zIndex;
-        commuter.element.style.zIndex = '100';
-
+        // Add missed highlight class - CSS handles positioning and animation
+        commuter.element.classList.add('highlight-missed');
+        
         // Remove after animation completes
         setTimeout(() => {
             commuter.element.classList.remove('highlight-missed');
-            commuter.element.classList.remove('no-hover');
-            commuter.element.style.zIndex = originalZIndex;
-            
-            // Make sure transform is still maintained
-            commuter.element.style.transform = 'translateX(-50%)';
         }, 4500); // Match the 3 animation cycles (1.5s × 3)
     } else {
         console.error(`Could not find commuter with ID ${gameState.currentChange.commuterId} to highlight!`);
