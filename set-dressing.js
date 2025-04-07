@@ -432,9 +432,9 @@ function handleSetDressingClick(event) {
             highlightMissedChange();
         } else if (gameState.currentChange && 
             !gameState.currentChange.found && 
-            gameState.currentChange.changeType !== 'setDressing') {
+            gameState.currentChange.changeType === 'commuter') {
             // If it's a commuter change that was missed, highlight that instead
-            window.core.highlightMissedChange();
+            window.commuters.highlightMissedChange();
         }
         
         // Show negative thought bubble from a random commuter
