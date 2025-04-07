@@ -376,12 +376,13 @@ function handleSetDressingClick(event) {
         // Mark as found
         gameState.currentChange.found = true;
 
-        // Highlight the set dressing element with temporary pulse effect
-        highlightElement(setDressingElement);
+        // Add temporary pulse effect but skip the highlight
+        // highlightElement(setDressingElement);
         
-        // Add permanent glow effect after the initial highlight animation
+        // Create click blocker without adding permanent highlight
         setTimeout(() => {
-            setDressingElement.classList.add('found-change');
+            // Remove the found-change class that adds the yellow highlight
+            // setDressingElement.classList.add('found-change');
             
             // Create and add click blocker to prevent further interactions
             const clickBlocker = document.createElement('div');

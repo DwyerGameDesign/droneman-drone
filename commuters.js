@@ -262,10 +262,8 @@ function handleCommuterClick(event) {
         // Highlight the commuter with temporary pulse effect
         highlightElement(commuterElement);
         
-        // Add permanent glow effect after the initial highlight animation
+        // Add click blocker without adding permanent glow effect
         setTimeout(() => {
-            commuterElement.classList.add('found-change');
-            
             // Create and add click blocker to prevent further interactions
             const clickBlocker = document.createElement('div');
             clickBlocker.className = 'click-blocker';
