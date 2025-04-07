@@ -345,16 +345,19 @@ function handleCommuterClick(event) {
         // Show a message about the wrong choice
         window.ui.showMessage("That's not what changed...", 1500);
         
-        // Highlight the actual change if it's a commuter change
+        // Highlight the actual change - ensure we show the changed commuter regardless of which commuter was clicked
         if (gameState.currentChange && 
-            !gameState.currentChange.found && 
-            gameState.currentChange.changeType === 'commuter') {
-            highlightMissedChange();
-        } else if (gameState.currentChange && 
-            !gameState.currentChange.found && 
-            gameState.currentChange.changeType === 'setDressing' &&
-            window.setDressing) {
-            window.setDressing.highlightMissedChange();
+            !gameState.currentChange.found) {
+            
+            // If a commuter has the change, highlight that commuter
+            if (gameState.currentChange.changeType === 'commuter') {
+                highlightMissedChange();
+            } 
+            // If a set dressing has the change, highlight that set dressing
+            else if (gameState.currentChange.changeType === 'setDressing' &&
+                    window.setDressing) {
+                window.setDressing.highlightMissedChange();
+            }
         }
         
         // Show negative thought bubble from a random commuter
