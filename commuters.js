@@ -536,8 +536,19 @@ function highlightMissedChange() {
         // Use no-hover class just to prevent hover animations, not clicks
         commuter.element.classList.add('no-hover');
         
+        // Store original transform to prevent position shifting
+        const originalTransform = commuter.element.style.transform;
+        
+        // Always ensure the translateX(-50%) is applied to maintain position
+        commuter.element.style.transform = 'translateX(-50%)';
+        
         // Add missed highlight class
         commuter.element.classList.add('highlight-missed');
+        
+        // Remove new-commuter class if it exists to prevent animation
+        if (commuter.element.classList.contains('new-commuter')) {
+            commuter.element.classList.remove('new-commuter');
+        }
         
         // Ensure the commuter appears above other elements during highlighting
         const originalZIndex = commuter.element.style.zIndex;
@@ -548,6 +559,9 @@ function highlightMissedChange() {
             commuter.element.classList.remove('highlight-missed');
             commuter.element.classList.remove('no-hover');
             commuter.element.style.zIndex = originalZIndex;
+            
+            // Make sure transform is still maintained
+            commuter.element.style.transform = 'translateX(-50%)';
         }, 4500); // Match the 3 animation cycles (1.5s × 3)
     } else {
         console.error(`Could not find commuter with ID ${gameState.currentChange.commuterId} to highlight!`);

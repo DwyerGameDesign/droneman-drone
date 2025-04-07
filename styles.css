@@ -277,6 +277,7 @@ h1 {
     animation: highlight-missed 1.5s 3;
     outline: 2px solid #d9534f;
     z-index: 100 !important;
+    position: relative; /* Ensure the element stays in place */
 }
 
 /* Universal highlight-pulse animation that maintains original transform */
@@ -299,7 +300,7 @@ h1 {
     }
 }
 
-/* Universal highlight-missed animation that maintains original transform */
+/* Fix highlight-missed animation to never modify transform */
 @keyframes highlight-missed {
     0% { 
         box-shadow: 0 0 0 0 rgba(217, 83, 79, 0.7);
@@ -969,5 +970,18 @@ body.mobile .mobile-controls {
 }
 
 .set-dressing-sprite.no-hover:hover {
+    transform: translateX(-50%) !important;
+}
+
+/* Specific overrides for commuter sprites when highlighted */
+.commuter-sprite.highlight-missed {
+    transform: translateX(-50%) !important; /* Force maintain the original transform */
+    animation: highlight-missed 1.5s 3;
+    outline: 2px solid #d9534f;
+    z-index: 100 !important;
+}
+
+/* Ensure no-hover consistently maintains transform for commuters */
+.commuter-sprite.no-hover:hover {
     transform: translateX(-50%) !important;
 }
