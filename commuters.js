@@ -544,7 +544,7 @@ function highlightMissedChange() {
         // Remove after animation completes
         setTimeout(() => {
             commuter.element.classList.remove('highlight-missed');
-        }, 4500); // Match the 3 animation cycles (1.5s × 3)
+        }, 1500); // Match animation duration (now 1.5s)
     } else {
         console.error(`Could not find commuter with ID ${gameState.currentChange.commuterId} to highlight!`);
         console.log(`Available commuters: ${allCommuters.map(c => `${c.type} (${c.id})`).join(', ')}`);

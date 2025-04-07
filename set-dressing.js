@@ -640,7 +640,7 @@ function highlightMissedChange() {
             setDressing.element.classList.remove('highlight-missed');
             setDressing.element.classList.remove('no-hover');
             setDressing.element.style.zIndex = originalZIndex;
-        }, 4500); // Match the 3 animation cycles (1.5s × 3)
+        }, 1500); // Match animation duration (now 1.5s)
     }
 }
 
