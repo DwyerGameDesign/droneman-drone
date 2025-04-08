@@ -17,13 +17,11 @@ const THOUGHTS = {
         "Another day, another dollar.",
         "6:40 train again.",
         "Same commute, different day.",
-        "This seat feels familiar.",
-        "Two more stops to go."
+        "This seat feels familiar."
     ],
     mid: [
         "Why do I do this every day?",
         "The train moves, but am I going anywhere?",
-        "That person seems different today.",
         "I never noticed that building before.",
         "Time feels different when you pay attention."
     ],
@@ -58,16 +56,13 @@ const THOUGHTS = {
 const DAY_NARRATIVES = {
     // Early awareness levels (1-2)
     early: [
-        "Everyday the same...",
-        "Everyday the same... but something feels different",
+        "Everyday the same?",
         "Something's not quite right...",
         "Is this day different somehow?",
         "The routine feels... off today."
     ],
     // Mid awareness levels (3-4)
     mid: [
-        "Wait... did that commuter just change?",
-        "I need to pay more attention...",
         "The changes are becoming more obvious...",
         "My eyes are starting to open...",
         "The pattern is changing subtly..."
