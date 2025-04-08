@@ -24,8 +24,11 @@ const SET_DRESSING_TYPES = [
     'bench',
     'bottle',
     'caution',
+    'cautionalt',
     'trash',
-    'trashcan'
+    'trashcan',
+    'backpack',
+    'rat'
 ];
 
 // Array to store all set dressing elements
@@ -37,41 +40,28 @@ let setDressingVariations = {};
  * Detect all available set dressing variations
  */
 async function detectSetDressingVariations() {
-    console.log("Detecting set dressing variations...");
+    console.log("Detecting set dressing sprites...");
 
     // For each set dressing type
     for (const type of SET_DRESSING_TYPES) {
         setDressingVariations[type] = [];
 
-        // Check for base set dressing element first
+        // Check for base set dressing element
         const baseImage = new Image();
         baseImage.src = `assets/sprites/${type}.png`;
 
         try {
             await imageExists(baseImage);
             setDressingVariations[type].push(`${type}.png`);
-            
-            // Only check for variations if base element exists
-            // Check for 'a' variation (specifically known for caution_a)
-            const variations = ['a'];
-            for (const variant of variations) {
-                const variantImage = new Image();
-                variantImage.src = `assets/sprites/${type}_${variant}.png`;
-                try {
-                    await imageExists(variantImage);
-                    setDressingVariations[type].push(`${type}_${variant}.png`);
-                } catch (error) {
-                    // Silently skip non-existent variations
-                }
-            }
         } catch (error) {
-            // If base element doesn't exist, skip all variations
+            // If base element doesn't exist, skip it
+            console.warn(`Could not load sprite for ${type}`);
             continue;
         }
     }
 
-    // Log final summary of found variations
-    console.log("Set dressing variations detection complete. Found variations:", setDressingVariations);
+    // Log final summary of found sprites
+    console.log("Set dressing sprite detection complete. Found sprites:", setDressingVariations);
     return setDressingVariations;
 }
 
@@ -242,6 +232,7 @@ function addSetDressing() {
             height = 27;
             break;
         case 'caution':
+        case 'cautionalt':
             width = 36;
             height = 54;
             break;
@@ -252,6 +243,18 @@ function addSetDressing() {
         case 'trashcan':
             width = 36;
             height = 45;
+            break;
+        case 'backpack':
+            width = 36;
+            height = 40;
+            break;
+        //case 'fireextinguisher':
+        //    width = 36;
+        //    height = 36;
+        //    break;
+        case 'rat':
+            width = 35;
+            height = 18;
             break;
         default:
             width = 36;
@@ -554,48 +557,78 @@ function changeExistingSetDressing() {
     const randomIndex = Math.floor(Math.random() * allSetDressing.length);
     const setDressing = allSetDressing[randomIndex];
 
-    // Get variations for this set dressing
-    const variations = setDressingVariations[setDressing.type];
-    if (!variations || variations.length <= 1) return null;
+    // Get all available types except the current one
+    const availableTypes = SET_DRESSING_TYPES.filter(type => 
+        type !== setDressing.type && 
+        setDressingVariations[type] && 
+        setDressingVariations[type].length > 0
+    );
 
-    // Select a different variation than the current one
-    const currentVariation = setDressing.currentVariation;
-    const otherVariations = variations.filter(v => v !== currentVariation);
+    if (availableTypes.length === 0) return null;
 
-    if (otherVariations.length === 0) return null;
-
-    // Select a random variation
-    const newVariation = otherVariations[Math.floor(Math.random() * otherVariations.length)];
-
-    // Apply the change
-    applySetDressingVariation(setDressing, newVariation);
+    // Select a random new type
+    const newType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+    const oldType = setDressing.type;
+    
+    // Update the element's type and sprite
+    setDressing.type = newType;
+    setDressing.currentVariation = `${newType}.png`;
+    setDressing.element.dataset.setDressingType = newType;
+    
+    // Update the visual appearance
+    setDressing.element.style.backgroundImage = `url(assets/sprites/${newType}.png)`;
+    
+    // Update dimensions based on new type
+    let width, height;
+    switch(newType) {
+        case 'bench':
+            width = 144;
+            height = 54;
+            break;
+        case 'bottle':
+            width = 18;
+            height = 27;
+            break;
+        case 'caution':
+            width = 36;
+            height = 54;
+            break;
+        case 'trash':
+            width = 30;
+            height = 24;
+            break;
+        case 'trashcan':
+            width = 36;
+            height = 45;
+            break;
+        case 'backpack':
+            width = 36;
+            height = 40;
+            break;
+        case 'rat':
+            width = 35;
+            height = 18;
+            break;
+        default:
+            width = 36;
+            height = 36;
+    }
+    
+    setDressing.element.style.width = `${width}px`;
+    setDressing.element.style.height = `${height}px`;
 
     // Create change object
     const change = {
         changeType: 'setDressing',
         elementId: setDressing.id,
-        fromVariation: currentVariation,
-        toVariation: newVariation,
-        changeAction: 'change',
+        fromType: oldType,
+        toType: newType,
+        changeAction: 'swap',
         found: false
     };
 
+    console.log(`Changed set dressing from ${oldType} to ${newType}`);
     return change;
-}
-
-/**
- * Apply a variation to a set dressing element
- */
-function applySetDressingVariation(setDressing, variation) {
-    if (!setDressing || !variation) return;
-
-    // Update the background image
-    setDressing.element.style.backgroundImage = `url(assets/sprites/${variation})`;
-
-    // Update the current variation
-    setDressing.currentVariation = variation;
-
-    console.log(`[SET DRESSING] Applied variation ${variation} to ${setDressing.id} (type: ${setDressing.type})`);
 }
 
 /**
