@@ -10,13 +10,13 @@ const MAX_SET_DRESSING = 8;
 // Positioned in columns offset from commuter positions to prevent overlapping
 const SET_DRESSING_POSITIONS = [
     [4, 21],
-    [16, 22],
-    [29, 23],
-    [41, 21],
-    [53, 24],
+    [18, 22],
+    [31, 23],
+    [44, 21],
+    [54, 24],
     [65, 22],
     [78, 23],
-    [90, 21]
+    [91, 21]
 ];
 
 // Types of set dressing elements - updated to match your available sprites

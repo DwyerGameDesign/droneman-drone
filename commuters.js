@@ -10,13 +10,13 @@ const MAX_COMMUTERS = 8;
 // Organized in distinct columns to prevent overlapping
 const COMMUTER_POSITIONS = [
     [50, 22],
-    [10, 23],
-    [22, 20],
-    [35, 24],
-    [59, 23],
+    [13, 23],
+    [24, 20],
+    [37, 24],
+    [60, 23],
     [71, 24],
-    [84, 20],
-    [96, 23]
+    [85, 20],
+    [95, 23]
 ];
 
 // Array to store all commuters
