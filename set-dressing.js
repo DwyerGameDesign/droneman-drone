@@ -686,7 +686,6 @@ window.setDressing = {
     createSetDressingChange,
     createNewSetDressingElement,
     changeExistingSetDressing,
-    applySetDressingVariation,
     highlightElement,
     highlightMissedChange,
     allSetDressing,
