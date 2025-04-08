@@ -632,7 +632,7 @@ function continueWithLevelUp(newLevel) {
         // Start the shader effect
         setTimeout(() => {
             window.shaderEffects.playEffect('wave', () => {
-                // Shader effect is done, show train button again
+                // Shader effect is done, show train button
                 if (gameState.elements.trainButton) {
                     gameState.elements.trainButton.style.display = 'block';
                 }
@@ -645,7 +645,7 @@ function continueWithLevelUp(newLevel) {
                 // Add and animate the new commuter
                 setTimeout(() => {
                     const newCommuter = commuters.addCommuter();
-        if (newCommuter) {
+                    if (newCommuter) {
                         console.log(`Added commuter ${newCommuter.type} for level ${newLevel}`);
                         // Add the new-commuter class for the animation
                         newCommuter.element.classList.add('new-commuter');
@@ -667,10 +667,12 @@ function continueWithLevelUp(newLevel) {
             commuters.highlightElement(newCommuter.element);
         }
         
-        // Show train button again
-        if (gameState.elements.trainButton) {
-            gameState.elements.trainButton.style.display = 'block';
-        }
+        // Show train button after all animations are complete
+        setTimeout(() => {
+            if (gameState.elements.trainButton) {
+                gameState.elements.trainButton.style.display = 'block';
+            }
+        }, 2000);
     }
 }
 
@@ -1194,40 +1196,27 @@ function handleCommuterClick(event) {
         // Get awareness gain from central calculation function
         const awarenessGain = calculateAwarenessXP();
 
+        // Calculate if this will cause a level up
+        const currentLevel = gameState.awarenessLevel;
+        const currentXP = gameState.awarenessXP;
+        const xpRequirements = AWARENESS_CONFIG.xpRequirements;
+        const willLevelUp = (currentXP + awarenessGain) >= xpRequirements[currentLevel];
+
         // Increase awareness
         addAwarenessXP(awarenessGain);
 
         // Show positive thought bubble from a random commuter
         showRandomThoughtBubble(true);
 
-        // CRITICAL FIX: SHOW TRAIN BUTTON - multiple methods
-        console.log("Core.js: Showing train button after correct commuter");
-        
-        // Run diagnostic to help trace the issue
-        diagnoseBtnVisibility();
-        
-        // Method 1: Direct style update
-        if (gameState.elements.trainButton) {
-            console.log("Core.js: Setting train button display to block");
-            gameState.elements.trainButton.style.display = 'block';
-        }
-        
-        // Method 2: DOM direct access
-        const trainButton = document.getElementById('train-button');
-        if (trainButton) {
-            console.log("Core.js: Direct DOM access to train button");
-            trainButton.style.display = 'block';
-        }
-        
-        // Method 3: Delayed check (sometimes first attempt fails)
-        setTimeout(() => {
-            console.log("Core.js: Delayed train button check");
-            const delayedButton = document.getElementById('train-button');
-            if (delayedButton && delayedButton.style.display !== 'block') {
-                console.log("Core.js: Fixing train button in delayed check");
-                delayedButton.style.display = 'block';
+        // Only show train button immediately if no level up occurred
+        if (!willLevelUp) {
+            console.log("Core.js: No level up, showing train button");
+            if (gameState.elements.trainButton) {
+                gameState.elements.trainButton.style.display = 'block';
             }
-        }, 100);
+        }
+        // If level up occurred, the train button will be shown after the level up process
+        // in the continueWithLevelUp function
         
         // Update narrative text
         window.ui.updateNarrativeText();
