@@ -3,6 +3,9 @@
  * UI and Display - All UI and display-related functions
  */
 
+// Debug mode flag - set to false for playtesting
+const DEBUG_MODE = false;
+
 /**
  * Update the awareness display
  */
@@ -294,15 +297,18 @@ function showHint() {
 }
 
 /**
- * Create debug button for testing positions
+ * Create debug button for showing positions
  */
 function createDebugButton() {
-    // Create the debug button
+    // Only create debug button if DEBUG_MODE is true
+    if (!DEBUG_MODE) return;
+
+    // Create debug button
     const debugButton = document.createElement('button');
     debugButton.id = 'debug-positions-button';
     debugButton.textContent = 'Debug Positions';
     
-    // Add the button to the document
+    // Add the debug button to the document
     document.body.appendChild(debugButton);
     
     // Add click event listener
