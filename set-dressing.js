@@ -9,14 +9,14 @@ const MAX_SET_DRESSING = 8;
 // Positions for each set dressing element [left%, bottom%]
 // Positioned in columns offset from commuter positions to prevent overlapping
 const SET_DRESSING_POSITIONS = [
+    [4, 21],    // Column 0.5 - Leftmost edge
     [22, 21],   // Column 1.5 - Between far left and left
-    [45, 23],   // Column 2.5 - Between left and center
-    [65, 25],   // Column 3.5 - Between center and right
-    [80, 24],   // Column 4.5 - Between right and far right
-    [95, 22],   // Column 5.5 - Rightmost edge
-    [8, 21],    // Column 0.5 - Leftmost edge
     [35, 24],   // Column 2.25 - Between left and left-center
-    [55, 20]    // Column 3.25 - Between center and right-center
+    [45, 23],   // Column 2.5 - Between left and center
+    [55, 20],   // Column 3.25 - Between center and right-center
+    [72, 25],   // Column 3.5 - Between center and right
+    [84, 24],   // Column 4.5 - Between right and far right
+    [96, 22]    // Column 5.5 - Rightmost edge
 ];
 
 // Types of set dressing elements - updated to match your available sprites
