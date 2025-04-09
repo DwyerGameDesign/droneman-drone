@@ -373,9 +373,6 @@ function handleSetDressingClick(event) {
         gameState.currentChange.elementId === setDressingId) {
         console.log("Correct set dressing element clicked!");
         
-        // Log change action type for debugging
-        console.log(`Set dressing change action: ${gameState.currentChange.changeAction}`);
-
         // Mark as found
         gameState.currentChange.found = true;
 
@@ -410,38 +407,50 @@ function handleSetDressingClick(event) {
         // Show positive thought bubble from a random commuter
         window.core.showRandomThoughtBubble(true);
         
-        // Show train button so player can proceed
-        if (gameState.elements.trainButton) {
-            gameState.elements.trainButton.style.display = 'block';
-        }
-        
-        // Disable clicking until next day
-        gameState.canClick = false;
-
         // Update narrative text
         window.ui.updateNarrativeText();
     } else {
         console.log("Wrong set dressing element clicked or no change to find");
         
-        // Show message about wrong choice
-        window.ui.showMessage("That's not what changed...", 1500);
+        // Get the custom message for this change
+        let message = "That's not what changed...";
+        if (gameState.currentChange && !gameState.currentChange.found) {
+            if (gameState.currentChange.changeType === 'commuter') {
+                const fromType = gameState.currentChange.fromVariation.split('_')[0];
+                const toType = gameState.currentChange.toVariation;
+                if (CHANGE_MESSAGES.commuter[fromType] && CHANGE_MESSAGES.commuter[fromType][toType]) {
+                    message = CHANGE_MESSAGES.commuter[fromType][toType];
+                }
+            } else if (gameState.currentChange.changeType === 'setDressing') {
+                const fromType = gameState.currentChange.fromType;
+                const toType = gameState.currentChange.toType;
+                if (CHANGE_MESSAGES.setDressing[fromType] && CHANGE_MESSAGES.setDressing[fromType][toType]) {
+                    message = CHANGE_MESSAGES.setDressing[fromType][toType];
+                }
+            }
+        }
         
-        // Highlight the actual change if it exists and hasn't been found
+        // Show the custom message
+        window.ui.showMessage(message, 1500);
+        
+        // Highlight the actual change if it's a commuter change
         if (gameState.currentChange && 
             !gameState.currentChange.found && 
-            gameState.currentChange.changeType === 'setDressing') {
-            highlightMissedChange();
+            gameState.currentChange.changeType === 'commuter') {
+            window.commuters.highlightMissedChange();
         } else if (gameState.currentChange && 
             !gameState.currentChange.found && 
-            gameState.currentChange.changeType === 'commuter') {
-            // If it's a commuter change that was missed, highlight that instead
-            window.commuters.highlightMissedChange();
+            gameState.currentChange.changeType === 'setDressing') {
+            window.setDressing.highlightMissedChange();
         }
+        
+        // Show negative thought bubble from a random commuter
+        window.core.showRandomThoughtBubble(false);
         
         // End the game with a summary after showing the highlight
         setTimeout(() => {
             window.core.showGameOverSummary("Your awareness wasn't strong enough to notice the changes.");
-        }, 0); // Immediate display without delay
+        }, 4500); // Match the highlight animation duration
     }
 }
 

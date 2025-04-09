@@ -174,3 +174,120 @@ const AWARENESS_CONFIG = {
         250     // XP needed to complete level 10 (game completion)
     ]
 };
+
+// Messages for when players miss a change
+const CHANGE_MESSAGES = {
+    // Commuter change messages
+    commuter: {
+        // Messages for when a commuter's appearance changes
+        'commuter1': {
+            'commuter1_a': "Yesterday, he had a briefcase...",
+        },
+        'commuter1_a': {
+            'commuter1': "Yesterday, he did not have a briefcase..."
+        },
+        'commuter2': {
+            'commuter2_a': "Yesterday, she had a purse...",
+        },
+        'commuter2_a': {
+            'commuter2': "Yesterday, she did not have a purse..."
+        },
+        'commuter3': {
+            'commuter3_a': "Yesterday, he had a shoulder bag...",
+        },
+        'commuter3_a': {
+            'commuter3': "Yesterday, he had a briefcase..."
+        },
+        'commuter4': {
+            'commuter4_a': "Yesterday, he had a briefcase...",
+        },
+        'commuter4_a': {
+            'commuter4': "Yesterday, he did not have a briefcase..."
+        },
+        'commuter5': {
+            'commuter5_a': "Yesterday, he had a hat and bag...",
+        },
+        'commuter5_a': {
+            'commuter5': "Yesterday, he did not have a hat or bag..."
+        },
+        'commuter6': {
+            'commuter6_a': "Yesterday, her purse was black...",
+        },
+        'commuter6_a': {
+            'commuter6': "Yesterday, her purse was brown..."
+        },
+        'commuter7': {
+            'commuter7_a': "Yesterday, he did not have a hat or briefcase...",
+        },
+        'commuter7_a': {
+            'commuter7': "Yesterday, he had a hat and briefcase..."
+        },
+        'commuter8': {
+            'commuter8_a': "Yesterday, he had a hat...",
+        },
+        'commuter8_a': {
+            'commuter8': "Yesterday, he did not have a hat..."
+        }
+    },
+    
+    // Set dressing change messages
+    setDressing: {
+        // Messages for when one set dressing piece changes to another
+        'bench': {
+            'bottle': "Yesterday, this was a bench...",
+            'trash': "Yesterday, this was a bench...",
+            'trashcan': "Yesterday, this was a bench...",
+            'caution': "Yesterday, this was a bench...",
+            'backpack': "Yesterday, this was a bench...",
+            'rat': "Yesterday, this was a bench..."
+        },
+        'bottle': {
+            'bench': "Yesterday, this was a bottle...",
+            'trash': "Yesterday, this was a bottle...",
+            'trashcan': "Yesterday, this was a bottle...",
+            'caution': "Yesterday, this was a bottle...",
+            'backpack': "Yesterday, this was a bottle...",
+            'rat': "Yesterday, this was a bottle..."
+        },
+        'trash': {
+            'bench': "Yesterday, this was trash...",
+            'bottle': "Yesterday, this was trash...",
+            'trashcan': "Yesterday, this was trash...",
+            'caution': "Yesterday, this was trash...",
+            'backpack': "Yesterday, this was trash...",
+            'rat': "Yesterday, this was trash..."
+        },
+        'trashcan': {
+            'bench': "Yesterday, this was a trashcan...",
+            'bottle': "Yesterday, this was a trashcan...",
+            'trash': "Yesterday, this was a trashcan...",
+            'caution': "Yesterday, this was a trashcan...",
+            'backpack': "Yesterday, this was a trashcan...",
+            'rat': "Yesterday, this was a trashcan..."
+        },
+        'caution': {
+            'bench': "Yesterday, this was a caution sign...",
+            'bottle': "Yesterday, this was a caution sign...",
+            'trash': "Yesterday, this was a caution sign...",
+            'trashcan': "Yesterday, this was a caution sign...",
+            'backpack': "Yesterday, this was a caution sign...",
+            'rat': "Yesterday, this was a caution sign..."
+        },
+        'backpack': {
+            'bench': "Yesterday, this was a backpack...",
+            'bottle': "Yesterday, this was a backpack...",
+            'trash': "Yesterday, this was a backpack...",
+            'trashcan': "Yesterday, this was a backpack...",
+            'caution': "Yesterday, this was a backpack...",
+            'rat': "Yesterday, this was a backpack..."
+        },
+        'rat': {
+            'bench': "Yesterday, this was a rat...",
+            'bottle': "Yesterday, this was a rat...",
+            'trash': "Yesterday, this was a rat...",
+            'trashcan': "Yesterday, this was a rat...",
+            'caution': "Yesterday, this was a rat...",
+            'backpack': "Yesterday, this was a rat..."
+        }
+    }
+};

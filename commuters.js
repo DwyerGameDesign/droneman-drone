@@ -211,13 +211,10 @@ function addCommuter() {
  * Handle commuter click events
  */
 function handleCommuterClick(event) {
-    console.log("=== COMMUTERS.JS handleCommuterClick called ===");
-    
     const commuterElement = event.currentTarget;
     const commuterId = commuterElement.id;
-    const commuterType = commuterElement.dataset.commuterType;
 
-    console.log(`Clicked commuter: ${commuterId} (type: ${commuterType})`);
+    console.log(`Clicked commuter: ${commuterId}`);
 
     // Check if we're transitioning
     if (gameState.isTransitioning) {
@@ -232,51 +229,18 @@ function handleCommuterClick(event) {
         return;
     }
 
-    // Show all commuters for debugging
-    console.log(`All commuters: ${allCommuters.map(c => `${c.type} (${c.id})`).join(', ')}`);
-
-    // Debug information about the current change
-    if (gameState.currentChange) {
-        console.log(`Current change: ${JSON.stringify(gameState.currentChange)}`);
-    } else {
-        console.log("No current change exists");
-    }
-
-    // Check if this is the current change - more detailed condition checking
-    const isCorrectCommuter = gameState.currentChange && 
+    // Check if this is the current change
+    if (gameState.currentChange && 
         !gameState.currentChange.found &&
-        gameState.currentChange.changeType === 'commuter' && 
-        gameState.currentChange.commuterId === commuterId;
-    
-    console.log(`Is correct commuter? ${isCorrectCommuter}`);
-    console.log(`Clicked: ${commuterId}, Expected: ${gameState.currentChange ? gameState.currentChange.commuterId : 'none'}`);
-    console.log(`Change type: ${gameState.currentChange ? gameState.currentChange.changeType : 'none'}`);
-    console.log(`Already found? ${gameState.currentChange ? gameState.currentChange.found : 'N/A'}`);
-    
-    if (isCorrectCommuter) {
+        (gameState.currentChange.changeType !== 'setDressing') && 
+        gameState.currentChange.commuterId === commuterId) {
         console.log("Correct commuter clicked!");
         
         // Mark as found
         gameState.currentChange.found = true;
 
-        // Highlight the commuter with temporary pulse effect
-        highlightElement(commuterElement);
-        
-        // Add permanent glow effect after the initial highlight animation
-        setTimeout(() => {
-            // Remove new-commuter class if it exists to prevent animation
-            if (commuterElement.classList.contains('new-commuter')) {
-                commuterElement.classList.remove('new-commuter');
-            }
-            
-            // Add found-change class - CSS will handle positioning and styling
-            commuterElement.classList.add('found-change');
-            
-            // Create and add click blocker to prevent further interactions
-            const clickBlocker = document.createElement('div');
-            clickBlocker.className = 'click-blocker';
-            gameState.elements.sceneContainer.appendChild(clickBlocker);
-        }, 1500);
+        // Highlight the commuter
+        commuters.highlightElement(commuterElement);
         
         // Add doober animation to awareness meter
         if (window.dooberSystem && window.dooberSystem.animate) {
@@ -289,87 +253,77 @@ function handleCommuterClick(event) {
         // Increment changes found counter
         gameState.changesFound++;
 
-        // Get awareness gain from core calculation function
-        const awarenessGain = window.core.calculateAwarenessXP();
+        // Get awareness gain from central calculation function
+        const awarenessGain = calculateAwarenessXP();
+
+        // Calculate if this will cause a level up
+        const currentLevel = gameState.awarenessLevel;
+        const currentXP = gameState.awarenessXP;
+        const xpRequirements = AWARENESS_CONFIG.xpRequirements;
+        const willLevelUp = (currentXP + awarenessGain) >= xpRequirements[currentLevel];
 
         // Increase awareness
-        window.core.addAwarenessXP(awarenessGain);
+        addAwarenessXP(awarenessGain);
 
         // Show positive thought bubble from a random commuter
-        window.core.showRandomThoughtBubble(true);
+        showRandomThoughtBubble(true);
 
-        // Call diagnostic function first
-        console.log("Commuters.js: Calling diagnostic function");
-        if (window.core.diagnoseBtnVisibility) {
-            window.core.diagnoseBtnVisibility();
-        }
-
-        // SUPER CRITICAL FIX: Use FOUR redundant methods to ensure train button is shown
-        console.log("Showing train button after correct commuter clicked - USING ALL METHODS");
-        
-        // Method 1: Using gameState.elements.trainButton
-        if (gameState.elements && gameState.elements.trainButton) {
-            console.log("Method 1: Using gameState.elements.trainButton");
-            gameState.elements.trainButton.style.display = 'block';
-        }
-        
-        // Method 2: Direct DOM access by ID
-        const trainButton = document.getElementById('train-button');
-        if (trainButton) {
-            console.log("Method 2: Using direct DOM ID access");
-            trainButton.style.display = 'block';
-        }
-        
-        // Method 3: Query selector fallback
-        if (!trainButton && (!gameState.elements || !gameState.elements.trainButton)) {
-            console.log("Method 3: Using querySelector fallback");
-            const trainButtons = document.querySelectorAll('.train-button');
-            if (trainButtons.length > 0) {
-                trainButtons[0].style.display = 'block';
-            } else {
-                console.error("Could not find train button by class");
+        // Only show train button immediately if no level up occurred
+        if (!willLevelUp) {
+            console.log("Core.js: No level up, showing train button");
+            if (gameState.elements.trainButton) {
+                gameState.elements.trainButton.style.display = 'block';
             }
         }
-        
-        // Method 4: Create a fallback timer to double-check button visibility
-        setTimeout(() => {
-            const delayedButton = document.getElementById('train-button');
-            if (delayedButton && delayedButton.style.display !== 'block') {
-                console.log("Method 4: Delayed fallback - button was still hidden!");
-                delayedButton.style.display = 'block';
-            }
-        }, 100);
-        
-        // Disable clicking until next day
-        gameState.canClick = false;
         
         // Update narrative text
         window.ui.updateNarrativeText();
     } else {
         console.log("Wrong commuter clicked or no change to find");
         
-        // Show a message about the wrong choice
-        window.ui.showMessage("That's not what changed...", 1500);
-        
-        // Highlight the actual change - ensure we show the changed commuter regardless of which commuter was clicked
-        if (gameState.currentChange && 
-            !gameState.currentChange.found) {
-            
-            // If a commuter has the change, highlight that commuter
+        // Get the custom message for this change
+        let message = "That's not what changed...";
+        if (gameState.currentChange && !gameState.currentChange.found) {
             if (gameState.currentChange.changeType === 'commuter') {
-                highlightMissedChange();
-            } 
-            // If a set dressing has the change, highlight that set dressing
-            else if (gameState.currentChange.changeType === 'setDressing' &&
-                    window.setDressing) {
-                window.setDressing.highlightMissedChange();
+                const fromVariation = gameState.currentChange.fromVariation;
+                const toVariation = gameState.currentChange.toVariation;
+                
+                // Only try the direct lookup
+                if (CHANGE_MESSAGES.commuter[fromVariation] && 
+                    CHANGE_MESSAGES.commuter[fromVariation][toVariation]) {
+                    message = CHANGE_MESSAGES.commuter[fromVariation][toVariation];
+                }
+            } else if (gameState.currentChange.changeType === 'setDressing') {
+                const fromType = gameState.currentChange.fromType;
+                const toType = gameState.currentChange.toType;
+                if (CHANGE_MESSAGES.setDressing[fromType] && CHANGE_MESSAGES.setDressing[fromType][toType]) {
+                    message = CHANGE_MESSAGES.setDressing[fromType][toType];
+                }
             }
         }
         
+        // Show the custom message
+        window.ui.showMessage(message, 1500);
+        
+        // Highlight the actual change if it's a commuter change
+        if (gameState.currentChange && 
+            !gameState.currentChange.found && 
+            gameState.currentChange.changeType !== 'setDressing') {
+            window.commuters.highlightMissedChange();
+        } else if (gameState.currentChange && 
+            !gameState.currentChange.found && 
+            gameState.currentChange.changeType === 'setDressing' &&
+            window.setDressing) {
+            window.setDressing.highlightMissedChange();
+        }
+        
+        // Show negative thought bubble from a random commuter
+        showRandomThoughtBubble(false);
+        
         // End the game with a summary after showing the highlight
         setTimeout(() => {
-            window.core.showGameOverSummary("Your awareness wasn't strong enough to notice the changes.");
-        }, 0); // Immediate display without delay
+            showGameOverSummary("Your awareness wasn't strong enough to notice the changes.");
+        }, 4500); // Match the highlight animation duration
     }
 }
 
