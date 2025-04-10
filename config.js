@@ -182,15 +182,31 @@ const CHANGE_MESSAGES = {
         // Messages for when a commuter's appearance changes
         'commuter1': {
             'commuter1_a': "Yesterday, he had a briefcase...",
+            'commuter1_b': "Yesterday, his tie was red...",
+            'commuter1_c': "Yesterday, he wore glasses..."
         },
         'commuter1_a': {
             'commuter1': "Yesterday, he did not have a briefcase..."
         },
+        'commuter1_b': {
+            'commuter1': "Yesterday, his tie was not red..."
+        },
+        'commuter1_c': {
+            'commuter1': "Yesterday, he did not wear glasses..."
+        },
         'commuter2': {
-            'commuter2_a': "Yesterday, she had a purse...",
+            'commuter2_a': "Yesterday, she had that hairstyle...",
+            'commuter2_b': "Yesterday, her dress was blue...",
+            'commuter2_c': "Yesterday, she carried an umbrella..."
         },
         'commuter2_a': {
-            'commuter2': "Yesterday, she did not have a purse..."
+            'commuter2': "Yesterday, she did not have that hairstyle..."
+        },
+        'commuter2_b': {
+            'commuter2': "Yesterday, her dress was not blue..."
+        },
+        'commuter2_c': {
+            'commuter2': "Yesterday, she did not carry an umbrella..."
         },
         'commuter3': {
             'commuter3_a': "Yesterday, he had a shoulder bag...",
@@ -232,6 +248,16 @@ const CHANGE_MESSAGES = {
     
     // Set dressing change messages
     setDressing: {
+        // Messages for when a new set dressing item is added
+        'new': {
+            'bench': "The bench wasn't here yesterday...",
+            'bottle': "The bottle wasn't here yesterday...",
+            'trash': "The trash wasn't here yesterday...",
+            'trashcan': "The trashcan wasn't here yesterday...",
+            'caution': "The caution sign wasn't here yesterday...",
+            'backpack': "The backpack wasn't here yesterday...",
+            'rat': "The rat wasn't here yesterday..."
+        },
         // Messages for when one set dressing piece changes to another
         'bench': {
             'bottle': "Yesterday, this was a bench...",
