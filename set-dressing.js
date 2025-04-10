@@ -440,17 +440,25 @@ function handleSetDressingClick(event) {
                 }
             } else if (gameState.currentChange.changeType === 'setDressing') {
                 // Check if this is a new item being added
-                if (gameState.currentChange.changeAction === 'add') {
-                    const toType = setDressingType;
+                if (gameState.currentChange.isNewlyAdded) {
+                    const toType = gameState.currentChange.toType;
+                    console.log(`Looking for new set dressing message for type: ${toType}`);
                     if (CHANGE_MESSAGES.setDressing.new && CHANGE_MESSAGES.setDressing.new[toType]) {
                         message = CHANGE_MESSAGES.setDressing.new[toType];
+                        console.log(`Found message: ${message}`);
+                    } else {
+                        console.log(`No message found for new set dressing type: ${toType}`);
                     }
                 } else {
                     // This is a change from one type to another
                     const fromType = gameState.currentChange.fromType;
                     const toType = gameState.currentChange.toType;
+                    console.log(`Looking for set dressing change message from ${fromType} to ${toType}`);
                     if (CHANGE_MESSAGES.setDressing[fromType] && CHANGE_MESSAGES.setDressing[fromType][toType]) {
                         message = CHANGE_MESSAGES.setDressing[fromType][toType];
+                        console.log(`Found message: ${message}`);
+                    } else {
+                        console.log(`No message found for set dressing change from ${fromType} to ${toType}`);
                     }
                 }
             }
@@ -462,7 +470,7 @@ function handleSetDressingClick(event) {
         // Highlight the actual change if it's a commuter change
         if (gameState.currentChange && 
             !gameState.currentChange.found && 
-            gameState.currentChange.changeType === 'commuter') {
+            gameState.currentChange.changeType !== 'setDressing') {
             window.commuters.highlightMissedChange();
         } else if (gameState.currentChange && 
             !gameState.currentChange.found && 
