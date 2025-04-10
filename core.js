@@ -627,6 +627,12 @@ function handleLevelUp(newLevel, previousLevel) {
  * Continue with level up process after popup is closed
  */
 function continueWithLevelUp(newLevel) {
+    // Disable clicking until the player takes the train
+    gameState.canClick = false;
+    
+    // Show a message to inform the player that they need to take the train
+    window.ui.showMessage("Take the train to look for the next change", 3000);
+    
     // Play the level up effect
     if (window.shaderEffects && window.shaderEffects.playEffect) {
         // Start the shader effect
@@ -645,7 +651,7 @@ function continueWithLevelUp(newLevel) {
                 // Add and animate the new commuter
                 setTimeout(() => {
                     const newCommuter = commuters.addCommuter();
-        if (newCommuter) {
+                    if (newCommuter) {
                         console.log(`Added commuter ${newCommuter.type} for level ${newLevel}`);
                         // Add the new-commuter class for the animation
                         newCommuter.element.classList.add('new-commuter');
@@ -770,52 +776,25 @@ function proceedToNextDay() {
                 blocker.parentNode.removeChild(blocker);
             }
         });
-
+        
         // Increment day
         gameState.day++;
-        gameState.elements.dayDisplay.textContent = gameState.day;
-
+        if (gameState.elements.dayDisplay) {
+            gameState.elements.dayDisplay.textContent = gameState.day;
+        }
+        
+        console.log(`Day ${gameState.day} starts`);
+        
         // Reset current change
         gameState.currentChange = null;
-
-        // Create changes for the new day based on specific pattern
-        if (gameState.day === 2) {
-            // On day 2, add a set dressing piece
-            console.log("Day 2: Adding a set dressing piece");
-            if (window.setDressing) {
-                const change = window.setDressing.createNewSetDressingElement();
-                if (change) {
-                    gameState.currentChange = change;
-                    console.log("Created set dressing change:", change);
-                } else {
-                    // Fallback if set dressing fails
-                    console.log("Failed to create set dressing, falling back to commuter change");
-                    gameState.currentChange = { changeType: 'commuter' };
-                    commuters.createFirstChange();
-                }
-            }
-        } else if (gameState.day === 3) {
-            // On day 3, change a commuter
-            console.log("Day 3: Changing a commuter");
-            gameState.currentChange = { changeType: 'commuter' };
-            commuters.createRandomChange();
-        } else if (gameState.day > 3) {
-            // For later days, randomly choose between commuter or set dressing changes
-            createDailyChange();
-        }
-
-        // Enable clicking since there's something to find (if day >= 2)
-        gameState.canClick = gameState.day >= 2;
-
-        // Hide train button on day 2+ until player finds the change or makes a mistake
-        if (gameState.day >= 2 && gameState.elements.trainButton) {
-            gameState.elements.trainButton.style.display = 'none';
-        }
-
+        
+        // Determine if there should be a change today
+        determineChangesForDay();
+        
         // Fade back in
         setTimeout(() => {
             gameState.elements.sceneContainer.classList.remove('fading');
-
+            
             // Update narrative text with typewriter effect
             if (gameState.typewriter) {
                 gameState.typewriter.stop();
@@ -825,28 +804,49 @@ function proceedToNextDay() {
                 }, 100);
             }
 
-            gameState.isTransitioning = false; // Reset transition flag
+            // Enable interactions after fade-in
+            gameState.isTransitioning = false;
         }, 500); // Fade in duration
     }, 500); // Fade out duration
 }
 
 /**
- * Determine the number of changes to create for the current day
+ * Determine which changes should occur for the current day
  */
 function determineChangesForDay() {
-    // Early game, gradually introduce changes
-    if (gameState.day < 6) {
-        return gameState.day >= 4 ? 1 : 0;  // Start with day 4
+    // Create changes for the new day based on specific pattern
+    if (gameState.day === 2) {
+        // On day 2, add a set dressing piece
+        console.log("Day 2: Adding a set dressing piece");
+        if (window.setDressing) {
+            const change = window.setDressing.createNewSetDressingElement();
+            if (change) {
+                gameState.currentChange = change;
+                console.log("Created set dressing change:", change);
+            } else {
+                // Fallback if set dressing fails
+                console.log("Failed to create set dressing, falling back to commuter change");
+                gameState.currentChange = { changeType: 'commuter' };
+                commuters.createFirstChange();
+            }
+        }
+    } else if (gameState.day === 3) {
+        // On day 3, change a commuter
+        console.log("Day 3: Changing a commuter");
+        gameState.currentChange = { changeType: 'commuter' };
+        commuters.createRandomChange();
+    } else if (gameState.day > 3) {
+        // For later days, randomly choose between commuter or set dressing changes
+        createDailyChange();
     }
-    
-    // Determine chance of change based on awareness level
-    const awarenessLevel = gameState.awarenessLevel || 1;
-    
-    // As awareness increases, so does the chance of having a change
-    const changeProb = Math.min(0.9, 0.5 + (awarenessLevel * 0.05));
-    
-    // Randomly determine if there should be a change today
-    return Math.random() < changeProb ? 1 : 0;
+
+    // Enable clicking only if there's a change to find (if day >= 2)
+    gameState.canClick = gameState.day >= 2 && gameState.currentChange !== null;
+
+    // Hide train button on day 2+ until player finds the change or makes a mistake
+    if (gameState.day >= 2 && gameState.elements.trainButton) {
+        gameState.elements.trainButton.style.display = 'none';
+    }
 }
 
 /**

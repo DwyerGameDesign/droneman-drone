@@ -225,7 +225,13 @@ function handleCommuterClick(event) {
     // Check if clicking is allowed
     if (!gameState.canClick) {
         console.log("Clicking not allowed right now");
-        window.ui.showPopupMessage("everyday the same", event.clientX, event.clientY);
+        
+        // If we've found a change already but clicking isn't re-enabled yet (after level up)
+        if (gameState.currentChange && gameState.currentChange.found) {
+            window.ui.showPopupMessage("take the train to continue", event.clientX, event.clientY);
+        } else {
+            window.ui.showPopupMessage("everyday the same", event.clientX, event.clientY);
+        }
         return;
     }
 
