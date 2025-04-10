@@ -1183,17 +1183,32 @@ function handleCommuterClick(event) {
                 const fromVariation = gameState.currentChange.fromVariation;
                 const toVariation = gameState.currentChange.toVariation;
                 
-                // Extract base types from variations
-                const fromBase = fromVariation.split('_')[0];
-                const toBase = toVariation.split('_')[0];
+                console.log(`Looking for message with fromVariation: "${fromVariation}", toVariation: "${toVariation}"`);
+                
+                // Extract base types from variations (remove file extension)
+                const fromBase = fromVariation.split('.')[0];
+                const toBase = toVariation.split('.')[0];
+                
+                console.log(`Extracted base types - fromBase: "${fromBase}", toBase: "${toBase}"`);
                 
                 // Try both directions of lookup
                 if (CHANGE_MESSAGES.commuter[fromBase] && 
-                    CHANGE_MESSAGES.commuter[fromBase][toVariation]) {
-                    message = CHANGE_MESSAGES.commuter[fromBase][toVariation];
+                    CHANGE_MESSAGES.commuter[fromBase][toBase]) {
+                    message = CHANGE_MESSAGES.commuter[fromBase][toBase];
+                    console.log(`Found message using fromBase[toBase]: "${message}"`);
                 } else if (CHANGE_MESSAGES.commuter[toBase] && 
-                    CHANGE_MESSAGES.commuter[toBase][fromVariation]) {
-                    message = CHANGE_MESSAGES.commuter[toBase][fromVariation];
+                    CHANGE_MESSAGES.commuter[toBase][fromBase]) {
+                    message = CHANGE_MESSAGES.commuter[toBase][fromBase];
+                    console.log(`Found message using toBase[fromBase]: "${message}"`);
+                } else {
+                    console.log(`No message found in CHANGE_MESSAGES.commuter for these variations`);
+                    console.log(`CHANGE_MESSAGES.commuter keys: ${Object.keys(CHANGE_MESSAGES.commuter)}`);
+                    if (CHANGE_MESSAGES.commuter[fromBase]) {
+                        console.log(`CHANGE_MESSAGES.commuter[${fromBase}] keys: ${Object.keys(CHANGE_MESSAGES.commuter[fromBase])}`);
+                    }
+                    if (CHANGE_MESSAGES.commuter[toBase]) {
+                        console.log(`CHANGE_MESSAGES.commuter[${toBase}] keys: ${Object.keys(CHANGE_MESSAGES.commuter[toBase])}`);
+                    }
                 }
                 
                 // If no custom message is found, use a default
@@ -1242,7 +1257,7 @@ function handleCommuterClick(event) {
         // End the game with a summary after showing the highlight
         setTimeout(() => {
             showGameOverSummary("Your awareness wasn't strong enough to notice the changes.");
-        }, 4500); // Match the highlight animation duration
+        }, 1500); // Match the highlight animation duration
     }
 }
 

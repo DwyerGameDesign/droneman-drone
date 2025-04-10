@@ -297,17 +297,25 @@ function handleCommuterClick(event) {
                 const fromVariation = gameState.currentChange.fromVariation;
                 const toVariation = gameState.currentChange.toVariation;
                 
-                // Extract base types from variations
-                const fromBase = fromVariation.split('_')[0];
-                const toBase = toVariation.split('_')[0];
+                console.log(`Looking for message with fromVariation: "${fromVariation}", toVariation: "${toVariation}"`);
+                
+                // Extract base types from variations (remove file extension)
+                const fromBase = fromVariation.split('.')[0];
+                const toBase = toVariation.split('.')[0];
+                
+                console.log(`Extracted base types - fromBase: "${fromBase}", toBase: "${toBase}"`);
                 
                 // Try both directions of lookup
                 if (CHANGE_MESSAGES.commuter[fromBase] && 
-                    CHANGE_MESSAGES.commuter[fromBase][toVariation]) {
-                    message = CHANGE_MESSAGES.commuter[fromBase][toVariation];
+                    CHANGE_MESSAGES.commuter[fromBase][toBase]) {
+                    message = CHANGE_MESSAGES.commuter[fromBase][toBase];
+                    console.log(`Found message using fromBase[toBase]: "${message}"`);
                 } else if (CHANGE_MESSAGES.commuter[toBase] && 
-                    CHANGE_MESSAGES.commuter[toBase][fromVariation]) {
-                    message = CHANGE_MESSAGES.commuter[toBase][fromVariation];
+                    CHANGE_MESSAGES.commuter[toBase][fromBase]) {
+                    message = CHANGE_MESSAGES.commuter[toBase][fromBase];
+                    console.log(`Found message using toBase[fromBase]: "${message}"`);
+                } else {
+                    console.log(`No message found in CHANGE_MESSAGES.commuter for these variations`);
                 }
                 
                 // If no custom message is found, use a default
@@ -317,9 +325,28 @@ function handleCommuterClick(event) {
             } else if (gameState.currentChange.changeType === 'setDressing') {
                 const fromType = gameState.currentChange.fromType;
                 const toType = gameState.currentChange.toType;
-                if (CHANGE_MESSAGES.setDressing[fromType] && CHANGE_MESSAGES.setDressing[fromType][toType]) {
-                    message = CHANGE_MESSAGES.setDressing[fromType][toType];
+                
+                // Check if this is a new item being added
+                if (gameState.currentChange.changeAction === 'add' || gameState.currentChange.isNewlyAdded) {
+                    console.log(`Looking for new set dressing message for type: ${toType}`);
+                    if (CHANGE_MESSAGES.setDressing.new && CHANGE_MESSAGES.setDressing.new[toType]) {
+                        message = CHANGE_MESSAGES.setDressing.new[toType];
+                        console.log(`Found new set dressing message: "${message}"`);
+                    } else {
+                        console.log(`No message found for new set dressing type: ${toType}`);
+                    }
                 } else {
+                    // This is a change from one type to another
+                    console.log(`Looking for set dressing change message from ${fromType} to ${toType}`);
+                    if (CHANGE_MESSAGES.setDressing[fromType] && CHANGE_MESSAGES.setDressing[fromType][toType]) {
+                        message = CHANGE_MESSAGES.setDressing[fromType][toType];
+                        console.log(`Found set dressing change message: "${message}"`);
+                    } else {
+                        console.log(`No message found for set dressing change from ${fromType} to ${toType}`);
+                    }
+                }
+                
+                if (!message) {
                     message = "I noticed something change with the platform...";
                 }
             }
