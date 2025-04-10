@@ -291,7 +291,6 @@ window.core = {
     calculateAwarenessXP,
     calculateTrainXP,
     showRandomThoughtBubble,
-    showThoughtBubbleAtElement,
     updateAwarenessLevel,
     handleLevelUp,
     continueWithLevelUp,
@@ -996,60 +995,8 @@ function showRandomThoughtBubble(isPositive) {
     
     console.log(`Showing thought bubble: "${thought}"`);
     
-    // Create and position the thought bubble
-    showThoughtBubbleAtElement(randomCommuter.element, thought, isPositive);
-}
-
-/**
- * Display a thought bubble at a specific element
- * @param {HTMLElement} element - The element to attach the thought bubble to
- * @param {string} text - The thought text
- * @param {boolean} isPositive - Whether it's a positive or negative thought
- */
-function showThoughtBubbleAtElement(element, text, isPositive) {
-    if (!element) return;
-    
-    // Create a temporary thought bubble
-    const thoughtBubble = document.createElement('div');
-    thoughtBubble.className = isPositive ? 'thought-bubble temp-thought' : 'thought-bubble temp-thought negative';
-    thoughtBubble.textContent = text;
-    
-    // Position the bubble above the element
-    const rect = element.getBoundingClientRect();
-    const sceneRect = gameState.elements.sceneContainer.getBoundingClientRect();
-    
-    // Calculate position, keeping bubble inside the scene container
-    let leftPos = rect.left + rect.width/2 - sceneRect.left;
-    let bottomPos = sceneRect.bottom - rect.top + 10;
-    
-    // Create and style the bubble
-    thoughtBubble.style.position = 'absolute';
-    thoughtBubble.style.left = `${leftPos}px`;
-    thoughtBubble.style.bottom = `${bottomPos}px`;
-    thoughtBubble.style.transform = 'translateX(-50%)';
-    
-    // Add speech bubble tail
-    const tail = document.createElement('div');
-    tail.style.position = 'absolute';
-    tail.style.bottom = '-8px';
-    tail.style.left = '50%';
-    tail.style.transform = 'translateX(-50%)';
-    tail.style.width = '0';
-    tail.style.height = '0';
-    tail.style.borderLeft = '8px solid transparent';
-    tail.style.borderRight = '8px solid transparent';
-    tail.style.borderTop = isPositive ? '8px solid #d4d4c8' : '8px solid #e6a4a4';
-    thoughtBubble.appendChild(tail);
-    
-    // Add to scene
-    gameState.elements.sceneContainer.appendChild(thoughtBubble);
-    
-    // Remove after animation completes
-    setTimeout(() => {
-        if (thoughtBubble.parentNode) {
-            thoughtBubble.parentNode.removeChild(thoughtBubble);
-        }
-    }, 3000);
+    // Use the UI's showThoughtBubble function
+    window.ui.showThoughtBubble(randomCommuter.element, thought, isPositive);
 }
 
 /**

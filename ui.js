@@ -152,36 +152,55 @@ function showPopupMessage(text, x, y) {
 }
 
 /**
- * Show a thought bubble with text based on awareness level
+ * Show a thought bubble with text
+ * @param {HTMLElement} element - The element to attach the thought bubble to
+ * @param {string} text - The thought text
+ * @param {boolean} isPositive - Whether it's a positive or negative thought
  */
-function showThoughtBubble() {
-    // Get thoughts from config
-    // THOUGHTS is defined in config.js
+function showThoughtBubble(element, text, isPositive) {
+    if (!element) return;
     
-    // Determine which thought set to use based on awareness level
-    let thoughtSet = 'early';
+    // Create a temporary thought bubble
+    const thoughtBubble = document.createElement('div');
+    thoughtBubble.className = isPositive ? 'thought-bubble temp-thought' : 'thought-bubble temp-thought negative';
+    thoughtBubble.textContent = text;
     
-    if (gameState.awarenessLevel >= 8) {
-        thoughtSet = 'final';
-    } else if (gameState.awarenessLevel >= 5) {
-        thoughtSet = 'late';
-    } else if (gameState.awarenessLevel >= 3) {
-        thoughtSet = 'mid';
-    }
+    // Position the bubble above the element
+    const rect = element.getBoundingClientRect();
+    const sceneRect = gameState.elements.sceneContainer.getBoundingClientRect();
     
-    // Choose a random thought from the appropriate set
-    const thoughts = THOUGHTS[thoughtSet];
-    const randomIndex = Math.floor(Math.random() * thoughts.length);
-    const thought = thoughts[randomIndex];
+    // Calculate position, keeping bubble inside the scene container
+    let leftPos = rect.left + rect.width/2 - sceneRect.left;
+    let bottomPos = sceneRect.bottom - rect.top + 10;
     
-    // Display the thought
-    thoughtBubble.textContent = thought;
-    thoughtBubble.style.display = 'block';
+    // Create and style the bubble
+    thoughtBubble.style.position = 'absolute';
+    thoughtBubble.style.left = `${leftPos}px`;
+    thoughtBubble.style.bottom = `${bottomPos}px`;
+    thoughtBubble.style.transform = 'translateX(-50%)';
     
-    // Hide after a few seconds
+    // Add speech bubble tail
+    const tail = document.createElement('div');
+    tail.style.position = 'absolute';
+    tail.style.bottom = '-8px';
+    tail.style.left = '50%';
+    tail.style.transform = 'translateX(-50%)';
+    tail.style.width = '0';
+    tail.style.height = '0';
+    tail.style.borderLeft = '8px solid transparent';
+    tail.style.borderRight = '8px solid transparent';
+    tail.style.borderTop = isPositive ? '8px solid #d4d4c8' : '8px solid #e6a4a4';
+    thoughtBubble.appendChild(tail);
+    
+    // Add to scene
+    gameState.elements.sceneContainer.appendChild(thoughtBubble);
+    
+    // Remove after animation completes
     setTimeout(() => {
-        thoughtBubble.style.display = 'none';
-    }, 5000);
+        if (thoughtBubble.parentNode) {
+            thoughtBubble.parentNode.removeChild(thoughtBubble);
+        }
+    }, 3000);
 }
 
 function showSegmentConnectionNarrative(segmentNumber) {
