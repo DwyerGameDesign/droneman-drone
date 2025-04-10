@@ -963,6 +963,12 @@ function removeAwarenessXP(amount) {
 function showRandomThoughtBubble(isPositive) {
     // Only proceed if there are commuters
     if (!commuters.allCommuters || commuters.allCommuters.length === 0) return;
+
+    // If we've missed a change, don't show random negative thoughts
+    // The custom message will be shown by the click handler instead
+    if (!isPositive && gameState.currentChange && !gameState.currentChange.found) {
+        return;
+    }
     
     // Select a random commuter
     const randomIndex = Math.floor(Math.random() * commuters.allCommuters.length);
@@ -1242,11 +1248,18 @@ function handleCommuterClick(event) {
                     CHANGE_MESSAGES.commuter[toBase][fromVariation]) {
                     message = CHANGE_MESSAGES.commuter[toBase][fromVariation];
                 }
+                
+                // If no custom message is found, use a default
+                if (!message) {
+                    message = "I noticed something change with that commuter...";
+                }
             } else if (gameState.currentChange.changeType === 'setDressing') {
                 const fromType = gameState.currentChange.fromType;
                 const toType = gameState.currentChange.toType;
                 if (CHANGE_MESSAGES.setDressing[fromType] && CHANGE_MESSAGES.setDressing[fromType][toType]) {
                     message = CHANGE_MESSAGES.setDressing[fromType][toType];
+                } else {
+                    message = "I noticed something change with the platform...";
                 }
             }
         }
@@ -1257,8 +1270,13 @@ function handleCommuterClick(event) {
             window.ui.showThoughtBubble(commuter1.element, message, false);
             
             // Don't show random thought bubble since we're already showing a custom message
+        } else if (gameState.currentChange && !gameState.currentChange.found) {
+            // If we couldn't find commuter1 or a message, but there is a change, show a default message
+            if (commuter1 && commuter1.element) {
+                window.ui.showThoughtBubble(commuter1.element, "Something changed, but I can't quite place it...", false);
+            }
         } else {
-            // Show negative thought bubble from a random commuter only if no custom message
+            // Only show random negative thought if there's no change to find
             showRandomThoughtBubble(false);
         }
         
