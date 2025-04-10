@@ -398,14 +398,31 @@ function handleSetDressingClick(event) {
         // Increment changes found counter
         gameState.changesFound++;
 
-        // Get awareness gain from core calculation function
-        const awarenessGain = window.core.calculateAwarenessXP();
+        // Get awareness gain from central calculation function
+        const awarenessGain = calculateAwarenessXP();
+
+        // Calculate if this will cause a level up
+        const currentLevel = gameState.awarenessLevel;
+        const currentXP = gameState.awarenessXP;
+        const xpRequirements = AWARENESS_CONFIG.xpRequirements;
+        const willLevelUp = (currentXP + awarenessGain) >= xpRequirements[currentLevel];
 
         // Increase awareness
-        window.core.addAwarenessXP(awarenessGain);
+        addAwarenessXP(awarenessGain);
 
         // Show positive thought bubble from a random commuter
-        window.core.showRandomThoughtBubble(true);
+        showRandomThoughtBubble(true);
+
+        // Only show train button immediately if no level up occurred
+        if (!willLevelUp) {
+            console.log("Core.js: No level up, showing train button");
+            if (gameState.elements.trainButton) {
+                gameState.elements.trainButton.style.display = 'block';
+                console.log("Train button displayed");
+            } else {
+                console.error("Train button element not found in gameState.elements");
+            }
+        }
         
         // Update narrative text
         window.ui.updateNarrativeText();

@@ -273,6 +273,9 @@ function handleCommuterClick(event) {
             console.log("Core.js: No level up, showing train button");
             if (gameState.elements.trainButton) {
                 gameState.elements.trainButton.style.display = 'block';
+                console.log("Train button displayed");
+            } else {
+                console.error("Train button element not found in gameState.elements");
             }
         }
         
@@ -366,6 +369,11 @@ function createFirstChange() {
 
     // Enable clicking since this is day 4 and we have a change to find
     gameState.canClick = true;
+
+    // Initialize train button
+    if (gameState.elements.trainButton) {
+        gameState.elements.trainButton.style.display = 'none';
+    }
 }
 
 /**
