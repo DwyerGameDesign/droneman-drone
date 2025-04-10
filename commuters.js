@@ -291,10 +291,17 @@ function handleCommuterClick(event) {
                 const fromVariation = gameState.currentChange.fromVariation;
                 const toVariation = gameState.currentChange.toVariation;
                 
-                // Only try the direct lookup
-                if (CHANGE_MESSAGES.commuter[fromVariation] && 
-                    CHANGE_MESSAGES.commuter[fromVariation][toVariation]) {
-                    message = CHANGE_MESSAGES.commuter[fromVariation][toVariation];
+                // Extract base types from variations
+                const fromBase = fromVariation.split('_')[0];
+                const toBase = toVariation.split('_')[0];
+                
+                // Try both directions of lookup
+                if (CHANGE_MESSAGES.commuter[fromBase] && 
+                    CHANGE_MESSAGES.commuter[fromBase][toVariation]) {
+                    message = CHANGE_MESSAGES.commuter[fromBase][toVariation];
+                } else if (CHANGE_MESSAGES.commuter[toBase] && 
+                    CHANGE_MESSAGES.commuter[toBase][fromVariation]) {
+                    message = CHANGE_MESSAGES.commuter[toBase][fromVariation];
                 }
             } else if (gameState.currentChange.changeType === 'setDressing') {
                 const fromType = gameState.currentChange.fromType;
