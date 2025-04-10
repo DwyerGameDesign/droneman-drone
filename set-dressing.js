@@ -461,6 +461,11 @@ function handleSetDressingClick(event) {
         const commuter1 = window.commuters.allCommuters.find(c => c.type === 'commuter1');
         if (commuter1 && commuter1.element && message) {
             window.ui.showThoughtBubble(commuter1.element, message, false);
+            
+            // Don't show random thought bubble since we're already showing a custom message
+        } else {
+            // Show negative thought bubble from a random commuter only if no custom message
+            window.core.showRandomThoughtBubble(false);
         }
         
         // Highlight the actual change if it's a set dressing change
@@ -469,9 +474,6 @@ function handleSetDressingClick(event) {
             gameState.currentChange.changeType === 'setDressing') {
             window.setDressing.highlightMissedChange();
         }
-        
-        // Show negative thought bubble from a random commuter
-        window.core.showRandomThoughtBubble(false);
         
         // End the game with a summary after showing the highlight
         setTimeout(() => {

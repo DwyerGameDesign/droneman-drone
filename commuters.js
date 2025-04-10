@@ -316,6 +316,11 @@ function handleCommuterClick(event) {
         const commuter1 = allCommuters.find(c => c.type === 'commuter1');
         if (commuter1 && commuter1.element && message) {
             window.ui.showThoughtBubble(commuter1.element, message, false);
+            
+            // Don't show random thought bubble since we're already showing a custom message
+        } else {
+            // Show negative thought bubble from a random commuter only if no custom message
+            showRandomThoughtBubble(false);
         }
         
         // Highlight the actual change if it's a commuter change
@@ -329,9 +334,6 @@ function handleCommuterClick(event) {
             window.setDressing) {
             window.setDressing.highlightMissedChange();
         }
-        
-        // Show negative thought bubble from a random commuter
-        showRandomThoughtBubble(false);
         
         // End the game with a summary after showing the highlight
         setTimeout(() => {
