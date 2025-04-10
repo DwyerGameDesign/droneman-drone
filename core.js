@@ -406,7 +406,7 @@ async function init() {
             }
             
             // Set up mobile support
-            setupMobileSupport();
+    setupMobileSupport();
             
             // Create debug button for position testing
             window.ui.createDebugButton();
@@ -645,7 +645,7 @@ function continueWithLevelUp(newLevel) {
                 // Add and animate the new commuter
                 setTimeout(() => {
                     const newCommuter = commuters.addCommuter();
-                    if (newCommuter) {
+        if (newCommuter) {
                         console.log(`Added commuter ${newCommuter.type} for level ${newLevel}`);
                         // Add the new-commuter class for the animation
                         newCommuter.element.classList.add('new-commuter');

@@ -76,9 +76,9 @@ function showSegmentNarrative(segmentNumber) {
     // Display the narrative
     gameState.typewriter.stop();
     gameState.elements.narrativeText.textContent = '';
-    setTimeout(() => {
+        setTimeout(() => {
         gameState.typewriter.type(text);
-    }, 100);
+        }, 100);
 }
 
 /**

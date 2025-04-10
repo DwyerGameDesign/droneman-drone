@@ -570,7 +570,7 @@ body.mobile .mobile-controls {
     }
     
     /* Even smaller commuters for small screens */
-    .commuter-sprite {
+.commuter-sprite {
         transform: translateX(-50%) scale(0.8);
     }
 }

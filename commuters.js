@@ -312,8 +312,11 @@ function handleCommuterClick(event) {
             }
         }
         
-        // Show the custom message
-        window.ui.showMessage(message, 1500);
+        // Show the custom message in a thought bubble from commuter1
+        const commuter1 = allCommuters.find(c => c.type === 'commuter1');
+        if (commuter1 && commuter1.element) {
+            window.ui.showThoughtBubble(commuter1.element, message, false);
+        }
         
         // Highlight the actual change if it's a commuter change
         if (gameState.currentChange && 
