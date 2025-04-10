@@ -285,7 +285,7 @@ function handleCommuterClick(event) {
         console.log("Wrong commuter clicked or no change to find");
         
         // Get the custom message for this change
-        let message = "That's not what changed...";
+        let message = null;
         if (gameState.currentChange && !gameState.currentChange.found) {
             if (gameState.currentChange.changeType === 'commuter') {
                 const fromVariation = gameState.currentChange.fromVariation;
@@ -314,7 +314,7 @@ function handleCommuterClick(event) {
         
         // Show the custom message in a thought bubble from commuter1
         const commuter1 = allCommuters.find(c => c.type === 'commuter1');
-        if (commuter1 && commuter1.element) {
+        if (commuter1 && commuter1.element && message) {
             window.ui.showThoughtBubble(commuter1.element, message, false);
         }
         

@@ -430,49 +430,41 @@ function handleSetDressingClick(event) {
         console.log("Wrong set dressing element clicked or no change to find");
         
         // Get the custom message for this change
-        let message = "That's not what changed...";
+        let message = null;
         if (gameState.currentChange && !gameState.currentChange.found) {
             if (gameState.currentChange.changeType === 'commuter') {
-                const fromType = gameState.currentChange.fromVariation.split('_')[0];
-                const toType = gameState.currentChange.toVariation;
-                if (CHANGE_MESSAGES.commuter[fromType] && CHANGE_MESSAGES.commuter[fromType][toType]) {
-                    message = CHANGE_MESSAGES.commuter[fromType][toType];
+                const fromVariation = gameState.currentChange.fromVariation;
+                const toVariation = gameState.currentChange.toVariation;
+                
+                // Extract base types from variations
+                const fromBase = fromVariation.split('_')[0];
+                const toBase = toVariation.split('_')[0];
+                
+                // Try both directions of lookup
+                if (CHANGE_MESSAGES.commuter[fromBase] && 
+                    CHANGE_MESSAGES.commuter[fromBase][toVariation]) {
+                    message = CHANGE_MESSAGES.commuter[fromBase][toVariation];
+                } else if (CHANGE_MESSAGES.commuter[toBase] && 
+                    CHANGE_MESSAGES.commuter[toBase][fromVariation]) {
+                    message = CHANGE_MESSAGES.commuter[toBase][fromVariation];
                 }
             } else if (gameState.currentChange.changeType === 'setDressing') {
-                // Check if this is a new item being added
-                if (gameState.currentChange.isNewlyAdded) {
-                    const toType = gameState.currentChange.toType;
-                    console.log(`Looking for new set dressing message for type: ${toType}`);
-                    if (CHANGE_MESSAGES.setDressing.new && CHANGE_MESSAGES.setDressing.new[toType]) {
-                        message = CHANGE_MESSAGES.setDressing.new[toType];
-                        console.log(`Found message: ${message}`);
-                    } else {
-                        console.log(`No message found for new set dressing type: ${toType}`);
-                    }
-                } else {
-                    // This is a change from one type to another
-                    const fromType = gameState.currentChange.fromType;
-                    const toType = gameState.currentChange.toType;
-                    console.log(`Looking for set dressing change message from ${fromType} to ${toType}`);
-                    if (CHANGE_MESSAGES.setDressing[fromType] && CHANGE_MESSAGES.setDressing[fromType][toType]) {
-                        message = CHANGE_MESSAGES.setDressing[fromType][toType];
-                        console.log(`Found message: ${message}`);
-                    } else {
-                        console.log(`No message found for set dressing change from ${fromType} to ${toType}`);
-                    }
+                const fromType = gameState.currentChange.fromType;
+                const toType = gameState.currentChange.toType;
+                if (CHANGE_MESSAGES.setDressing[fromType] && CHANGE_MESSAGES.setDressing[fromType][toType]) {
+                    message = CHANGE_MESSAGES.setDressing[fromType][toType];
                 }
             }
         }
         
-        // Show the custom message
-        window.ui.showMessage(message, 1500);
+        // Show the custom message in a thought bubble from commuter1
+        const commuter1 = window.commuters.allCommuters.find(c => c.type === 'commuter1');
+        if (commuter1 && commuter1.element && message) {
+            window.ui.showThoughtBubble(commuter1.element, message, false);
+        }
         
-        // Highlight the actual change if it's a commuter change
+        // Highlight the actual change if it's a set dressing change
         if (gameState.currentChange && 
-            !gameState.currentChange.found && 
-            gameState.currentChange.changeType !== 'setDressing') {
-            window.commuters.highlightMissedChange();
-        } else if (gameState.currentChange && 
             !gameState.currentChange.found && 
             gameState.currentChange.changeType === 'setDressing') {
             window.setDressing.highlightMissedChange();
