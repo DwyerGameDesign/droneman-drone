@@ -4,7 +4,7 @@
  */
 
 // The URL to open when the album sprite is clicked
-const ALBUM_URL = "https://www.google.com";
+const ALBUM_URL = "https://www.alteredrootband.com/";
 
 // Position for the album sprite [left%, bottom%]
 const ALBUM_POSITION = [81.3, 45];
