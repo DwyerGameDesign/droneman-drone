@@ -281,9 +281,6 @@ function handleCommuterClick(event) {
                 console.error("Train button element not found in gameState.elements");
             }
         }
-        
-        // Update narrative text
-        window.ui.updateNarrativeText();
     } else {
         console.log("Wrong commuter clicked or no change to find");
         

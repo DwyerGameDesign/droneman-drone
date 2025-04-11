@@ -426,9 +426,6 @@ function handleSetDressingClick(event) {
                 console.error("Train button element not found in gameState.elements");
             }
         }
-        
-        // Update narrative text
-        window.ui.updateNarrativeText();
     } else {
         console.log("Wrong set dressing element clicked or no change to find");
         
