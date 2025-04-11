@@ -260,7 +260,7 @@ function addSetDressing() {
             width = 36;
             height = 36;
     }
-    
+
     // Calculate actual position
     const containerWidth = gameState.elements.sceneContainer.offsetWidth;
     const containerHeight = gameState.elements.sceneContainer.offsetHeight;
@@ -367,7 +367,7 @@ function handleSetDressingClick(event) {
         if (gameState.currentChange && gameState.currentChange.found) {
             window.ui.showPopupMessage("take the train to continue", event.clientX, event.clientY);
         } else {
-            window.ui.showPopupMessage("everyday the same", event.clientX, event.clientY);
+        window.ui.showPopupMessage("everyday the same", event.clientX, event.clientY);
         }
         return;
     }
@@ -378,7 +378,7 @@ function handleSetDressingClick(event) {
         gameState.currentChange.changeType === 'setDressing' && 
         gameState.currentChange.elementId === setDressingId) {
         console.log("Correct set dressing element clicked!");
-        
+
         // Mark as found
         gameState.currentChange.found = true;
 
@@ -580,8 +580,8 @@ function createNewSetDressingElement() {
         return null;
     }
     
-    // Add a new set dressing element
-    const newElement = addSetDressing();
+        // Add a new set dressing element
+        const newElement = addSetDressing();
     if (!newElement) {
         console.warn("Failed to add new set dressing element");
         return null;
@@ -602,17 +602,17 @@ function createNewSetDressingElement() {
     // Remove any filter effects
     newElement.element.style.filter = 'none';
 
-    // Create change object
-    const change = {
-        changeType: 'setDressing',
-        elementId: newElement.id,
-        changeAction: 'add',
+        // Create change object
+        const change = {
+            changeType: 'setDressing',
+            elementId: newElement.id,
+            changeAction: 'add',
         toType: newElement.type,
-        found: false
-    };
+            found: false
+        };
 
     console.log("Successfully created new set dressing element:", newElement.type);
-    return change;
+        return change;
 }
 
 /**

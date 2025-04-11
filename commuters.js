@@ -241,7 +241,7 @@ function handleCommuterClick(event) {
         (gameState.currentChange.changeType !== 'setDressing') && 
         gameState.currentChange.commuterId === commuterId) {
         console.log("Correct commuter clicked!");
-        
+
         // Mark as found
         gameState.currentChange.found = true;
 
@@ -283,7 +283,7 @@ function handleCommuterClick(event) {
         }
     } else {
         console.log("Wrong commuter clicked or no change to find");
-        
+
         // Get the custom message for this change
         let message = null;
         if (gameState.currentChange && !gameState.currentChange.found) {
@@ -589,7 +589,7 @@ function highlightMissedChange() {
         
         // Add missed highlight class - CSS handles positioning and animation
         commuter.element.classList.add('highlight-missed');
-        
+
         // Remove after animation completes
         setTimeout(() => {
             commuter.element.classList.remove('highlight-missed');

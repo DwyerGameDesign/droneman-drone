@@ -806,7 +806,7 @@ function proceedToNextDay() {
                     // and had time to be read (if day is 2 or later)
                     if (gameState.day >= 2) {
                         // Increased delay to allow player to read the narrative text first
-                        setTimeout(() => {
+                setTimeout(() => {
                             showRandomThoughtBubble(true);
                         }, 1500); // 3 seconds delay after narrative text
                     }
