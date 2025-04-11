@@ -7,7 +7,7 @@
 const ALBUM_URL = "https://www.google.com";
 
 // Position for the album sprite [left%, bottom%]
-const ALBUM_POSITION = [80, 45];
+const ALBUM_POSITION = [81, 45];
 
 // Dimensions of the album sprite
 const ALBUM_WIDTH = 30;

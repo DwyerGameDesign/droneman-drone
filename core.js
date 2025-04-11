@@ -808,7 +808,7 @@ function proceedToNextDay() {
                         // Increased delay to allow player to read the narrative text first
                         setTimeout(() => {
                             showRandomThoughtBubble(true);
-                        }, 3000); // 3 seconds delay after narrative text
+                        }, 1000); // 3 seconds delay after narrative text
                     }
                 }, 100);
             }
