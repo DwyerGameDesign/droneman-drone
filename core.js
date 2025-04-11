@@ -806,6 +806,14 @@ function proceedToNextDay() {
 
             // Enable interactions after fade-in
             gameState.isTransitioning = false;
+            
+            // Show a random thought bubble after the scene loads (if day is 2 or later)
+            if (gameState.day >= 2) {
+                // Use a positive thought bubble by default
+                setTimeout(() => {
+                    showRandomThoughtBubble(true);
+                }, 1000);
+            }
         }, 500); // Fade in duration
     }, 500); // Fade out duration
 }

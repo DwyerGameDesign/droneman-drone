@@ -416,9 +416,6 @@ function handleSetDressingClick(event) {
         // Increase awareness
         addAwarenessXP(awarenessGain);
 
-        // Show positive thought bubble from a random commuter
-        showRandomThoughtBubble(true);
-
         // Only show train button immediately if no level up occurred
         if (!willLevelUp) {
             console.log("Core.js: No level up, showing train button");

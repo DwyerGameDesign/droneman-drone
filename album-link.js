@@ -7,11 +7,11 @@
 const ALBUM_URL = "https://www.google.com";
 
 // Position for the album sprite [left%, bottom%]
-const ALBUM_POSITION = [96, 35];
+const ALBUM_POSITION = [65, 45];
 
 // Dimensions of the album sprite
-const ALBUM_WIDTH = 150;
-const ALBUM_HEIGHT = 174;
+const ALBUM_WIDTH = 30;
+const ALBUM_HEIGHT = 35;
 
 // Reference to the album element
 let albumElement = null;
