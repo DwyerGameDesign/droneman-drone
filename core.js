@@ -795,25 +795,26 @@ function proceedToNextDay() {
         setTimeout(() => {
             gameState.elements.sceneContainer.classList.remove('fading');
 
-            // Update narrative text with typewriter effect
+            // Update narrative text with typewriter effect first
             if (gameState.typewriter) {
                 gameState.typewriter.stop();
                 gameState.elements.narrativeText.textContent = '';
                 setTimeout(() => {
                     window.ui.updateNarrativeText();
+                    
+                    // Show a random thought bubble after the narrative text has been displayed
+                    // and had time to be read (if day is 2 or later)
+                    if (gameState.day >= 2) {
+                        // Increased delay to allow player to read the narrative text first
+                        setTimeout(() => {
+                            showRandomThoughtBubble(true);
+                        }, 3000); // 3 seconds delay after narrative text
+                    }
                 }, 100);
             }
 
             // Enable interactions after fade-in
             gameState.isTransitioning = false;
-            
-            // Show a random thought bubble after the scene loads (if day is 2 or later)
-            if (gameState.day >= 2) {
-                // Use a positive thought bubble by default
-                setTimeout(() => {
-                    showRandomThoughtBubble(true);
-                }, 1000);
-            }
         }, 500); // Fade in duration
     }, 500); // Fade out duration
 }
