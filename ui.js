@@ -98,13 +98,28 @@ function updateTypewriterText(text) {
 
 /**
  * Show a message for a specified duration
+ * @param {string} text - The message text to display
+ * @param {number} duration - How long to display the message in milliseconds
+ * @param {boolean} positionHigher - Whether to position the message higher on the screen
  */
-function showMessage(text, duration = 2000) {
+function showMessage(text, duration = 2000, positionHigher = false) {
     message.textContent = text;
     message.style.visibility = 'visible';
+    
+    // Position the message higher if requested
+    if (positionHigher) {
+        message.style.top = '20%'; // Higher position
+        message.style.fontSize = '1.2em'; // Slightly larger font
+    } else {
+        message.style.top = '30%'; // Default position
+        message.style.fontSize = '1em'; // Default font size
+    }
 
     setTimeout(() => {
         message.style.visibility = 'hidden';
+        // Reset position and font size after hiding
+        message.style.top = '30%';
+        message.style.fontSize = '1em';
     }, duration);
 }
 

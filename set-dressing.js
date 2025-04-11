@@ -538,17 +538,12 @@ function handleSetDressingClick(event) {
             }
         }
         
-        // Show the custom message in a thought bubble from commuter1
-        const commuter1 = window.commuters.allCommuters.find(c => c.type === 'commuter1');
-        if (commuter1 && commuter1.element && message) {
-            window.ui.showThoughtBubble(commuter1.element, message, false);
-            
-            // Don't show random thought bubble since we're already showing a custom message
+        // Show the custom message using the UI message system instead of thought bubble
+        if (message) {
+            window.ui.showMessage(message, 3000, true); // Show message higher on the screen
         } else if (gameState.currentChange && !gameState.currentChange.found) {
-            // If we couldn't find commuter1 or a message, but there is a change, show a default message
-            if (commuter1 && commuter1.element) {
-                window.ui.showThoughtBubble(commuter1.element, "Something changed, but I can't quite place it...", false);
-            }
+            // If we couldn't find a message, but there is a change, show a default message
+            window.ui.showMessage("Something changed, but I can't quite place it...", 3000, true);
         } else {
             // Only show random negative thought if there's no change to find
             window.core.showRandomThoughtBubble(false);
@@ -564,7 +559,7 @@ function handleSetDressingClick(event) {
         // End the game with a summary after showing the highlight
         setTimeout(() => {
             window.core.showGameOverSummary("Your awareness wasn't strong enough to notice the changes.");
-        }, 4500); // Match the highlight animation duration
+        }, 1500); // Match the highlight animation duration
     }
 }
 
@@ -618,6 +613,7 @@ function createNewSetDressingElement() {
         changeType: 'setDressing',
         elementId: newElement.id,
         changeAction: 'add',
+        toType: newElement.type,
         found: false
     };
 

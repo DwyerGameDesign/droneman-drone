@@ -194,17 +194,22 @@ h1 {
 /* Message and Thought Bubble */
 .message {
     position: absolute;
-    top: 50%;
+    top: 30%; /* Default position, can be changed by JS */
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(20, 20, 20, 0.8);
+    background-color: rgba(20, 20, 20, 0.9);
     color: #d4d4c8;
     padding: 12px 20px;
     visibility: hidden;
-    z-index: 100;
+    z-index: 1000; /* Higher z-index to ensure visibility */
     font-family: 'Courier New', monospace;
     border-radius: 5px;
     font-size: 18px;
+    max-width: 80%;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border: 1px solid #4e4eb2; /* Subtle border for better visibility */
+    transition: top 0.3s ease; /* Smooth transition for position changes */
 }
 
 .thought-bubble {

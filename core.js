@@ -628,9 +628,6 @@ function continueWithLevelUp(newLevel) {
     // Disable clicking until the player takes the train
     gameState.canClick = false;
     
-    // Show a message to inform the player that they need to take the train
-    window.ui.showMessage("Take the train to look for the next change", 3000);
-    
     // Play the level up effect
     if (window.shaderEffects && window.shaderEffects.playEffect) {
         // Start the shader effect
@@ -649,7 +646,7 @@ function continueWithLevelUp(newLevel) {
                 // Add and animate the new commuter
                 setTimeout(() => {
                     const newCommuter = commuters.addCommuter();
-                    if (newCommuter) {
+        if (newCommuter) {
                         console.log(`Added commuter ${newCommuter.type} for level ${newLevel}`);
                         // Add the new-commuter class for the animation
                         newCommuter.element.classList.add('new-commuter');
@@ -788,11 +785,11 @@ function proceedToNextDay() {
         
         // Determine if there should be a change today
         determineChangesForDay();
-        
+
         // Fade back in
         setTimeout(() => {
             gameState.elements.sceneContainer.classList.remove('fading');
-            
+
             // Update narrative text with typewriter effect
             if (gameState.typewriter) {
                 gameState.typewriter.stop();
