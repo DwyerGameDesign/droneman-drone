@@ -409,6 +409,11 @@ async function init() {
             // Create debug button for position testing
             window.ui.createDebugButton();
             
+            // Initialize album link
+            if (window.albumLink && window.albumLink.initAlbumLink) {
+                window.albumLink.initAlbumLink();
+            }
+            
             // All systems initialized, now reveal the game
             // Small delay to ensure everything is ready
             setTimeout(revealGame, 500);
@@ -1064,6 +1069,13 @@ function setupMobileSupport() {
 
         enhanceTouchTargets();
     }
+    
+    // Add window resize listener to update album position
+    window.addEventListener('resize', () => {
+        if (window.albumLink && window.albumLink.updateAlbumPosition) {
+            window.albumLink.updateAlbumPosition();
+        }
+    });
 }
 
 /**
