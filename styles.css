@@ -76,7 +76,7 @@ h1 {
     border-radius: 4px;
     margin: 5px 0 15px 0;
     min-height: 50px;
-    height: 70px; /* Fixed height to prevent resizing */
+    height: 50px; /* Fixed height to prevent resizing */
     text-align: left;
     width: 800px; /* Fixed width */
     box-sizing: border-box;
