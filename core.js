@@ -589,12 +589,6 @@ function handleLevelUp(newLevel, previousLevel) {
         gameState.elements.trainButton.style.display = 'none';
     }
     
-    // Show level up effect
-    const meterElement = document.querySelector('.awareness-meter');
-    if (meterElement && window.xpEffects) {
-        window.xpEffects.showLevelUp(meterElement, newLevel);
-    }
-
     // Create level up popup
     const levelUpPopup = document.createElement('div');
     levelUpPopup.className = 'level-up-popup';

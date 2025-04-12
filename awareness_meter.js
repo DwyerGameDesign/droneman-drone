@@ -166,26 +166,35 @@ class AwarenessMeter {
         
         // Update display with animation sequence
         if (leveledUp) {
-            // First, fill the bar to 100%
+            // 1. First, fill the bar to 100%
             this.progressElement.style.transition = 'width 0.8s ease-in-out';
             this.progressElement.style.width = '100%';
             
-            // After bar fills, update level and reset bar
+            // 2. After bar fills, show level up text, then update level display
             setTimeout(() => {
-                // Update level text
-                this.levelDisplay.textContent = `Level ${this.currentLevel}`;
-                
-                // Reset bar to new level's progress
-                const progressPercent = this.xpToNextLevel > 0 ? (this.currentXP / this.xpToNextLevel) * 100 : 100;
-                const cappedProgress = Math.min(Math.max(0, progressPercent), 100);
-                this.progressElement.style.width = `${cappedProgress}%`;
-                
-                // If level increased and callback exists, call it after a delay
-                if (this.options.onLevelUp) {
-                    setTimeout(() => {
-                        this.options.onLevelUp(this.currentLevel, previousLevel);
-                    }, 2000); // 2 second delay
+                // Show level up effect with floating text
+                const meterElement = document.querySelector('.awareness-meter');
+                if (meterElement && window.xpEffects) {
+                    window.xpEffects.showLevelUp(meterElement, this.currentLevel);
                 }
+                
+                // 3. Update level text and reset bar after a short delay
+                setTimeout(() => {
+                    // Update level text
+                    this.levelDisplay.textContent = `Level ${this.currentLevel}`;
+                    
+                    // Reset bar to new level's progress
+                    const progressPercent = this.xpToNextLevel > 0 ? (this.currentXP / this.xpToNextLevel) * 100 : 100;
+                    const cappedProgress = Math.min(Math.max(0, progressPercent), 100);
+                    this.progressElement.style.width = `${cappedProgress}%`;
+                    
+                    // 4 & 5. Wait and then show level-up popup
+                    if (this.options.onLevelUp) {
+                        setTimeout(() => {
+                            this.options.onLevelUp(this.currentLevel, previousLevel);
+                        }, 2000); // 2 second delay before popup
+                    }
+                }, 1000); // Wait 1s after level up text appears
             }, 800); // Wait for bar fill animation to complete
         } else {
             // Normal progress update
