@@ -182,31 +182,15 @@ const CHANGE_MESSAGES = {
         // Messages for when a commuter's appearance changes
         'commuter1': {
             'commuter1_a': "Yesterday, he had a briefcase...",
-            'commuter1_b': "Yesterday, his tie was red...",
-            'commuter1_c': "Yesterday, he wore glasses..."
         },
         'commuter1_a': {
             'commuter1': "Yesterday, he did not have a briefcase..."
         },
-        'commuter1_b': {
-            'commuter1': "Yesterday, his tie was not red..."
-        },
-        'commuter1_c': {
-            'commuter1': "Yesterday, he did not wear glasses..."
-        },
         'commuter2': {
-            'commuter2_a': "Yesterday, she had that hairstyle...",
-            'commuter2_b': "Yesterday, her dress was blue...",
-            'commuter2_c': "Yesterday, she carried an umbrella..."
+            'commuter2_a': "Yesterday, she had a briefcase...",
         },
         'commuter2_a': {
-            'commuter2': "Yesterday, she did not have that hairstyle..."
-        },
-        'commuter2_b': {
-            'commuter2': "Yesterday, her dress was not blue..."
-        },
-        'commuter2_c': {
-            'commuter2': "Yesterday, she did not carry an umbrella..."
+            'commuter2': "Yesterday, she did not have that briefcase..."
         },
         'commuter3': {
             'commuter3_a': "Yesterday, he had a shoulder bag...",

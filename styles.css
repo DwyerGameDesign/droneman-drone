@@ -835,14 +835,14 @@ body.mobile .mobile-controls {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -60%); /* Move it slightly higher */
     background-color: rgba(0, 0, 0, 0.85);
     color: #d4d4c8;
-    padding: 20px;
+    padding: 30px;
     text-align: center;
     z-index: 1500;
     border-radius: 5px;
-    box-shadow: 0 0 15px rgba(78, 78, 178, 0.7);
+    box-shadow: 0 0 20px rgba(78, 78, 178, 0.8);
     font-family: 'Courier New', monospace;
     max-width: 80%;
     width: 400px;
