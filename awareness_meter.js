@@ -170,8 +170,13 @@ class AwarenessMeter {
             this.levelUpData = {
                 previousLevel,
                 newLevel: this.currentLevel,
-                excessXP: this.currentXP
+                excessXP: this.currentXP,
+                displayLevel: previousLevel // Store the previous level for display
             };
+            
+            // Set currentLevel back to previous for display purposes
+            // It will be updated after they click continue
+            this.displayLevel = previousLevel;
             
             // 1. First, fill the bar to 100%
             this.progressElement.style.transition = 'width 0.8s ease-in-out';
@@ -179,9 +184,6 @@ class AwarenessMeter {
             
             // 2. After bar fills, show level up text only
             setTimeout(() => {
-                // Update level text immediately
-                this.levelDisplay.textContent = `Level ${this.currentLevel}`;
-                
                 // Show level up effect with floating text
                 const meterElement = document.querySelector('.awareness-meter');
                 if (meterElement && window.xpEffects) {
@@ -192,7 +194,7 @@ class AwarenessMeter {
                 if (this.options.onLevelUp) {
                     setTimeout(() => {
                         this.options.onLevelUp(this.currentLevel, previousLevel);
-                    }, 2000); // 2 second delay before popup
+                    }, 1000); // 1 second delay before popup
                 }
             }, 800); // Wait for bar fill animation to complete
         } else {
@@ -209,6 +211,9 @@ class AwarenessMeter {
      */
     resetProgressAfterLevelUp() {
         if (!this.levelUpData) return;
+        
+        // Now update the displayed level text
+        this.levelDisplay.textContent = `Level ${this.currentLevel}`;
         
         // Calculate progress percentage for new level
         const progressPercent = this.xpToNextLevel > 0 ? (this.currentXP / this.xpToNextLevel) * 100 : 100;
