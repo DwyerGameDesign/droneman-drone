@@ -104,33 +104,37 @@ const DAY_NARRATIVES = {
 const LEVEL_UP_NARRATIVES = {
     // Early stage (levels 1-2)
     early: [
-        "Are there more people than just me...",
-        "I can see another person...",
-        "Is that someone else? A connection?",
-        "Wait... were they always here?",
-        "Is that another commuter...",
-        "I'm starting to recognize more people like me...",
-        "I’m not the only one here.",
-        "Someone’s here. Someone real.",
-        "I’m not alone. I’m not alone."
+        "A new person is seen. Were they always there?",
+        "Another commuter enters the view.",
+        "A new face in the fog.",
+        "Someone is noticed. The veil thins.",
+        "They are no longer alone. Not entirely.",
+        "A figure becomes distinct.",
+        "A Connection begins...",
+        "Another shape gains meaning.",
+        "The pattern breaks. A person is noticed.",
+        "A stranger appears, yet feels familiar.",
+        "A new soul emerges...",
+        "Sight expands. Others emerge.",
+        "One sees another. A quiet beginning."
     ],
     // Mid stage (levels 3-4)
     mid: [
-        "I'm starting to recognize faces in the crowd...",
+        "They start to recognize faces in the crowd...",
         "The commuters are becoming more distinct...",
-        "I can see more details in each person now...",
-        "The world is becoming more vibrant...",
-        "The people around me are taking shape, becoming individuals...",
-        "The fog is lifting from my perception..."
+        "They can see more details in each other...",
+        "The world is becoming more than a blur...",
+        "The people around are taking shape, becoming individuals...",
+        "The fog is lifting from perception..."
     ],
     // Late stage (levels 5-7)
     late: [
-        "I'm seeing connections between people...",
-        "The veil is lifting, I can see clearly now...",
+        "There are connections between people...",
+        "The veil is lifting, We can see clearly now...",
         "Everything is coming into focus...",
         "The patterns are revealing themselves...",
-        "My awareness stretches beyond the platform now...",
-        "The boundaries between us all are thinning..."
+        "Awareness stretches beyond the platform now...",
+        "The boundaries between are thinning..."
     ],
     // Final stage (levels 8-10)
     final: [
