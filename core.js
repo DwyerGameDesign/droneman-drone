@@ -595,6 +595,31 @@ function handleLevelUp(newLevel, previousLevel) {
         window.xpEffects.showLevelUp(meterElement, newLevel);
     }
 
+    // Create level up popup
+    const levelUpPopup = document.createElement('div');
+    levelUpPopup.className = 'level-up-popup';
+    levelUpPopup.innerHTML = `
+        <h2>LEVEL UP</h2>
+        <p>Your awareness is growing stronger.</p>
+        <p>Awareness Level: <span class="level-number">${newLevel}</span></p>
+        <button id="continue-level-up">Continue</button>
+    `;
+    
+    // Add popup to body
+    document.body.appendChild(levelUpPopup);
+    
+    // Add event listener to continue button
+    const continueButton = document.getElementById('continue-level-up');
+    if (continueButton) {
+        continueButton.addEventListener('click', () => {
+            // Remove the popup
+            document.body.removeChild(levelUpPopup);
+            
+            // Continue with the level up process
+            continueWithLevelUp(newLevel);
+        });
+    }
+    
     // Check for game completion (if maxLevel reached)
     if (newLevel >= AWARENESS_CONFIG.maxLevel) {
         gameComplete();
