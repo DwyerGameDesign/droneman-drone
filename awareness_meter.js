@@ -185,7 +185,7 @@ class AwarenessMeter {
                 if (this.options.onLevelUp) {
                     this.options.onLevelUp(this.currentLevel, previousLevel);
                 }
-            }, 800); // Wait for bar fill animation to complete
+            }, 1600); // Wait for bar fill animation to complete
         } else {
             // Normal progress update
             this.updateDisplay();
