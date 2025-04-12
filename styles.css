@@ -1082,11 +1082,6 @@ body.mobile .mobile-controls {
     cursor: pointer;
     transition: transform 0.2s ease, filter 0.3s ease;
     box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.2);
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    background-size: 100% 100% !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
 }
 
 .album-sprite:hover {
