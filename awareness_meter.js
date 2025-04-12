@@ -170,22 +170,30 @@ class AwarenessMeter {
             this.progressElement.style.transition = 'width 0.8s ease-in-out';
             this.progressElement.style.width = '100%';
             
-            // After bar fills, update level and reset bar
+            // After bar fills, show level up text
             setTimeout(() => {
-                // Update level text
-                this.levelDisplay.textContent = `Level ${this.currentLevel}`;
-                
-                // Reset bar to new level's progress
-                const progressPercent = this.xpToNextLevel > 0 ? (this.currentXP / this.xpToNextLevel) * 100 : 100;
-                const cappedProgress = Math.min(Math.max(0, progressPercent), 100);
-                this.progressElement.style.width = `${cappedProgress}%`;
-                
-                // If level increased and callback exists, call it after a delay
-                if (this.options.onLevelUp) {
-                    setTimeout(() => {
-                        this.options.onLevelUp(this.currentLevel, previousLevel);
-                    }, 2000); // 2 second delay
+                // Show level up effect
+                if (window.xpEffects && window.xpEffects.showLevelUp) {
+                    window.xpEffects.showLevelUp(this.meterElement, this.currentLevel);
                 }
+                
+                // After level up text appears, update level and reset bar
+                setTimeout(() => {
+                    // Update level text
+                    this.levelDisplay.textContent = `Level ${this.currentLevel}`;
+                    
+                    // Reset bar to new level's progress
+                    const progressPercent = this.xpToNextLevel > 0 ? (this.currentXP / this.xpToNextLevel) * 100 : 100;
+                    const cappedProgress = Math.min(Math.max(0, progressPercent), 100);
+                    this.progressElement.style.width = `${cappedProgress}%`;
+                    
+                    // If level increased and callback exists, call it after a delay
+                    if (this.options.onLevelUp) {
+                        setTimeout(() => {
+                            this.options.onLevelUp(this.currentLevel, previousLevel);
+                        }, 2000); // 2 second delay
+                    }
+                }, 1000); // Wait for level up text to start floating
             }, 800); // Wait for bar fill animation to complete
         } else {
             // Normal progress update
