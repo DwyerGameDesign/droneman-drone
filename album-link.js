@@ -50,7 +50,7 @@ function addAlbumToScene() {
     albumElement.style.width = `${ALBUM_WIDTH}px`;
     albumElement.style.height = `${ALBUM_HEIGHT}px`;
     albumElement.style.transform = 'translateX(-50%)';
-    albumElement.style.backgroundImage = 'url(assets/sprites/album.png)';
+    albumElement.style.backgroundImage = 'url(assets/sprites/band_logo.png)';
     albumElement.style.backgroundSize = 'contain';
     albumElement.style.backgroundRepeat = 'no-repeat';
     albumElement.style.backgroundPosition = 'bottom center';

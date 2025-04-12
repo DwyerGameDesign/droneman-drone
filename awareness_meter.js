@@ -192,10 +192,10 @@ class AwarenessMeter {
                     if (this.options.onLevelUp) {
                         setTimeout(() => {
                             this.options.onLevelUp(this.currentLevel, previousLevel);
-                        }, 2000); // 2 second delay before popup
+                        }, 1000); // 2 second delay before popup
                     }
                 }, 1000); // Wait 1s after level up text appears
-            }, 800); // Wait for bar fill animation to complete
+            }, 1000); // Wait for bar fill animation to complete
         } else {
             // Normal progress update
             this.updateDisplay();
