@@ -91,11 +91,11 @@ const DAY_NARRATIVES = {
 const LEVEL_UP_NARRATIVES = {
     // Early stage (levels 1-2)
     early: [
-        "I notice someone new on the platform...",
-        "Another person stands out from the crowd...",
-        "Wait... is that someone new? They weren't here yesterday...",
-        "Another commuter has appeared... but they seem different somehow.",
-        "I'm starting to recognize more distinct faces in the crowd..."
+        "Are there more people than just me...",
+        "I can see another person...",
+        "Wait... were they always here?",
+        "Is that another commuter...",
+        "I'm starting to recognize more people like me..."
     ],
     // Mid stage (levels 3-4)
     mid: [
