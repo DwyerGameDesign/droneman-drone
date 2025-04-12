@@ -10,8 +10,8 @@ const ALBUM_URL = "https://www.alteredrootband.com/";
 const ALBUM_POSITION = [81.3, 45]; // 81.3, 45
 
 // Dimensions of the album sprite
-const ALBUM_WIDTH = 45;
-const ALBUM_HEIGHT = 26;
+const ALBUM_WIDTH = 35;
+const ALBUM_HEIGHT = 18;
 
 // Reference to the album element
 let albumElement = null;
