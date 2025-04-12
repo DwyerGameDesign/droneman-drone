@@ -835,7 +835,7 @@ body.mobile .mobile-controls {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -60%); /* Move it slightly higher */
+    transform: translate(-50%, -70%); /* Move it higher */
     background-color: rgba(0, 0, 0, 0.85);
     color: #d4d4c8;
     padding: 30px;
