@@ -170,31 +170,20 @@ class AwarenessMeter {
             this.levelUpData = {
                 previousLevel,
                 newLevel: this.currentLevel,
-                excessXP: this.currentXP,
-                displayLevel: previousLevel // Store the previous level for display
+                excessXP: this.currentXP
             };
             
-            // Set currentLevel back to previous for display purposes
-            // It will be updated after they click continue
-            this.displayLevel = previousLevel;
+            // Don't update the level display text yet - keep showing previous level
             
             // 1. First, fill the bar to 100%
             this.progressElement.style.transition = 'width 0.8s ease-in-out';
             this.progressElement.style.width = '100%';
             
-            // 2. After bar fills, show level up text only
+            // 2. After bar fills, show level up popup immediately
             setTimeout(() => {
-                // Show level up effect with floating text
-                const meterElement = document.querySelector('.awareness-meter');
-                if (meterElement && window.xpEffects) {
-                    window.xpEffects.showLevelUp(meterElement, this.currentLevel);
-                }
-                
-                // 3 & 4. Wait and then show level-up popup
+                // Show level-up popup
                 if (this.options.onLevelUp) {
-                    setTimeout(() => {
-                        this.options.onLevelUp(this.currentLevel, previousLevel);
-                    }, 1000); // 1 second delay before popup
+                    this.options.onLevelUp(this.currentLevel, previousLevel);
                 }
             }, 800); // Wait for bar fill animation to complete
         } else {
@@ -211,6 +200,12 @@ class AwarenessMeter {
      */
     resetProgressAfterLevelUp() {
         if (!this.levelUpData) return;
+        
+        // First, show the level up text effect
+        const meterElement = document.querySelector('.awareness-meter');
+        if (meterElement && window.xpEffects) {
+            window.xpEffects.showLevelUp(meterElement, this.currentLevel);
+        }
         
         // Now update the displayed level text
         this.levelDisplay.textContent = `Level ${this.currentLevel}`;
