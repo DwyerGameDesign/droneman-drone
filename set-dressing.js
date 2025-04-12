@@ -543,11 +543,13 @@ function handleSetDressingClick(event) {
             window.core.showRandomThoughtBubble(false);
         }
         
-        // Highlight the actual change if it's a set dressing change
-        if (gameState.currentChange && 
-            !gameState.currentChange.found && 
-            gameState.currentChange.changeType === 'setDressing') {
-            window.setDressing.highlightMissedChange();
+        // Highlight the actual change based on its type
+        if (gameState.currentChange && !gameState.currentChange.found) {
+            if (gameState.currentChange.changeType === 'setDressing') {
+                window.setDressing.highlightMissedChange();
+            } else if (gameState.currentChange.changeType === 'commuter') {
+                window.commuters.highlightMissedChange();
+            }
         }
         
         // End the game with a summary after showing the highlight
