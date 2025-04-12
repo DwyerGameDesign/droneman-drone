@@ -624,6 +624,11 @@ function handleLevelUp(newLevel, previousLevel) {
  * Continue with level up process after popup is closed
  */
 function continueWithLevelUp(newLevel) {
+    // Reset the progress bar to show the correct amount for the new level
+    if (gameState.awarenessMeter && typeof gameState.awarenessMeter.resetProgressAfterLevelUp === 'function') {
+        gameState.awarenessMeter.resetProgressAfterLevelUp();
+    }
+    
     // Disable clicking until the player takes the train
     gameState.canClick = false;
     
@@ -645,7 +650,7 @@ function continueWithLevelUp(newLevel) {
                 // Add and animate the new commuter
                 setTimeout(() => {
                     const newCommuter = commuters.addCommuter();
-        if (newCommuter) {
+                    if (newCommuter) {
                         console.log(`Added commuter ${newCommuter.type} for level ${newLevel}`);
                         // Add the new-commuter class for the animation
                         newCommuter.element.classList.add('new-commuter');
