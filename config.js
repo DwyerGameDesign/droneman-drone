@@ -17,20 +17,33 @@ const THOUGHTS = {
         "Another day, another dollar.",
         "6:40 train again.",
         "Same commute, different day.",
-        "This seat feels familiar."
+        "Same shoes, same steps.",
+        "Coffee. Platform. Silence. Repeat.",
+        "My soul is nearly drained.",
+        "Just me and my thoughts again.",
+        "Same routine for years, still a stranger.",
+        "Do I even belong here?",
+        "We're all alone, just in the same place.",
+        "No one ever says good morning."
     ],
     mid: [
         "Why do I do this every day?",
         "The train moves, but am I going anywhere?",
-        "I never noticed that building before.",
-        "Time feels different when you pay attention."
+        "Do they notice me, like I notice them?",
+        "They never speak. Just like me.",
+        "Is it just me?",
+        "Time feels different when you pay attention.",
+        "Should I talk to them? Smile?",
+        "We all stand together, but apart.",
+        "Not a single nod. Not a smile."
     ],
     late: [
         "I don't have to do this forever.",
+        "We all wait like clockwork toys.",
         "There's more to life than this cycle.",
-        "I could engineer a plan to change things.",
         "My soul feels less drained today.",
-        "The grip is loosening."
+        "The grip is loosening.",
+        "Maybe we're not meant to do this."
     ],
     final: [
         "I am not just a drone.",
@@ -93,9 +106,13 @@ const LEVEL_UP_NARRATIVES = {
     early: [
         "Are there more people than just me...",
         "I can see another person...",
+        "Is that someone else? A connection?",
         "Wait... were they always here?",
         "Is that another commuter...",
-        "I'm starting to recognize more people like me..."
+        "I'm starting to recognize more people like me...",
+        "I’m not the only one here.",
+        "Someone’s here. Someone real.",
+        "I’m not alone. I’m not alone."
     ],
     // Mid stage (levels 3-4)
     mid: [
