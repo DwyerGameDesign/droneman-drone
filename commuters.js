@@ -272,12 +272,25 @@ function handleCommuterClick(event) {
         // Disable clicking for all commuters and set dressing
         gameState.canClick = false;
         
-        // Remove click handlers from all commuters
-        allCommuters.forEach(commuter => {
-            if (commuter.element) {
-                commuter.element.style.pointerEvents = 'none';
-            }
-        });
+        // Disable pointer events for all interactive elements
+        const sceneContainer = gameState.elements.sceneContainer;
+        if (sceneContainer) {
+            // Disable pointer events for all commuters
+            allCommuters.forEach(commuter => {
+                if (commuter.element) {
+                    commuter.element.style.pointerEvents = 'none';
+                }
+            });
+
+            // Disable pointer events for all set dressing elements
+            const setDressingElements = sceneContainer.querySelectorAll('.set-dressing-sprite');
+            setDressingElements.forEach(element => {
+                element.style.pointerEvents = 'none';
+            });
+
+            // Change cursor style to indicate no interaction
+            sceneContainer.style.cursor = 'not-allowed';
+        }
 
         // Only show train button immediately if no level up occurred
         if (!willLevelUp) {
