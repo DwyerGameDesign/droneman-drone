@@ -325,11 +325,12 @@ h1 {
     }
 }
 
-/* Awareness container layout */
+/* Awareness container on the right side */
 .awareness-container {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-left: auto; /* Push to right side */
 }
 
 /* Level display */
@@ -339,7 +340,7 @@ h1 {
     font-weight: bold;
     color: #d4d4c8;
     min-width: 80px;
-    text-align: left;
+    text-align: right; /* Align text to the right */
 }
 
 /* Updated meter appearance */
