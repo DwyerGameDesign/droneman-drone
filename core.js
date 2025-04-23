@@ -342,14 +342,15 @@ async function init() {
         document.body.appendChild(newTrainButton);
     }
 
-    // Initialize UI elements
+    // Initialize game elements
     gameState.elements = {
-        sceneContainer: document.getElementById('scene-container'),
-        trainButton: document.getElementById('train-button'),
-        dayDisplay: document.getElementById('day'),
+        scene: document.getElementById('scene'),
+        awarenessBar: document.getElementById('awareness-bar'),
+        awarenessContainer: document.getElementById('awareness-container'),
         narrativeText: document.getElementById('narrative-text'),
-        message: document.getElementById('message'),
-        thoughtBubble: document.getElementById('thought-bubble')
+        thoughtBubble: document.getElementById('thought-bubble'),
+        day: document.getElementById('day'),
+        levelDisplay: document.getElementById('level-display'),
     };
 
     // BUGFIX: Double check train button was found
@@ -775,8 +776,12 @@ function proceedToNextDay() {
     // Set in transitioning state
     gameState.isTransitioning = true;
     
-    // Update day counter in HUD
-    gameState.elements.dayCounter.textContent = `Day:${gameState.day}`;
+    // Update day counter
+    if (gameState.elements.day) {
+        gameState.elements.day.textContent = gameState.day;
+    } else {
+        console.warn('Day counter element not found');
+    }
     
     // Temporarily disable clicking
     gameState.canClick = false;
@@ -1657,8 +1662,10 @@ function setupNewDay() {
     });
 
     // Update day display
-    if (gameState.elements.dayDisplay) {
-        gameState.elements.dayDisplay.textContent = gameState.day;
+    if (gameState.elements.day) {
+        gameState.elements.day.textContent = gameState.day;
+    } else {
+        console.warn('Day counter element not found');
     }
     
     console.log(`Day ${gameState.day} starts`);
