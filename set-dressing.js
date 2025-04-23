@@ -538,9 +538,10 @@ function createSetDressingChange() {
     );
     
     // Determine whether to add a new element or change an existing one
-    // If we still have unique types available, prefer adding new elements
+    // More balanced approach - 50% chance to change, and only add new elements when needed
     const shouldAddNew = (allSetDressing.length < MAX_SET_DRESSING) && 
-                       (unusedTypes.length > 0 || Math.random() < 0.8 || allSetDressing.length < 4);
+                       ((unusedTypes.length > 0 && Math.random() < 0.3) || 
+                       (allSetDressing.length < 2));
 
     if (shouldAddNew) {
         console.log("Will add a new set dressing element");
