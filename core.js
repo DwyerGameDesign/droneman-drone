@@ -154,17 +154,21 @@ const xpEffects = {
         const awarenessContainer = document.getElementById('awareness-container');
         if (!awarenessContainer) return;
         
+        // Find the actual awareness meter within the container
+        const awarenessMeter = awarenessContainer.querySelector('.awareness-meter');
+        const targetElement = awarenessMeter || awarenessContainer;
+        
         // Get element position
-        const rect = awarenessContainer.getBoundingClientRect();
+        const rect = targetElement.getBoundingClientRect();
         
         // Create particle text
         const particle = document.createElement('div');
         particle.className = 'xp-particle';
         particle.textContent = `+${amount} XP`;
         
-        // Position the particle
+        // Position the particle - align to right side of meter
         particle.style.position = 'absolute';
-        particle.style.left = `${rect.left + rect.width / 2}px`;
+        particle.style.left = `${rect.left + rect.width * 0.75}px`;
         particle.style.top = `${rect.top + rect.height / 2}px`;
         particle.style.transform = 'translate(-50%, -50%)';
         
@@ -190,17 +194,21 @@ const xpEffects = {
         const awarenessContainer = document.getElementById('awareness-container');
         if (!awarenessContainer) return;
         
+        // Find the actual awareness meter within the container
+        const awarenessMeter = awarenessContainer.querySelector('.awareness-meter');
+        const targetElement = awarenessMeter || awarenessContainer;
+        
         // Get element position
-        const rect = awarenessContainer.getBoundingClientRect();
+        const rect = targetElement.getBoundingClientRect();
         
         // Create particle text
         const particle = document.createElement('div');
         particle.className = 'xp-particle xp-loss';
         particle.textContent = `-${amount} XP`;
         
-        // Position the particle
+        // Position the particle - align to right side of meter
         particle.style.position = 'absolute';
-        particle.style.left = `${rect.left + rect.width / 2}px`;
+        particle.style.left = `${rect.left + rect.width * 0.75}px`;
         particle.style.top = `${rect.top + rect.height / 2}px`;
         particle.style.transform = 'translate(-50%, -50%)';
         
@@ -1247,8 +1255,8 @@ function createDailyChange() {
     
     // Balance between commuter and set dressing changes
     // Higher probability for set dressing changes
-    const commuterProb = 0.2; // 20% chance for commuter changes (reduced from 40%)
-    const setDressingProb = 0.8; // 80% chance for set dressing changes (increased from 60%)
+    const commuterProb = 0.3; // 20% chance for commuter changes (reduced from 40%)
+    const setDressingProb = 0.7; // 80% chance for set dressing changes (increased from 60%)
     
     console.log(`Change probabilities: commuter=${commuterProb.toFixed(2)}, setDressing=${setDressingProb.toFixed(2)}`);
 
