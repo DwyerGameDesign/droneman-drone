@@ -54,14 +54,13 @@ class DooberSystem {
         const sourceRect = sourceElement.getBoundingClientRect();
         const targetRect = targetElement.getBoundingClientRect();
         
-        // Get positions relative to container
-        const containerRect = this.options.container.getBoundingClientRect();
+        // Calculate start and end positions relative to viewport
+        const startX = sourceRect.left + sourceRect.width / 2;
+        const startY = sourceRect.top + sourceRect.height / 2;
         
-        // Calculate start and end positions
-        const startX = sourceRect.left + sourceRect.width / 2 - containerRect.left;
-        const startY = sourceRect.top + sourceRect.height / 2 - containerRect.top;
-        const endX = targetRect.left + targetRect.width / 2 - containerRect.left;
-        const endY = targetRect.top + targetRect.height / 2 - containerRect.top;
+        // Target the middle-right side of the meter for a more satisfying arrival
+        const endX = targetRect.left + targetRect.width * 0.75;
+        const endY = targetRect.top + targetRect.height / 2;
         
         // Create multiple doobers for a more dynamic effect
         for (let i = 0; i < this.options.count; i++) {
@@ -80,6 +79,13 @@ class DooberSystem {
         const doober = document.createElement('div');
         doober.className = 'doober';
         
+        // Convert positions to be relative to the container
+        const containerRect = this.options.container.getBoundingClientRect();
+        const relStartX = startX - containerRect.left;
+        const relStartY = startY - containerRect.top;
+        const relEndX = endX - containerRect.left;
+        const relEndY = endY - containerRect.top;
+        
         // Apply styles
         Object.assign(doober.style, {
             position: 'absolute',
@@ -90,8 +96,8 @@ class DooberSystem {
             boxShadow: `0 0 10px ${this.options.glowColor}`,
             zIndex: 1000,
             pointerEvents: 'none',
-            left: `${startX}px`,
-            top: `${startY}px`,
+            left: `${relStartX}px`,
+            top: `${relStartY}px`,
             transition: `all ${this.options.duration}ms ${this.options.easing}`,
             opacity: 0,
             transform: 'scale(0.5)'
@@ -105,8 +111,8 @@ class DooberSystem {
         const randomOffsetY = (Math.random() - 0.5) * 50;
         
         // Define the control point for a curved path
-        const controlX = startX + (endX - startX) * 0.5 + randomOffsetX;
-        const controlY = startY + (endY - startY) * 0.3 + randomOffsetY;
+        const controlX = relStartX + (relEndX - relStartX) * 0.5 + randomOffsetX;
+        const controlY = relStartY + (relEndY - relStartY) * 0.3 + randomOffsetY;
         
         // Animate using keyframes for a curved path
         const keyframes = [
@@ -114,8 +120,8 @@ class DooberSystem {
                 offset: 0,
                 opacity: 1,
                 transform: 'scale(0.5)',
-                left: `${startX}px`,
-                top: `${startY}px`
+                left: `${relStartX}px`,
+                top: `${relStartY}px`
             },
             { // Control point
                 offset: 0.5,
@@ -128,8 +134,8 @@ class DooberSystem {
                 offset: 1,
                 opacity: 0,
                 transform: 'scale(0.5)',
-                left: `${endX}px`,
-                top: `${endY}px`
+                left: `${relEndX}px`,
+                top: `${relEndY}px`
             }
         ];
         
@@ -169,9 +175,15 @@ function animateDooberToAwarenessMeter(sourceElement) {
         initDooberSystem();
     }
     
+    // Target the awareness meter specifically instead of just the container
     const awarenessContainer = document.getElementById('awareness-container');
-    if (awarenessContainer && sourceElement) {
-        dooberSystem.createDoober(sourceElement, awarenessContainer);
+    const awarenessMeter = awarenessContainer ? awarenessContainer.querySelector('.awareness-meter') : null;
+    
+    // If meter exists, target that; otherwise fall back to the container
+    const targetElement = awarenessMeter || awarenessContainer;
+    
+    if (targetElement && sourceElement) {
+        dooberSystem.createDoober(sourceElement, targetElement);
     }
 }
 
