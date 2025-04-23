@@ -557,6 +557,11 @@ function highlightElement(element) {
     // Check if this is a commuter or another element type
     const isCommuter = element.classList.contains('commuter-sprite');
     
+    // Remove new-commuter class if it exists to prevent animation
+    if (element.classList.contains('new-commuter')) {
+        element.classList.remove('new-commuter');
+    }
+    
     // Add appropriate highlight class
     element.classList.add('highlight-pulse');
     
