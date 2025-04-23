@@ -724,6 +724,11 @@ function takeTrain() {
     console.log("Taking the train");
     gameState.isTransitioning = true;
 
+    // Reset cursor style
+    if (gameState.elements.sceneContainer) {
+        gameState.elements.sceneContainer.style.cursor = 'default';
+    }
+
     // Ensure train button reference is fresh before hiding
     if (!gameState.elements.trainButton || !document.contains(gameState.elements.trainButton)) {
         console.log("Train button reference needs refresh");
