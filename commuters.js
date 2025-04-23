@@ -269,6 +269,16 @@ function handleCommuterClick(event) {
         // Increase awareness
         addAwarenessXP(awarenessGain);
 
+        // Disable clicking for all commuters and set dressing
+        gameState.canClick = false;
+        
+        // Remove click handlers from all commuters
+        allCommuters.forEach(commuter => {
+            if (commuter.element) {
+                commuter.element.style.pointerEvents = 'none';
+            }
+        });
+
         // Only show train button immediately if no level up occurred
         if (!willLevelUp) {
             console.log("Core.js: No level up, showing train button");
