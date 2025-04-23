@@ -345,12 +345,14 @@ async function init() {
     // Initialize game elements
     gameState.elements = {
         scene: document.getElementById('scene'),
+        sceneContainer: document.getElementById('scene-container'),
         awarenessBar: document.getElementById('awareness-bar'),
         awarenessContainer: document.getElementById('awareness-container'),
         narrativeText: document.getElementById('narrative-text'),
         thoughtBubble: document.getElementById('thought-bubble'),
         day: document.getElementById('day'),
         levelDisplay: document.getElementById('level-display'),
+        trainButton: document.getElementById('train-button')
     };
 
     // BUGFIX: Double check train button was found
@@ -360,7 +362,11 @@ async function init() {
     }
 
     // Initialize train platform background
-    initializeTrainPlatformBackground();
+    if (gameState.elements.sceneContainer) {
+        initializeTrainPlatformBackground();
+    } else {
+        console.error("Scene container not found, cannot initialize train platform background");
+    }
 
     // Initialize typewriter
     gameState.typewriter = new Typewriter(gameState.elements.narrativeText, {
@@ -713,7 +719,11 @@ function initializeTrainPlatformBackground() {
     platformBackground.style.zIndex = '1'; // Set low z-index so it appears behind all other elements
 
     // Insert at the beginning of the scene container
-    gameState.elements.sceneContainer.insertBefore(platformBackground, gameState.elements.sceneContainer.firstChild);
+    if (gameState.elements.sceneContainer) {
+        gameState.elements.sceneContainer.insertBefore(platformBackground, gameState.elements.sceneContainer.firstChild);
+    } else {
+        console.error("Scene container not found when trying to add platform background");
+    }
 }
 
 /**
