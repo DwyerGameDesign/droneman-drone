@@ -294,61 +294,61 @@ function handleCommuterClick(event) {
                 
                 // Extract base types from variations properly
                 // Format could be "commuter1.png" or "commuter1_a.png"
-                let fromBase, toBase;
+                let fromBase, toBase, fromVarName, toVarName;
                 
-                // Extract the base name (e.g., "commuter1") and variation suffix (e.g., "_a") if any
-                if (fromVariation.includes('_')) {
-                    // Handle variations like "commuter1_a.png"
-                    fromBase = fromVariation.split('.')[0]; // "commuter1_a"
-                    const mainParts = fromBase.split('_');
-                    fromBase = mainParts[0]; // "commuter1"
+                // Extract the base name (e.g., "commuter1") and full variant name (e.g., "commuter1_a")
+                fromVarName = fromVariation.split('.')[0]; // Remove extension first
+                toVarName = toVariation.split('.')[0]; // Remove extension first
+                
+                // Extract the base commuter type
+                if (fromVarName.includes('_')) {
+                    // Handle variations like "commuter1_a"
+                    fromBase = fromVarName.split('_')[0]; // "commuter1"
                 } else {
-                    // Handle base sprites like "commuter1.png"
-                    fromBase = fromVariation.split('.')[0]; // "commuter1"
+                    // Handle base sprites like "commuter1"
+                    fromBase = fromVarName;
                 }
                 
-                if (toVariation.includes('_')) {
-                    // Handle variations like "commuter1_a.png"
-                    toBase = toVariation.split('.')[0]; // "commuter1_a"
+                if (toVarName.includes('_')) {
+                    // Handle variations like "commuter1_a"
+                    toBase = toVarName.split('_')[0]; // "commuter1"
                 } else {
-                    // Handle base sprites like "commuter1.png"
-                    toBase = toVariation.split('.')[0]; // "commuter1"
+                    // Handle base sprites like "commuter1"
+                    toBase = toVarName;
                 }
                 
-                console.log(`Extracted types - fromBase: "${fromBase}", toBase: "${toBase}"`);
+                console.log(`Extracted types - fromVarName: "${fromVarName}", toVarName: "${toVarName}", fromBase: "${fromBase}", toBase: "${toBase}"`);
                 
                 // Debug: Show available keys in CHANGE_MESSAGES.commuter
                 console.log(`CHANGE_MESSAGES.commuter keys: ${Object.keys(CHANGE_MESSAGES.commuter)}`);
                 
-                // First, try to find the message using the exact keys we have
-                if (CHANGE_MESSAGES.commuter[fromBase] && CHANGE_MESSAGES.commuter[fromBase][toBase]) {
-                    message = CHANGE_MESSAGES.commuter[fromBase][toBase];
-                    console.log(`Found message using fromBase[toBase]: "${message}"`);
-                } else {
-                    // We might need to add suffix for the variation
-                    // If toBase is "commuter1" and there's a variation suffix in toVariation like "commuter1_a.png", 
-                    // we need to check for "commuter1" -> "commuter1_a"
-                    const toVarName = toVariation.split('.')[0]; // Remove extension
+                // Look up the message directly using the full variant names
+                if (CHANGE_MESSAGES.commuter[fromVarName] && CHANGE_MESSAGES.commuter[fromVarName][toVarName]) {
+                    message = CHANGE_MESSAGES.commuter[fromVarName][toVarName];
+                    console.log(`Found message using fromVarName[toVarName]: "${message}"`);
+                } 
+                // If that failed, look up with base names if the variants are different formats
+                else if (CHANGE_MESSAGES.commuter[fromBase] && CHANGE_MESSAGES.commuter[fromBase][toVarName]) {
+                    message = CHANGE_MESSAGES.commuter[fromBase][toVarName];
+                    console.log(`Found message using fromBase[toVarName]: "${message}"`);
+                } 
+                // Try looking up with the variant in the messages
+                else if (CHANGE_MESSAGES.commuter[fromVarName] && CHANGE_MESSAGES.commuter[fromVarName][toBase]) {
+                    message = CHANGE_MESSAGES.commuter[fromVarName][toBase];
+                    console.log(`Found message using fromVarName[toBase]: "${message}"`);
+                } 
+                // If all else fails, log what we tried
+                else {
+                    console.log(`No message found in CHANGE_MESSAGES.commuter for these variations`);
+                    console.log(`Tried to look up: CHANGE_MESSAGES.commuter[${fromVarName}][${toVarName}]`);
+                    console.log(`Tried to look up: CHANGE_MESSAGES.commuter[${fromBase}][${toVarName}]`);
+                    console.log(`Tried to look up: CHANGE_MESSAGES.commuter[${fromVarName}][${toBase}]`);
                     
-                    if (CHANGE_MESSAGES.commuter[fromBase] && CHANGE_MESSAGES.commuter[fromBase][toVarName]) {
-                        message = CHANGE_MESSAGES.commuter[fromBase][toVarName];
-                        console.log(`Found message using fromBase[toVarName]: "${message}"`);
-                    } else {
-                        // Try the other direction
-                        const fromVarName = fromVariation.split('.')[0]; // Remove extension
-                        
-                        if (CHANGE_MESSAGES.commuter[toBase] && CHANGE_MESSAGES.commuter[toBase][fromVarName]) {
-                            message = CHANGE_MESSAGES.commuter[toBase][fromVarName];
-                            console.log(`Found message using toBase[fromVarName]: "${message}"`);
-                        } else {
-                            console.log(`No message found in CHANGE_MESSAGES.commuter for these variations`);
-                            if (CHANGE_MESSAGES.commuter[fromBase]) {
-                                console.log(`CHANGE_MESSAGES.commuter[${fromBase}] keys: ${Object.keys(CHANGE_MESSAGES.commuter[fromBase])}`);
-                            }
-                            if (CHANGE_MESSAGES.commuter[toBase]) {
-                                console.log(`CHANGE_MESSAGES.commuter[${toBase}] keys: ${Object.keys(CHANGE_MESSAGES.commuter[toBase])}`);
-                            }
-                        }
+                    if (CHANGE_MESSAGES.commuter[fromVarName]) {
+                        console.log(`CHANGE_MESSAGES.commuter[${fromVarName}] keys: ${Object.keys(CHANGE_MESSAGES.commuter[fromVarName])}`);
+                    }
+                    if (CHANGE_MESSAGES.commuter[fromBase]) {
+                        console.log(`CHANGE_MESSAGES.commuter[${fromBase}] keys: ${Object.keys(CHANGE_MESSAGES.commuter[fromBase])}`);
                     }
                 }
                 
