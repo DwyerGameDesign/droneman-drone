@@ -277,10 +277,15 @@ function handleCommuterClick(event) {
             // Disable pointer events for all interactive elements
             const sceneContainer = gameState.elements.sceneContainer;
             if (sceneContainer) {
-                // Disable pointer events for all commuters
+                // Disable pointer events for all commuters and their touch areas
                 allCommuters.forEach(commuter => {
                     if (commuter.element) {
                         commuter.element.style.pointerEvents = 'none';
+                        // Also disable pointer events on any touch areas
+                        const touchAreas = commuter.element.querySelectorAll('.touch-area');
+                        touchAreas.forEach(area => {
+                            area.style.pointerEvents = 'none';
+                        });
                     }
                 });
 
