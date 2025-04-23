@@ -43,7 +43,7 @@ function createMobileWarningScreen() {
         <div class="warning-content">
             <p>This game is designed for desktop browsers and doesn't work well on mobile devices.</p>
             <div class="album-container">
-                <img src="assets/sprites/band_logo.png" alt="Altered Root Band" class="album-image">
+                <img src="assets/sprites/album.png" alt="Altered Root Band" class="album-image">
             </div>
             <p>Please visit <a href="${albumUrl}" target="_blank">www.alteredrootband.com</a> to learn more.</p>
             <a href="${albumUrl}" target="_blank" class="visit-button">Visit Band Website</a>

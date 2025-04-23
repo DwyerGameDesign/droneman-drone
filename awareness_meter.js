@@ -46,12 +46,18 @@ class AwarenessMeter {
             document.querySelector('.hud').appendChild(this.options.container);
         }
         
+        // Force the container to be right-aligned
+        this.options.container.style.marginLeft = 'auto';
+        this.options.container.style.display = 'flex';
+        this.options.container.style.justifyContent = 'flex-end';
+        
         // Create level display
         this.levelDisplay = document.createElement('div');
         this.levelDisplay.className = 'awareness-level';
         this.levelDisplay.textContent = `Level ${this.currentLevel}`;
         this.levelDisplay.style.marginRight = '10px';
         this.levelDisplay.style.fontWeight = 'bold';
+        this.levelDisplay.style.textAlign = 'right';
         
         // Create meter container
         this.meterElement = document.createElement('div');

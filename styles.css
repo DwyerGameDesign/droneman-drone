@@ -41,6 +41,7 @@ h1 {
     width: 100%;
     margin-bottom: 10px;
     align-items: center;
+    position: relative; /* Add position relative to the container */
 }
 
 .day-counter {
@@ -334,12 +335,15 @@ h1 {
 
 /* Awareness container on the right side */
 .awareness-container {
-    display: flex;
+    display: flex !important;
     align-items: center;
     gap: 10px;
     margin-left: auto; /* Push to right side */
-    justify-content: flex-end; /* Align contents to the right */
-    flex: 0 0 auto; /* Don't grow or shrink, use auto basis */
+    justify-content: flex-end !important; /* Align contents to the right */
+    position: absolute; /* Position absolutely */
+    right: 0; /* Align to the right edge */
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); /* Center vertically */
 }
 
 /* Level display */
