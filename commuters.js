@@ -269,39 +269,42 @@ function handleCommuterClick(event) {
         // Increase awareness
         addAwarenessXP(awarenessGain);
 
-        // Disable clicking for all commuters and set dressing
-        gameState.canClick = false;
-        
-        // Disable pointer events for all interactive elements
-        const sceneContainer = gameState.elements.sceneContainer;
-        if (sceneContainer) {
-            // Disable pointer events for all commuters
-            allCommuters.forEach(commuter => {
-                if (commuter.element) {
-                    commuter.element.style.pointerEvents = 'none';
-                }
-            });
+        // Wait for awareness meter animation to complete before disabling interactions
+        setTimeout(() => {
+            // Disable clicking for all commuters and set dressing
+            gameState.canClick = false;
+            
+            // Disable pointer events for all interactive elements
+            const sceneContainer = gameState.elements.sceneContainer;
+            if (sceneContainer) {
+                // Disable pointer events for all commuters
+                allCommuters.forEach(commuter => {
+                    if (commuter.element) {
+                        commuter.element.style.pointerEvents = 'none';
+                    }
+                });
 
-            // Disable pointer events for all set dressing elements
-            const setDressingElements = sceneContainer.querySelectorAll('.set-dressing-sprite');
-            setDressingElements.forEach(element => {
-                element.style.pointerEvents = 'none';
-            });
+                // Disable pointer events for all set dressing elements
+                const setDressingElements = sceneContainer.querySelectorAll('.set-dressing-sprite');
+                setDressingElements.forEach(element => {
+                    element.style.pointerEvents = 'none';
+                });
 
-            // Change cursor style to indicate no interaction
-            sceneContainer.style.cursor = 'not-allowed';
-        }
-
-        // Only show train button immediately if no level up occurred
-        if (!willLevelUp) {
-            console.log("Core.js: No level up, showing train button");
-            if (gameState.elements.trainButton) {
-                gameState.elements.trainButton.style.display = 'block';
-                console.log("Train button displayed");
-            } else {
-                console.error("Train button element not found in gameState.elements");
+                // Change cursor style to indicate no interaction
+                sceneContainer.style.cursor = 'not-allowed';
             }
-        }
+
+            // Only show train button immediately if no level up occurred
+            if (!willLevelUp) {
+                console.log("Core.js: No level up, showing train button");
+                if (gameState.elements.trainButton) {
+                    gameState.elements.trainButton.style.display = 'block';
+                    console.log("Train button displayed");
+                } else {
+                    console.error("Train button element not found in gameState.elements");
+                }
+            }
+        }, 800); // Wait for awareness meter animation to complete
     } else {
         console.log("Wrong commuter clicked or no change to find");
 
