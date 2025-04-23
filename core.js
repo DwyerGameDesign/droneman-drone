@@ -17,7 +17,6 @@ let gameState = {
     typewriter: null,
     awarenessMeter: null,
     changesFound: 0,
-    bestDay: 1,            // Track best day count
     elements: {
         // Elements will be defined in init()
     }
@@ -322,12 +321,6 @@ window.core = {
  */
 async function init() {
     console.log("Initializing Drone: The Daily Commute");
-
-    // Load best day from localStorage if it exists
-    const savedBestDay = localStorage.getItem('droneBestDay');
-    if (savedBestDay) {
-        gameState.bestDay = parseInt(savedBestDay);
-    }
 
     // Game elements should be hidden initially via CSS
     // The loading-overlay will be visible instead
@@ -1138,88 +1131,61 @@ function enhanceTouchTargets() {
 
 /**
  * Show game over summary with replay option
+ * @param {string} message - The message to display
  */
-function showGameOverSummary() {
-    // Create popup container
-    const popup = document.createElement('div');
-    popup.className = 'popup game-over-popup';
-
-    // Check if this is a new best score
-    const isNewBest = gameState.day > gameState.bestDay;
-    if (isNewBest) {
-        gameState.bestDay = gameState.day;
-        localStorage.setItem('droneBestDay', gameState.bestDay);
+function showGameOverSummary(message) {
+    const sceneContainer = gameState.elements.sceneContainer;
+    const trainButton = gameState.elements.trainButton;
+    
+    // Disable clicking
+    gameState.canClick = false;
+    gameState.isTransitioning = true;
+    
+    // Add game over class
+    sceneContainer.classList.add('game-over');
+    
+    // Hide train button
+    if (trainButton) {
+        trainButton.style.display = 'none';
     }
-
-    // Create content
-    const content = document.createElement('div');
-    content.innerHTML = `
-        <h2>Awareness Lost</h2>
-        <p>${GAME_OVER_TEXTS[Math.floor(Math.random() * GAME_OVER_TEXTS.length)]}</p>        
-        <p>You were free ${gameState.day} day${gameState.day !== 1 ? 's' : ''}</p>
-        <p>Best: ${gameState.bestDay} day${gameState.bestDay !== 1 ? 's' : ''}</p>
-        ${isNewBest ? '<p style="color: #ffdd44;">New Best!</p>' : ''}
-        <button id="restartButton">Board the Train Again</button>
-    `;
-    popup.appendChild(content);
-
-    // Add popup to game container
-    document.getElementById('game-container').appendChild(popup);
-
-    // Add click handler to restart button
-    const restartButton = document.getElementById('restartButton');
-    if (restartButton) {
-        restartButton.addEventListener('click', () => {
-            // Remove the popup
-            popup.remove();
-            
-            // Reset game state
-            gameState.day = 1;
-            gameState.awarenessLevel = 1;
-            gameState.awarenessXP = 0;
-            gameState.canClick = false;
-            gameState.currentChange = null;
-            gameState.isTransitioning = false;
-            gameState.changesFound = 0;
-
-            // Update UI elements
-            if (gameState.elements.dayDisplay) {
-                gameState.elements.dayDisplay.textContent = gameState.day;
-            }
-
-            // Reset awareness meter
-            if (gameState.awarenessMeter) {
-                gameState.awarenessMeter.setProgress(1, 0);
-            }
-
-            // Clear any existing commuters and set dressing
-            if (window.commuters) {
-                commuters.removeAllCommuters();
-                commuters.addInitialCommuter();
-            }
-
-            if (window.setDressing) {
-                window.setDressing.removeAllSetDressing();
-            }
-
-            // Update narrative text
-            if (gameState.elements.narrativeText) {
-                window.ui.updateNarrativeText();
-            }
-
-            // Show train button
-            if (gameState.elements.trainButton) {
-                gameState.elements.trainButton.style.display = 'block';
-            }
-
-            // Remove any scene effects
-            const sceneContainer = gameState.elements.sceneContainer;
-            if (sceneContainer) {
-                sceneContainer.classList.remove('game-over');
-                sceneContainer.classList.remove('completion');
-            }
-        });
+    
+    // Select random ending text from config
+    const randomText = GAME_OVER_TEXTS[Math.floor(Math.random() * GAME_OVER_TEXTS.length)];
+    
+    // Update typewriter with random ending text
+    if (gameState.typewriter) {
+        gameState.typewriter.stop();
+        gameState.elements.narrativeText.textContent = '';
+        setTimeout(() => {
+            gameState.typewriter.type(randomText);
+        }, 100);
     }
+    
+    // Create and show the summary popup
+    setTimeout(() => {
+        const summaryPopup = document.createElement('div');
+        summaryPopup.className = 'game-over-summary';
+        
+        summaryPopup.innerHTML = `
+            <h2>AWARENESS LOST</h2>
+            <p>${message}</p>
+            <p>Days on the train: ${gameState.day}</p>
+            <p>Awareness level: ${gameState.awarenessLevel}</p>
+            <p>Changes found: ${gameState.changesFound}</p>
+            <button id="replay-button">Take the Train Again</button>
+        `;
+        
+        // Add to document body instead of scene container
+        document.body.appendChild(summaryPopup);
+        
+        // Add event listener to replay button
+        const replayButton = document.getElementById('replay-button');
+        if (replayButton) {
+            replayButton.addEventListener('click', () => {
+                location.reload(); // Reload the page to restart the game
+            });
+        }
+    }, 2000);
 }
 
 /**

@@ -572,7 +572,7 @@ function highlightElement(element) {
     
     // Add appropriate highlight class
     element.classList.add('highlight-pulse');
-    
+
     // For commuters, we need to maintain their specific transform
     if (isCommuter) {
         // Ensure transform is maintained by adding !important inline style
