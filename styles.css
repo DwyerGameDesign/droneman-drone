@@ -43,7 +43,14 @@ h1 {
     align-items: center;
 }
 
-.day-counter, .awareness-counter {
+.day-counter {
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto; /* Don't grow or shrink, use auto basis */
+}
+
+.awareness-counter {
     font-size: 18px;
     display: flex;
     align-items: center;
@@ -331,6 +338,8 @@ h1 {
     align-items: center;
     gap: 10px;
     margin-left: auto; /* Push to right side */
+    justify-content: flex-end; /* Align contents to the right */
+    flex: 0 0 auto; /* Don't grow or shrink, use auto basis */
 }
 
 /* Level display */
