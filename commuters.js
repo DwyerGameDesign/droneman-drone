@@ -418,7 +418,7 @@ function handleCommuterClick(event) {
         
         // End the game with a summary after showing the highlight
         setTimeout(() => {
-            showGameOverSummary("Your awareness wasn't strong enough to notice the changes.");
+            showGameOverSummary();
         }, 1500); // Match the highlight animation duration
     }
 }

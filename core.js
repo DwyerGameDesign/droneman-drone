@@ -1131,7 +1131,7 @@ function enhanceTouchTargets() {
 
 /**
  * Show game over summary with replay option
- * @param {string} message - The message to display
+ * @param {string} message - The message to display (optional)
  */
 function showGameOverSummary(message) {
     const sceneContainer = gameState.elements.sceneContainer;
@@ -1161,6 +1161,12 @@ function showGameOverSummary(message) {
         }, 100);
     }
     
+    // Use default message if none provided
+    if (!message) {
+        // Select a random message from the GAME_OVER_SUMMARY_TEXT array
+        message = GAME_OVER_SUMMARY_TEXT[Math.floor(Math.random() * GAME_OVER_SUMMARY_TEXT.length)];
+    }
+    
     // Get or update the high score
     let highScore = localStorage.getItem('droneHighScore') || 0;
     highScore = parseInt(highScore);
@@ -1182,7 +1188,7 @@ function showGameOverSummary(message) {
         // Create the changes found text with appropriate high score message
         let changesFoundText;
         if (isNewBest) {
-            changesFoundText = `Changes found: ${gameState.changesFound} || <span style="color: #ffcc00; font-weight: bold;">New Best!</span>`;
+            changesFoundText = `Changes found: ${gameState.changesFound} <span style="color: #ffcc00; font-weight: bold;">New Best!</span>`;
         } else {
             changesFoundText = `Changes found: ${gameState.changesFound} || Your best: ${highScore}`;
         }

@@ -454,7 +454,7 @@ function handleSetDressingClick(event) {
         
         // End the game with a summary after showing the highlight
         setTimeout(() => {
-            window.core.showGameOverSummary("Your awareness wasn't strong enough to notice the changes.");
+            window.core.showGameOverSummary();
         }, 1500); // Match the highlight animation duration
     }
 }

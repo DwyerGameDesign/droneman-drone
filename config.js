@@ -159,6 +159,17 @@ const GAME_OVER_TEXTS = [
     "The numbness returns, familiar and comforting...",
 ];
 
+// Game over summary popup texts
+const GAME_OVER_SUMMARY_TEXT = [
+    "Your awareness wasn't strong enough to notice the changes.",
+    "The subtle differences escaped your observation.",
+    "Your perception couldn't capture the changes.",
+    "The details slipped through the cracks.",
+    "Your mind wasn't quite sharp enough to spot the differences.",
+    "The changes were there, but your awareness was not.",
+    "Your awareness needs more development."
+];
+
 // Game settings
 const GAME_SETTINGS = {
     // Transition timing
