@@ -607,11 +607,13 @@ body.mobile .mobile-controls {
     background-position: bottom center !important;
     transition: transform 0.3s ease, opacity 0.3s ease;
     transform-origin: center bottom;
+    pointer-events: auto !important; /* Ensure hover works */
 }
 
 /* Set dressing hover effect */
 .set-dressing-sprite:hover {
     transform: translateX(-50%) scale(1.05) !important;
+    z-index: 6 !important; /* Slightly higher z-index on hover */
 }
 
 /* Update to ensure highlight-pulse animation works on set dressing elements */

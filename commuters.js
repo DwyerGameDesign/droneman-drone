@@ -9,7 +9,7 @@ const MAX_COMMUTERS = 7;
 // Positions for each commuter [left%, bottom%]
 // Organized in distinct columns to prevent overlapping
 const COMMUTER_POSITIONS = [
-    [50, 22],  // Center
+    [30, 22],  // Center
     [11, 23],  // Far left
     [25, 20],  // Left
     [37, 22],  // Left-center
