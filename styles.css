@@ -117,11 +117,12 @@ h1 {
     background-repeat: no-repeat !important;
     background-position: bottom center !important;
     transition: transform 0.3s ease, opacity 0.3s ease;
+    transform-origin: center bottom;
 }
 
 /* Commuter hover effect */
 .commuter-sprite:hover {
-    transform: translateX(-50%) scale(1.05) !important;
+    transform: translateX(-50%) scale(1.1);
 }
 
 /* Platform background */
