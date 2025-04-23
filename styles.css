@@ -1018,7 +1018,7 @@ body.mobile .mobile-controls {
     transform: translateX(-50%) !important; /* Maintain positioning */
 }
 
-/* Enhanced highlight pulse animation for commuters - blue glow (matches set dressing) */
+/* Enhanced highlight pulse animation for commuters - blue glow with proper positioning */
 @keyframes commuter-highlight-pulse {
     0% { 
         box-shadow: 0 0 0 0 rgba(78, 78, 178, 0.7);

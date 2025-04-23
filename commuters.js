@@ -555,12 +555,25 @@ function applyCommuterVariation(commuter, variation) {
 function highlightElement(element) {
     if (!element) return;
 
-    // Simply add highlight class for glow effect - CSS handles positioning
+    // Check if this is a commuter or another element type
+    const isCommuter = element.classList.contains('commuter-sprite');
+    
+    // Add appropriate highlight class
     element.classList.add('highlight-pulse');
+    
+    // For commuters, we need to maintain their specific transform
+    if (isCommuter) {
+        // Ensure transform is maintained by adding !important inline style
+        element.style.setProperty('transform', 'translateX(-50%)', 'important');
+    }
 
     // Remove highlight after animation completes
     setTimeout(() => {
         element.classList.remove('highlight-pulse');
+        if (isCommuter) {
+            // Reset the inline style to let the class take over
+            element.style.removeProperty('transform');
+        }
     }, 1500);
 }
 
@@ -588,10 +601,15 @@ function highlightMissedChange() {
         
         // Add missed highlight class - CSS handles positioning and animation
         commuter.element.classList.add('highlight-missed');
+        
+        // Ensure transform is maintained by adding !important inline style
+        commuter.element.style.setProperty('transform', 'translateX(-50%)', 'important');
 
         // Remove after animation completes
         setTimeout(() => {
             commuter.element.classList.remove('highlight-missed');
+            // Reset the inline style to let the class take over
+            commuter.element.style.removeProperty('transform');
         }, 1500); // Match animation duration (now 1.5s)
     } else {
         console.error(`Could not find commuter with ID ${gameState.currentChange.commuterId} to highlight!`);
