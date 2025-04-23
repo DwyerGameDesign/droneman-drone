@@ -105,7 +105,7 @@ const LEVEL_UP_NARRATIVES = {
     // Early stage (levels 1-2)
     early: [
         "A new person is seen. Were they always there?",
-        "Another commuter enters the view.",
+        "Another soul enters the view.",
         "A new face in the fog.",
         "Someone is noticed. The veil thins.",
         "They are no longer alone. Not entirely.",
@@ -121,7 +121,7 @@ const LEVEL_UP_NARRATIVES = {
     // Mid stage (levels 3-4)
     mid: [
         "They start to recognize faces in the crowd...",
-        "The commuters are becoming more distinct...",
+        "Each person is becoming more distinct...",
         "They can see more details in each other...",
         "The world is becoming more than a blur...",
         "The people around are taking shape, becoming individuals...",
@@ -151,7 +151,7 @@ const GAME_OVER_TEXTS = [
     "Back to being a drone...",
     "Your brief moment of clarity fades...",
     "The routine claims you once more...",
-    "The commuters all look the same again...",
+    "Everyone looks the same again...",
     "Your awareness flickers and dims...",
     "The cycle of sameness resumes...",
     "Your perception blurs back to normal...",
