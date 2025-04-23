@@ -84,21 +84,15 @@ function showSegmentNarrative(segmentNumber) {
 /**
  * Update typewriter text
  */
-function updateTypewriterText(text, elementId = 'narrative-text') {
-    const element = document.getElementById(elementId);
-    if (!element) {
-        console.error(`Element with id ${elementId} not found`);
-        return;
-    }
-
-    // Use gameState.typewriter if available
-    if (window.gameState && window.gameState.typewriter) {
-        window.gameState.typewriter.stop();
-        element.textContent = '';
-        window.gameState.typewriter.type(text);
+function updateTypewriterText(text) {
+    if (typewriter) {
+        typewriter.stop();
+        narrativeText.textContent = '';
+        setTimeout(() => {
+            typewriter.type(text);
+        }, 100);
     } else {
-        // Fallback to direct text update
-        element.textContent = text;
+        narrativeText.textContent = text;
     }
 }
 
@@ -397,12 +391,111 @@ function debugPositions() {
         commuterElement.style.backgroundSize = 'contain';
         commuterElement.style.backgroundRepeat = 'no-repeat';
         commuterElement.style.backgroundPosition = 'bottom center';
-        commuterElement.style.zIndex = `${10 + i}`
+        commuterElement.style.zIndex = `${10 + i}`;
+        commuterElement.style.width = '54px';
+        commuterElement.style.height = '128px';
+        
+        // Add to DOM
+        gameState.elements.sceneContainer.appendChild(commuterElement);
     }
+    
+    // Add all set dressing in their positions
+    for (let i = 0; i < window.setDressing.SET_DRESSING_POSITIONS.length; i++) {
+        // Create the set dressing element
+        const setDressingId = `debug-set-dressing-${i}`;
+        const setDressingElement = document.createElement('div');
+        setDressingElement.id = setDressingId;
+        setDressingElement.className = 'set-dressing-sprite debug-element';
+        
+        // Add label to show position index
+        const label = document.createElement('div');
+        label.textContent = `S${i}`;
+        label.className = 'debug-label debug-setdressing-label';
+        setDressingElement.appendChild(label);
+        
+        // Calculate actual position
+        const position = window.setDressing.SET_DRESSING_POSITIONS[i];
+        const containerWidth = gameState.elements.sceneContainer.offsetWidth;
+        const containerHeight = gameState.elements.sceneContainer.offsetHeight;
+        const xPos = (position[0] / 100) * containerWidth;
+        const yPos = (position[1] / 100) * containerHeight;
+        
+        // Set styles
+        setDressingElement.style.position = 'absolute';
+        setDressingElement.style.left = `${xPos}px`;
+        setDressingElement.style.bottom = `${yPos}px`;
+        setDressingElement.style.transform = 'translateX(-50%)';
+        
+        // Use a different set dressing type for each position
+        const types = window.setDressing.SET_DRESSING_TYPES;
+        const setDressingType = types[i % types.length];
+        setDressingElement.style.backgroundImage = `url(assets/sprites/${setDressingType}.png)`;
+        setDressingElement.style.backgroundSize = 'contain';
+        setDressingElement.style.backgroundRepeat = 'no-repeat';
+        setDressingElement.style.backgroundPosition = 'bottom center';
+        setDressingElement.style.zIndex = '5';
+        
+        // Set dimensions based on type
+        let width, height;
+        switch(setDressingType) {
+            case 'bench':
+                width = 144;
+                height = 54;
+                break;
+            case 'bottle':
+                width = 18;
+                height = 27;
+                break;
+            case 'caution':
+                width = 36;
+                height = 54;
+                break;
+            case 'trash':
+                width = 30;
+                height = 24;
+                break;
+            case 'trashcan':
+                width = 36;
+                height = 45;
+                break;
+            default:
+                width = 36;
+                height = 36;
+        }
+        
+        setDressingElement.style.width = `${width}px`;
+        setDressingElement.style.height = `${height}px`;
+        
+        // Add to DOM
+        gameState.elements.sceneContainer.appendChild(setDressingElement);
+    }
+    
+    // Create a clear button
+    const clearButton = document.createElement('button');
+    clearButton.id = 'debug-clear-button';
+    clearButton.textContent = 'Clear Debug Elements';
+    
+    // Add the clear button to the document
+    document.body.appendChild(clearButton);
+    
+    // Add click event listener
+    clearButton.addEventListener('click', clearAllElements);
 }
 
+/**
+ * Clear all debug elements
+ */
 function clearAllElements() {
-    // Implementation of clearAllElements function
+    // Remove all debug elements
+    document.querySelectorAll('.debug-element').forEach(element => {
+        element.remove();
+    });
+    
+    // Remove clear button if it exists
+    const clearButton = document.getElementById('debug-clear-button');
+    if (clearButton) {
+        clearButton.remove();
+    }
 }
 
 // Export UI functions to window object

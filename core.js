@@ -305,11 +305,7 @@ window.core = {
     gameComplete,
     showGameOverSummary,
     diagnoseBtnVisibility,
-    revealGame,
-    createPreviousDayButton,
-    showPreviousDay,
-    captureDayState,
-    setupNewDay
+    revealGame
 };
 
 /**
@@ -342,17 +338,14 @@ async function init() {
         document.body.appendChild(newTrainButton);
     }
 
-    // Initialize game elements
+    // Initialize UI elements
     gameState.elements = {
-        scene: document.getElementById('scene'),
         sceneContainer: document.getElementById('scene-container'),
-        awarenessBar: document.getElementById('awareness-bar'),
-        awarenessContainer: document.getElementById('awareness-container'),
+        trainButton: document.getElementById('train-button'),
+        dayDisplay: document.getElementById('day'),
         narrativeText: document.getElementById('narrative-text'),
-        thoughtBubble: document.getElementById('thought-bubble'),
-        day: document.getElementById('day'),
-        levelDisplay: document.getElementById('level-display'),
-        trainButton: document.getElementById('train-button')
+        message: document.getElementById('message'),
+        thoughtBubble: document.getElementById('thought-bubble')
     };
 
     // BUGFIX: Double check train button was found
@@ -362,11 +355,7 @@ async function init() {
     }
 
     // Initialize train platform background
-    if (gameState.elements.sceneContainer) {
-        initializeTrainPlatformBackground();
-    } else {
-        console.error("Scene container not found, cannot initialize train platform background");
-    }
+    initializeTrainPlatformBackground();
 
     // Initialize typewriter
     gameState.typewriter = new Typewriter(gameState.elements.narrativeText, {
@@ -643,11 +632,6 @@ function continueWithLevelUp(newLevel) {
     // Disable clicking until the player takes the train
     gameState.canClick = false;
     
-    // Check if we should create the previous day button (at level 2 or higher)
-    if (newLevel >= 2 && gameState.previousDayState) {
-        createPreviousDayButton(2);
-    }
-    
     // Play the level up effect
     if (window.shaderEffects && window.shaderEffects.playEffect) {
         // Start the shader effect
@@ -666,7 +650,7 @@ function continueWithLevelUp(newLevel) {
                 // Add and animate the new commuter
                 setTimeout(() => {
                     const newCommuter = commuters.addCommuter();
-                    if (newCommuter) {
+        if (newCommuter) {
                         console.log(`Added commuter ${newCommuter.type} for level ${newLevel}`);
                         // Add the new-commuter class for the animation
                         newCommuter.element.classList.add('new-commuter');
@@ -719,11 +703,7 @@ function initializeTrainPlatformBackground() {
     platformBackground.style.zIndex = '1'; // Set low z-index so it appears behind all other elements
 
     // Insert at the beginning of the scene container
-    if (gameState.elements.sceneContainer) {
-        gameState.elements.sceneContainer.insertBefore(platformBackground, gameState.elements.sceneContainer.firstChild);
-    } else {
-        console.error("Scene container not found when trying to add platform background");
-    }
+    gameState.elements.sceneContainer.insertBefore(platformBackground, gameState.elements.sceneContainer.firstChild);
 }
 
 /**
@@ -775,68 +755,67 @@ function takeTrain() {
  * Function to handle the transition to the next day
  */
 function proceedToNextDay() {
-    console.log(`Proceeding from day ${gameState.day} to ${gameState.day + 1}`);
+    // Refresh train button reference to prevent stale references
+    gameState.elements.trainButton = document.getElementById('train-button');
     
-    // Capture the current day's state before moving to next day
-    gameState.previousDayState = captureDayState();
-    
-    // Increment the day counter
-    gameState.day++;
-    
-    // Set in transitioning state
-    gameState.isTransitioning = true;
-    
-    // Update day counter
-    if (gameState.elements.day) {
-        gameState.elements.day.textContent = gameState.day;
-    } else {
-        console.warn('Day counter element not found');
-    }
-    
-    // Temporarily disable clicking
-    gameState.canClick = false;
-    
-    // Play train departure sound/effect
-    // (If you have a sound system)
-    
-    // Apply day transition shader if available
-    if (window.shaderEffects && window.shaderEffects.playEffect) {
-        window.shaderEffects.playEffect('train', () => {
-            // Configure changes for the new day after shader effect
-            setupNewDay();
+    // Fade out
+    gameState.elements.sceneContainer.classList.add('fading');
+
+    setTimeout(() => {
+        // Clean up found-change highlights
+        const foundElements = document.querySelectorAll('.found-change');
+        foundElements.forEach(element => {
+            element.classList.remove('found-change');
         });
-    } else {
-        // Fallback if no shader system: simple fade out/in
-        const gameContainer = document.querySelector('.game-container');
         
-        // Fade out
-        if (gameContainer) {
-            gameContainer.style.opacity = '0';
-            
-            // Wait for fade out, then set up new day and fade back in
-            setTimeout(() => {
-                setupNewDay();
-                gameContainer.style.opacity = '1';
-            }, 1000);
-        } else {
-            // If no container found, just set up the new day
-            setupNewDay();
+        // Remove any click blockers
+        const clickBlockers = document.querySelectorAll('.click-blocker');
+        clickBlockers.forEach(blocker => {
+            if (blocker.parentNode) {
+                blocker.parentNode.removeChild(blocker);
+            }
+        });
+        
+        // Increment day
+        gameState.day++;
+        if (gameState.elements.dayDisplay) {
+            gameState.elements.dayDisplay.textContent = gameState.day;
         }
-    }
-    
-    // Update narrative text immediately
-    const dayNarrative = DAY_NARRATIVES[gameState.day] || "Another day passes...";
-    window.ui.updateTypewriterText(dayNarrative, "narrative-text");
-    
-    // Show appropriate thought bubble after the narrative text has been displayed
-    // Only start showing thoughts after a couple of days
-    if (gameState.day >= 2) {
+        
+        console.log(`Day ${gameState.day} starts`);
+        
+        // Reset current change
+        gameState.currentChange = null;
+        
+        // Determine if there should be a change today
+        determineChangesForDay();
+
+        // Fade back in
         setTimeout(() => {
-            const randomThoughtIndex = Math.floor(Math.random() * THOUGHTS.length);
-            const thought = THOUGHTS[randomThoughtIndex];
-            window.ui.showThoughtBubble(thought);
-        }, 3000); // Wait 3 seconds after showing narrative text
-    }
+            gameState.elements.sceneContainer.classList.remove('fading');
+
+            // Update narrative text with typewriter effect first
+            if (gameState.typewriter) {
+                gameState.typewriter.stop();
+                gameState.elements.narrativeText.textContent = '';
+                setTimeout(() => {
+                    window.ui.updateNarrativeText();
+                    
+                    // Show a random thought bubble after the narrative text has been displayed
+                    // and had time to be read (if day is 2 or later)
+                    if (gameState.day >= 2) {
+                        // Increased delay to allow player to read the narrative text first
+                setTimeout(() => {
+                            showRandomThoughtBubble(true);
+                        }, 1500); // 3 seconds delay after narrative text
+                    }
+                }, 100);
+            }
+
+            // Enable interactions after fade-in
+            gameState.isTransitioning = false;
+        }, 500); // Fade in duration
+    }, 500); // Fade out duration
 }
 
 /**
@@ -1423,272 +1402,4 @@ function diagnoseBtnVisibility() {
         // Remove any classes that might hide it
         trainBtn.classList.remove('hidden');
     }
-}
-
-/**
- * Create Previous Day View button
- * @param {number} minLevel - Minimum level at which the button becomes available
- */
-function createPreviousDayButton(minLevel = 2) {
-    // Only create if we're at or above the required level
-    if (gameState.awarenessLevel < minLevel) {
-        return;
-    }
-    
-    // Only create if we have a previous day state
-    if (!gameState.previousDayState) {
-        return;
-    }
-    
-    // Check if the button already exists
-    let prevDayButton = document.getElementById('previous-day-button');
-    if (prevDayButton) {
-        return;
-    }
-    
-    // Create button container (positioned similarly to train button but above it)
-    const buttonContainer = document.createElement('div');
-    buttonContainer.className = 'previous-day-button-container';
-    
-    // Create the button
-    prevDayButton = document.createElement('button');
-    prevDayButton.id = 'previous-day-button';
-    prevDayButton.className = 'previous-day-button';
-    prevDayButton.textContent = 'View Previous Day';
-    prevDayButton.addEventListener('click', showPreviousDay);
-    
-    // Add to container
-    buttonContainer.appendChild(prevDayButton);
-    
-    // Add to game container
-    const gameContainer = document.querySelector('.game-container');
-    if (gameContainer) {
-        gameContainer.appendChild(buttonContainer);
-    }
-}
-
-/**
- * Show previous day state for 5 seconds
- */
-function showPreviousDay() {
-    // Disable button temporarily
-    const prevDayButton = document.getElementById('previous-day-button');
-    if (prevDayButton) {
-        prevDayButton.disabled = true;
-    }
-    
-    // Make sure we have previous day state
-    if (!gameState.previousDayState) {
-        window.ui.showMessage("No previous day to show", 1500);
-        if (prevDayButton) {
-            setTimeout(() => {
-                prevDayButton.disabled = false;
-            }, 2000);
-        }
-        return;
-    }
-    
-    console.log("Showing previous day state:", gameState.previousDayState);
-    
-    // Create overlay to show we're in previous day view
-    const overlay = document.createElement('div');
-    overlay.className = 'previous-day-overlay';
-    overlay.innerHTML = `<div class="previous-day-label">Day ${gameState.previousDayState.day} (Previous)</div>`;
-    document.body.appendChild(overlay);
-    
-    // Hide current commuters and set dressing
-    const currentCommuterElements = document.querySelectorAll('.commuter-sprite:not(.previous-day)');
-    const currentSetDressingElements = document.querySelectorAll('.set-dressing-sprite:not(.previous-day)');
-    
-    // Store current elements to restore later
-    const elementsToRestore = [];
-    
-    currentCommuterElements.forEach(el => {
-        elementsToRestore.push({
-            element: el,
-            display: el.style.display
-        });
-        el.style.display = 'none';
-    });
-    
-    currentSetDressingElements.forEach(el => {
-        elementsToRestore.push({
-            element: el,
-            display: el.style.display
-        });
-        el.style.display = 'none';
-    });
-    
-    // Create temporary elements to show previous day state
-    const tempElements = [];
-    
-    // Show previous day commuters
-    if (gameState.previousDayState.commuters) {
-        gameState.previousDayState.commuters.forEach(commuter => {
-            const element = document.createElement('div');
-            element.className = 'commuter-sprite previous-day';
-            element.style.position = 'absolute';
-            element.style.left = commuter.position.left;
-            element.style.bottom = commuter.position.bottom;
-            element.style.transform = 'translateX(-50%)';
-            element.style.backgroundImage = commuter.backgroundImage;
-            element.style.backgroundSize = 'contain';
-            element.style.backgroundRepeat = 'no-repeat';
-            element.style.backgroundPosition = 'bottom center';
-            element.style.zIndex = commuter.zIndex;
-            
-            gameState.elements.sceneContainer.appendChild(element);
-            tempElements.push(element);
-        });
-    }
-    
-    // Show previous day set dressing
-    if (gameState.previousDayState.setDressing) {
-        gameState.previousDayState.setDressing.forEach(item => {
-            const element = document.createElement('div');
-            element.className = 'set-dressing-sprite previous-day';
-            element.style.position = 'absolute';
-            element.style.left = item.position.left;
-            element.style.bottom = item.position.bottom;
-            element.style.transform = 'translateX(-50%)';
-            element.style.backgroundImage = item.backgroundImage;
-            element.style.backgroundSize = 'contain';
-            element.style.backgroundRepeat = 'no-repeat';
-            element.style.backgroundPosition = 'bottom center';
-            element.style.zIndex = item.zIndex;
-            element.style.width = item.width;
-            element.style.height = item.height;
-            
-            gameState.elements.sceneContainer.appendChild(element);
-            tempElements.push(element);
-        });
-    }
-    
-    // Show for 5 seconds
-    setTimeout(() => {
-        // Remove temporary elements
-        tempElements.forEach(el => {
-            if (el.parentNode) {
-                el.parentNode.removeChild(el);
-            }
-        });
-        
-        // Restore current elements
-        elementsToRestore.forEach(item => {
-            item.element.style.display = item.display;
-        });
-        
-        // Remove overlay
-        if (overlay.parentNode) {
-            overlay.parentNode.removeChild(overlay);
-        }
-        
-        // Re-enable button
-        if (prevDayButton) {
-            setTimeout(() => {
-                prevDayButton.disabled = false;
-            }, 2000); // Add a 2-second cooldown
-        }
-        
-        window.ui.showMessage("Returned to current day", 1500);
-    }, 5000);
-    
-    // Show message
-    window.ui.showMessage("Viewing previous day for 5 seconds", 2000);
-}
-
-/**
- * Capture the current day state before transitioning to next day
- */
-function captureDayState() {
-    const state = {
-        day: gameState.day,
-        commuters: [],
-        setDressing: []
-    };
-    
-    // Capture commuter states
-    if (window.commuters && window.commuters.allCommuters) {
-        window.commuters.allCommuters.forEach(commuter => {
-            if (commuter.element) {
-                const rect = commuter.element.getBoundingClientRect();
-                const sceneRect = gameState.elements.sceneContainer.getBoundingClientRect();
-                
-                state.commuters.push({
-                    type: commuter.type,
-                    currentVariation: commuter.currentVariation,
-                    position: {
-                        left: commuter.element.style.left,
-                        bottom: commuter.element.style.bottom
-                    },
-                    backgroundImage: commuter.element.style.backgroundImage,
-                    zIndex: commuter.element.style.zIndex
-                });
-            }
-        });
-    }
-    
-    // Capture set dressing states
-    if (window.setDressing && window.setDressing.allSetDressing) {
-        window.setDressing.allSetDressing.forEach(item => {
-            if (item.element) {
-                state.setDressing.push({
-                    type: item.type,
-                    position: {
-                        left: item.element.style.left,
-                        bottom: item.element.style.bottom
-                    },
-                    width: item.element.style.width,
-                    height: item.element.style.height,
-                    backgroundImage: item.element.style.backgroundImage,
-                    zIndex: item.element.style.zIndex
-                });
-            }
-        });
-    }
-    
-    return state;
-}
-
-/**
- * Set up the new day state after transition
- */
-function setupNewDay() {
-    // Refresh train button reference to prevent stale references
-    gameState.elements.trainButton = document.getElementById('train-button');
-    
-    // Clean up found-change highlights
-    const foundElements = document.querySelectorAll('.found-change');
-    foundElements.forEach(element => {
-        element.classList.remove('found-change');
-    });
-    
-    // Remove any click blockers
-    const clickBlockers = document.querySelectorAll('.click-blocker');
-    clickBlockers.forEach(blocker => {
-        if (blocker.parentNode) {
-            blocker.parentNode.removeChild(blocker);
-        }
-    });
-
-    // Update day display
-    if (gameState.elements.day) {
-        gameState.elements.day.textContent = gameState.day;
-    } else {
-        console.warn('Day counter element not found');
-    }
-    
-    console.log(`Day ${gameState.day} starts`);
-    
-    // Reset current change
-    gameState.currentChange = null;
-    
-    // Determine if there should be a change today
-    determineChangesForDay();
-
-    // Create the previous day button if we're at the right level
-    createPreviousDayButton(2); // Unlock at level 2
-
-    // Enable interactions
-    gameState.isTransitioning = false;
 }
