@@ -1161,17 +1161,37 @@ function showGameOverSummary(message) {
         }, 100);
     }
     
+    // Get or update the high score
+    let highScore = localStorage.getItem('droneHighScore') || 0;
+    highScore = parseInt(highScore);
+    
+    // Check if player achieved a new high score
+    const isNewBest = gameState.changesFound > highScore;
+    
+    // Update high score if current changes found is higher
+    if (isNewBest) {
+        highScore = gameState.changesFound;
+        localStorage.setItem('droneHighScore', highScore);
+    }
+    
     // Create and show the summary popup
     setTimeout(() => {
         const summaryPopup = document.createElement('div');
         summaryPopup.className = 'game-over-summary';
         
+        // Create the changes found text with appropriate high score message
+        let changesFoundText;
+        if (isNewBest) {
+            changesFoundText = `Changes found: ${gameState.changesFound} || <span style="color: #ffcc00; font-weight: bold;">New Best!</span>`;
+        } else {
+            changesFoundText = `Changes found: ${gameState.changesFound} || Your best: ${highScore}`;
+        }
+        
         summaryPopup.innerHTML = `
             <h2>AWARENESS LOST</h2>
             <p>${message}</p>
             <p>Days on the train: ${gameState.day}</p>
-            <p>Awareness level: ${gameState.awarenessLevel}</p>
-            <p>Changes found: ${gameState.changesFound}</p>
+            <p>${changesFoundText}</p>
             <button id="replay-button">Take the Train Again</button>
         `;
         
