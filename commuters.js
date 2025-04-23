@@ -156,7 +156,7 @@ function addCommuter() {
     const commuterId = `commuter-${activeCommuters}`;
     const commuterElement = document.createElement('div');
     commuterElement.id = commuterId;
-    commuterElement.className = 'commuter-sprite';
+    commuterElement.className = 'commuter-sprite commuter-base';  // Add base class for positioning
     commuterElement.dataset.commuterType = commuterType;
 
     // Calculate actual position
@@ -169,7 +169,8 @@ function addCommuter() {
     commuterElement.style.position = 'absolute';
     commuterElement.style.left = `${xPos}px`;
     commuterElement.style.bottom = `${yPos}px`;
-    commuterElement.style.transform = 'translateX(-50%)';
+    commuterElement.style.zIndex = `${10 + activeCommuters}`;
+    commuterElement.style.cursor = 'pointer';
 
     // Use the first variation as default
     const defaultVariation = commuterVariations[commuterType][0];
@@ -177,8 +178,6 @@ function addCommuter() {
     commuterElement.style.backgroundSize = 'contain';
     commuterElement.style.backgroundRepeat = 'no-repeat';
     commuterElement.style.backgroundPosition = 'bottom center';
-    commuterElement.style.zIndex = `${10 + activeCommuters}`;
-    commuterElement.style.cursor = 'pointer';
 
     // Add to DOM
     gameState.elements.sceneContainer.appendChild(commuterElement);
