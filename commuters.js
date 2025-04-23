@@ -246,6 +246,14 @@ function handleCommuterClick(event) {
         // Highlight the commuter
         commuters.highlightElement(commuterElement);
         
+        // Just create a click blocker without adding permanent found-change class
+        setTimeout(() => {
+            // Create and add click blocker to prevent further interactions
+            const clickBlocker = document.createElement('div');
+            clickBlocker.className = 'click-blocker';
+            gameState.elements.sceneContainer.appendChild(clickBlocker);
+        }, 1500);
+        
         // Add doober animation to awareness meter
         if (window.dooberSystem && window.dooberSystem.animate) {
             const awarenessContainer = document.getElementById('awareness-container');
@@ -269,47 +277,16 @@ function handleCommuterClick(event) {
         // Increase awareness
         addAwarenessXP(awarenessGain);
 
-        // Wait for awareness meter animation to complete before disabling interactions
-        setTimeout(() => {
-            // Disable clicking for all commuters and set dressing
-            gameState.canClick = false;
-            
-            // Disable pointer events for all interactive elements
-            const sceneContainer = gameState.elements.sceneContainer;
-            if (sceneContainer) {
-                // Disable pointer events for all commuters and their touch areas
-                allCommuters.forEach(commuter => {
-                    if (commuter.element) {
-                        commuter.element.style.pointerEvents = 'none';
-                        // Also disable pointer events on any touch areas
-                        const touchAreas = commuter.element.querySelectorAll('.touch-area');
-                        touchAreas.forEach(area => {
-                            area.style.pointerEvents = 'none';
-                        });
-                    }
-                });
-
-                // Disable pointer events for all set dressing elements
-                const setDressingElements = sceneContainer.querySelectorAll('.set-dressing-sprite');
-                setDressingElements.forEach(element => {
-                    element.style.pointerEvents = 'none';
-                });
-
-                // Change cursor style to indicate no interaction
-                sceneContainer.style.cursor = 'not-allowed';
+        // Only show train button immediately if no level up occurred
+        if (!willLevelUp) {
+            console.log("Core.js: No level up, showing train button");
+            if (gameState.elements.trainButton) {
+                gameState.elements.trainButton.style.display = 'block';
+                console.log("Train button displayed");
+            } else {
+                console.error("Train button element not found in gameState.elements");
             }
-
-            // Only show train button immediately if no level up occurred
-            if (!willLevelUp) {
-                console.log("Core.js: No level up, showing train button");
-                if (gameState.elements.trainButton) {
-                    gameState.elements.trainButton.style.display = 'block';
-                    console.log("Train button displayed");
-                } else {
-                    console.error("Train button element not found in gameState.elements");
-                }
-            }
-        }, 800); // Wait for awareness meter animation to complete
+        }
     } else {
         console.log("Wrong commuter clicked or no change to find");
 
