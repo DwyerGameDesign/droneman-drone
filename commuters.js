@@ -4,19 +4,18 @@
  */
 
 // Maximum number of commuters in the scene
-const MAX_COMMUTERS = 8;
+const MAX_COMMUTERS = 7;
 
 // Positions for each commuter [left%, bottom%]
 // Organized in distinct columns to prevent overlapping
 const COMMUTER_POSITIONS = [
-    [49, 22],
-    [13, 23],
-    [24, 20],
-    [37, 24],
-    [60, 23],
-    [72, 24],
-    [85, 20],
-    [95, 23]
+    [50, 22],  // Center
+    [11, 23],  // Far left
+    [25, 20],  // Left
+    [37, 22],  // Left-center
+    [63, 21],  // Right-center
+    [75, 23],  // Right
+    [88, 20]   // Far right
 ];
 
 // Array to store all commuters

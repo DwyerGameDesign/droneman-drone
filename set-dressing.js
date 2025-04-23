@@ -9,14 +9,14 @@ const MAX_SET_DRESSING = 8;
 // Positions for each set dressing element [left%, bottom%]
 // Positioned in columns offset from commuter positions to prevent overlapping
 const SET_DRESSING_POSITIONS = [
-    [4, 21],
-    [18, 22],
-    [31, 23],
-    [43, 21],
-    [55, 24],
-    [65, 22],
-    [78, 23],
-    [91, 21]
+    [4, 21],   // Far far left
+    [18, 22],  // Between far left and left
+    [31, 23],  // Between left and left-center
+    [44, 21],  // Between center and left-center
+    [56, 24],  // Between center and right-center
+    [69, 22],  // Between right-center and right
+    [82, 23],  // Between right and far right
+    [95, 21]   // Far far right
 ];
 
 // Types of set dressing elements - updated to match your available sprites
@@ -91,79 +91,6 @@ function addInitialSetDressing(count = 3) {
     for (let i = 0; i < count; i++) {
         addSetDressing();
     }
-}
-
-/**
- * Check if a position would overlap with existing set dressing or commuters
- * @param {number} xPos - X position in pixels
- * @param {number} yPos - Y position in pixels
- * @param {number} width - Width of new element
- * @param {number} height - Height of new element
- * @param {number} buffer - Additional buffer space to prevent close placement
- * @returns {boolean} - True if position overlaps with existing elements
- */
-function checkForOverlap(xPos, yPos, width, height, buffer = 20) {
-    // Add buffer to dimensions to prevent elements from being too close
-    const adjustedWidth = width + buffer;
-    const adjustedHeight = height + buffer;
-    
-    // Check against all existing set dressing elements
-    for (const dressing of allSetDressing) {
-        if (!dressing.element) continue;
-        
-        // Get element position and size
-        const rect = dressing.element.getBoundingClientRect();
-        const sceneRect = gameState.elements.sceneContainer.getBoundingClientRect();
-        
-        // Convert to same coordinate system as new element
-        const elementLeft = rect.left - sceneRect.left;
-        const elementBottom = sceneRect.bottom - rect.bottom;
-        const elementWidth = rect.width;
-        const elementHeight = rect.height;
-        
-        // Check for overlap using rectangles
-        if (
-            xPos - adjustedWidth/2 < elementLeft + elementWidth/2 + buffer &&
-            xPos + adjustedWidth/2 > elementLeft - elementWidth/2 - buffer &&
-            yPos - adjustedHeight < elementBottom + elementHeight + buffer &&
-            yPos > elementBottom - buffer
-        ) {
-            return true; // Overlap detected
-        }
-    }
-    
-    // Check against all commuters as well
-    if (window.commuters && window.commuters.allCommuters) {
-        for (const commuter of window.commuters.allCommuters) {
-            if (!commuter.element) continue;
-            
-            // Get element position and size
-            const rect = commuter.element.getBoundingClientRect();
-            const sceneRect = gameState.elements.sceneContainer.getBoundingClientRect();
-            
-            // Convert to same coordinate system as new element
-            const elementLeft = rect.left - sceneRect.left;
-            const elementBottom = sceneRect.bottom - rect.bottom;
-            const elementWidth = rect.width;
-            const elementHeight = rect.height;
-            
-            // Use a larger buffer for commuters since they're more important
-            const commuterBuffer = buffer * 1.5;
-            
-            // Check for overlap using rectangles
-            if (
-                xPos - adjustedWidth/2 < elementLeft + elementWidth/2 + commuterBuffer &&
-                xPos + adjustedWidth/2 > elementLeft - elementWidth/2 - commuterBuffer &&
-                yPos - adjustedHeight < elementBottom + elementHeight + commuterBuffer &&
-                yPos > elementBottom - commuterBuffer
-            ) {
-                console.log(`Overlap detected with commuter ${commuter.id}`);
-                return true; // Overlap detected
-            }
-        }
-    }
-    
-    return false; // No overlap
 }
 
 /**
@@ -248,10 +175,6 @@ function addSetDressing() {
             width = 36;
             height = 40;
             break;
-        //case 'fireextinguisher':
-        //    width = 36;
-        //    height = 36;
-        //    break;
         case 'rat':
             width = 35;
             height = 18;
@@ -264,35 +187,10 @@ function addSetDressing() {
     // Calculate actual position
     const containerWidth = gameState.elements.sceneContainer.offsetWidth;
     const containerHeight = gameState.elements.sceneContainer.offsetHeight;
-    let xPos, yPos, adjustedYPercent;
-    let attempts = 0;
-    const maxAttempts = 10;
+    const xPos = (position[0] / 100) * containerWidth;
+    const yPos = (position[1] / 100) * containerHeight;
     
-    // Try to find a position without overlap within the selected position area
-    do {
-        // Get base position
-        const baseX = position[0];
-        const baseY = position[1];
-        
-        // Add minor randomness to positions (±2% for Y, ±1% for X)
-        // Reduced randomness to stay closer to the selected position
-        const randomXOffset = (Math.random() * 2 - 1);
-        const randomYOffset = (Math.random() * 4 - 2);
-        
-        const adjustedXPercent = baseX + randomXOffset;
-        adjustedYPercent = baseY + randomYOffset;
-        
-        xPos = (adjustedXPercent / 100) * containerWidth;
-        yPos = (adjustedYPercent / 100) * containerHeight;
-        
-        attempts++;
-    } while (attempts < maxAttempts && checkForOverlap(xPos, yPos, width, height));
-    
-    if (attempts >= maxAttempts) {
-        console.log(`Couldn't find non-overlapping position for ${selectedType} after ${maxAttempts} attempts`);
-    }
-    
-    console.log(`Placing ${selectedType} at position [${xPos}px, ${yPos}px] (attempt ${attempts}) using position index ${randomPositionIndex}`);
+    console.log(`Placing ${selectedType} at position [${xPos}px, ${yPos}px] using position index ${randomPositionIndex}`);
 
     // Set styles
     setDressingElement.style.position = 'absolute';
