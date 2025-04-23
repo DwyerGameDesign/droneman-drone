@@ -1247,8 +1247,8 @@ function createDailyChange() {
     
     // Balance between commuter and set dressing changes
     // Higher probability for set dressing changes
-    const commuterProb = 0.4; // 40% chance for commuter changes
-    const setDressingProb = 0.6; // 60% chance for set dressing changes
+    const commuterProb = 0.2; // 20% chance for commuter changes (reduced from 40%)
+    const setDressingProb = 0.8; // 80% chance for set dressing changes (increased from 60%)
     
     console.log(`Change probabilities: commuter=${commuterProb.toFixed(2)}, setDressing=${setDressingProb.toFixed(2)}`);
 
@@ -1276,12 +1276,17 @@ function createDailyChange() {
             console.log(`Set dressing change created: ${change.changeAction} for ${change.elementId}`);
             gameState.currentChange = change;
             
+            // Log more details about the change for debugging
+            console.log("Set dressing change details:", JSON.stringify(change, null, 2));
+            
             // If this is an 'add' change, specifically log it
             if (change.changeAction === 'add') {
                 const newDressing = window.setDressing.allSetDressing.find(d => d.id === change.elementId);
                 if (newDressing) {
                     console.log(`Added new ${newDressing.type} set dressing element at position [${newDressing.position}]`);
                 }
+            } else if (change.changeAction === 'swap') {
+                console.log(`Changed set dressing from ${change.fromType} to ${change.toType}`);
             }
         } else {
             // Fallback to commuter change if set dressing change fails

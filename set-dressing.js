@@ -35,6 +35,8 @@ const SET_DRESSING_TYPES = [
 let allSetDressing = [];
 let activeSetDressing = 0;
 let setDressingVariations = {};
+// Add a counter to track and force alternating behavior
+let setDressingChangeCounter = 0;
 
 /**
  * Detect all available set dressing variations
@@ -537,27 +539,40 @@ function createSetDressingChange() {
         setDressingVariations[type].length > 0
     );
     
-    // Determine whether to add a new element or change an existing one
-    // More balanced approach - 50% chance to change, and only add new elements when needed
-    const shouldAddNew = (allSetDressing.length < MAX_SET_DRESSING) && 
-                       ((unusedTypes.length > 0 && Math.random() < 0.3) || 
-                       (allSetDressing.length < 2));
+    // Force alternating behavior based on the counter
+    // Even numbers (0, 2, 4...) will add new elements if possible
+    // Odd numbers (1, 3, 5...) will change existing elements
+    setDressingChangeCounter++;
+    console.log(`Set dressing change counter: ${setDressingChangeCounter}`);
+    
+    const shouldAddNew = (setDressingChangeCounter % 2 === 0) && 
+                        (allSetDressing.length < MAX_SET_DRESSING) && 
+                        (unusedTypes.length > 0);
 
     if (shouldAddNew) {
-        console.log("Will add a new set dressing element");
+        console.log("Will add a new set dressing element (forced by counter)");
         return createNewSetDressingElement();
     } else {
-        // Change an existing set dressing element
-        console.log("Will change an existing set dressing element");
-        const changedElement = changeExistingSetDressing();
-        
-        // If changing an existing element fails, fall back to adding a new one
-        if (!changedElement && allSetDressing.length < MAX_SET_DRESSING) {
-            console.log("Changing existing set dressing failed, falling back to adding a new one");
+        // Check if we can change an existing element
+        if (allSetDressing.length > 0 && SET_DRESSING_TYPES.length > 1) {
+            console.log("Will change an existing set dressing element (forced by counter)");
+            const changedElement = changeExistingSetDressing();
+            
+            // If changing an existing element fails, fall back to adding a new one
+            if (!changedElement && allSetDressing.length < MAX_SET_DRESSING && unusedTypes.length > 0) {
+                console.log("Changing existing set dressing failed, falling back to adding a new one");
+                return createNewSetDressingElement();
+            }
+            
+            return changedElement;
+        } else if (allSetDressing.length < MAX_SET_DRESSING && unusedTypes.length > 0) {
+            // If we can't change (not enough variety), but can add a new one
+            console.log("Not enough variety to change, adding a new set dressing element");
             return createNewSetDressingElement();
+        } else {
+            console.log("Cannot create any set dressing changes");
+            return null;
         }
-        
-        return changedElement;
     }
 }
 
@@ -566,10 +581,14 @@ function createSetDressingChange() {
  */
 function changeExistingSetDressing() {
     // Select a random set dressing element
-    if (allSetDressing.length === 0) return null;
+    if (allSetDressing.length === 0) {
+        console.log("No set dressing elements to change");
+        return null;
+    }
 
     const randomIndex = Math.floor(Math.random() * allSetDressing.length);
     const setDressing = allSetDressing[randomIndex];
+    console.log(`Selected set dressing to change: ${setDressing.id} (${setDressing.type})`);
 
     // Get all available types except the current one
     const availableTypes = SET_DRESSING_TYPES.filter(type => 
@@ -578,11 +597,22 @@ function changeExistingSetDressing() {
         setDressingVariations[type].length > 0
     );
 
-    if (availableTypes.length === 0) return null;
+    if (availableTypes.length === 0) {
+        console.log("No available types to change to");
+        return null;
+    }
 
     // Select a random new type
     const newType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
     const oldType = setDressing.type;
+    console.log(`Will change ${setDressing.id} from "${oldType}" to "${newType}"`);
+    
+    // Store the original properties for debugging
+    const originalElement = {
+        id: setDressing.id,
+        type: oldType,
+        position: setDressing.position
+    };
     
     // Update the element's type and sprite
     setDressing.type = newType;
@@ -604,6 +634,7 @@ function changeExistingSetDressing() {
             height = 27;
             break;
         case 'caution':
+        case 'cautionalt':
             width = 36;
             height = 54;
             break;
@@ -640,8 +671,13 @@ function changeExistingSetDressing() {
         changeAction: 'swap',
         found: false
     };
-
+    
+    // Log the complete change object
     console.log(`Changed set dressing from ${oldType} to ${newType}`);
+    console.log(`Change object created:`, JSON.stringify(change, null, 2));
+    console.log(`Original element:`, JSON.stringify(originalElement, null, 2));
+    console.log(`Updated element: id=${setDressing.id}, type=${setDressing.type}, position=${JSON.stringify(setDressing.position)}`);
+
     return change;
 }
 
