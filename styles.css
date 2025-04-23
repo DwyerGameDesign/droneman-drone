@@ -122,7 +122,7 @@ h1 {
 
 /* Commuter hover effect */
 .commuter-sprite:hover {
-    transform: translateX(-50%) scale(1.1);
+    transform: translateX(-50%) scale(1.05) !important;
 }
 
 /* Platform background */
@@ -1118,8 +1118,4 @@ body.mobile .mobile-controls {
 .commuter-base {
     transform: translateX(-50%);
     transition: transform 0.2s ease-out;
-}
-
-.commuter-base:hover {
-    transform: translateX(-50%) scale(1.1);
 }
