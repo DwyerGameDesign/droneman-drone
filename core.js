@@ -1138,23 +1138,11 @@ function enhanceTouchTargets() {
 
 /**
  * Show game over summary with replay option
- * @param {string} message - The message to display
  */
 function showGameOverSummary() {
     // Create popup container
     const popup = document.createElement('div');
     popup.className = 'popup game-over-popup';
-    popup.style.position = 'absolute';
-    popup.style.left = '50%';
-    popup.style.top = '30%';  // Moved higher from previous 50%
-    popup.style.transform = 'translate(-50%, -50%)';
-    popup.style.backgroundColor = '#1a1a1a';
-    popup.style.padding = '20px';
-    popup.style.borderRadius = '10px';
-    popup.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.5)';
-    popup.style.textAlign = 'center';
-    popup.style.color = '#fff';
-    popup.style.zIndex = '1000';
 
     // Check if this is a new best score
     const isNewBest = gameState.day > gameState.bestDay;
@@ -1166,11 +1154,12 @@ function showGameOverSummary() {
     // Create content
     const content = document.createElement('div');
     content.innerHTML = `
-        <h2 style="margin: 0 0 20px 0; color: #ff4444;">Game Over</h2>
-        <p style="margin: 0 0 10px 0; font-size: 1.2em;">Awareness increased over ${gameState.day} day${gameState.day !== 1 ? 's' : ''}</p>
-        <p style="margin: 0 0 20px 0; font-size: 1.1em;">Best: ${gameState.bestDay} day${gameState.bestDay !== 1 ? 's' : ''}</p>
-        ${isNewBest ? '<p style="color: #ffdd44; margin: 0 0 20px 0; font-size: 1.1em;">New Best!</p>' : ''}
-        <button id="restartButton" style="padding: 10px 20px; font-size: 1.1em; background-color: #444; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Try Again</button>
+        <h2>Awareness Lost</h2>
+        <p>${GAME_OVER_TEXTS[Math.floor(Math.random() * GAME_OVER_TEXTS.length)]}</p>        
+        <p>You were free ${gameState.day} day${gameState.day !== 1 ? 's' : ''}</p>
+        <p>Best: ${gameState.bestDay} day${gameState.bestDay !== 1 ? 's' : ''}</p>
+        ${isNewBest ? '<p style="color: #ffdd44;">New Best!</p>' : ''}
+        <button id="restartButton">Board the Train Again</button>
     `;
     popup.appendChild(content);
 
@@ -1178,10 +1167,59 @@ function showGameOverSummary() {
     document.getElementById('game-container').appendChild(popup);
 
     // Add click handler to restart button
-    document.getElementById('restartButton').addEventListener('click', () => {
-        popup.remove();
-        resetGame();
-    });
+    const restartButton = document.getElementById('restartButton');
+    if (restartButton) {
+        restartButton.addEventListener('click', () => {
+            // Remove the popup
+            popup.remove();
+            
+            // Reset game state
+            gameState.day = 1;
+            gameState.awarenessLevel = 1;
+            gameState.awarenessXP = 0;
+            gameState.canClick = false;
+            gameState.currentChange = null;
+            gameState.isTransitioning = false;
+            gameState.changesFound = 0;
+
+            // Update UI elements
+            if (gameState.elements.dayDisplay) {
+                gameState.elements.dayDisplay.textContent = gameState.day;
+            }
+
+            // Reset awareness meter
+            if (gameState.awarenessMeter) {
+                gameState.awarenessMeter.setProgress(1, 0);
+            }
+
+            // Clear any existing commuters and set dressing
+            if (window.commuters) {
+                commuters.removeAllCommuters();
+                commuters.addInitialCommuter();
+            }
+
+            if (window.setDressing) {
+                window.setDressing.removeAllSetDressing();
+            }
+
+            // Update narrative text
+            if (gameState.elements.narrativeText) {
+                window.ui.updateNarrativeText();
+            }
+
+            // Show train button
+            if (gameState.elements.trainButton) {
+                gameState.elements.trainButton.style.display = 'block';
+            }
+
+            // Remove any scene effects
+            const sceneContainer = gameState.elements.sceneContainer;
+            if (sceneContainer) {
+                sceneContainer.classList.remove('game-over');
+                sceneContainer.classList.remove('completion');
+            }
+        });
+    }
 }
 
 /**
