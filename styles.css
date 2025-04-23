@@ -1155,3 +1155,50 @@ body.mobile .mobile-controls {
         transform: translateX(-50%);
     }
 }
+
+.game-over-popup {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #222;
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #444;
+    text-align: center;
+    z-index: 1000;
+    min-width: 300px;
+}
+
+.game-over-popup h2 {
+    color: #fff;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.game-over-popup p {
+    color: #ccc;
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+.game-over-popup button {
+    background-color: #444;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.game-over-popup button:hover {
+    background-color: #666 !important;
+    transform: scale(1.05);
+    transition: all 0.2s ease;
+}
+
+.game-over-popup button:active {
+    transform: scale(0.95);
+}

@@ -17,6 +17,7 @@ let gameState = {
     typewriter: null,
     awarenessMeter: null,
     changesFound: 0,
+    bestDay: 1,            // Track best day count
     elements: {
         // Elements will be defined in init()
     }
@@ -321,6 +322,12 @@ window.core = {
  */
 async function init() {
     console.log("Initializing Drone: The Daily Commute");
+
+    // Load best day from localStorage if it exists
+    const savedBestDay = localStorage.getItem('droneBestDay');
+    if (savedBestDay) {
+        gameState.bestDay = parseInt(savedBestDay);
+    }
 
     // Game elements should be hidden initially via CSS
     // The loading-overlay will be visible instead
@@ -1133,59 +1140,48 @@ function enhanceTouchTargets() {
  * Show game over summary with replay option
  * @param {string} message - The message to display
  */
-function showGameOverSummary(message) {
-    const sceneContainer = gameState.elements.sceneContainer;
-    const trainButton = gameState.elements.trainButton;
-    
-    // Disable clicking
-    gameState.canClick = false;
-    gameState.isTransitioning = true;
-    
-    // Add game over class
-    sceneContainer.classList.add('game-over');
-    
-    // Hide train button
-    if (trainButton) {
-        trainButton.style.display = 'none';
+function showGameOverSummary() {
+    // Create popup container
+    const popup = document.createElement('div');
+    popup.className = 'popup game-over-popup';
+    popup.style.position = 'absolute';
+    popup.style.left = '50%';
+    popup.style.top = '30%';  // Moved higher from previous 50%
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.backgroundColor = '#1a1a1a';
+    popup.style.padding = '20px';
+    popup.style.borderRadius = '10px';
+    popup.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.5)';
+    popup.style.textAlign = 'center';
+    popup.style.color = '#fff';
+    popup.style.zIndex = '1000';
+
+    // Check if this is a new best score
+    const isNewBest = gameState.day > gameState.bestDay;
+    if (isNewBest) {
+        gameState.bestDay = gameState.day;
+        localStorage.setItem('droneBestDay', gameState.bestDay);
     }
-    
-    // Select random ending text from config
-    const randomText = GAME_OVER_TEXTS[Math.floor(Math.random() * GAME_OVER_TEXTS.length)];
-    
-    // Update typewriter with random ending text
-    if (gameState.typewriter) {
-        gameState.typewriter.stop();
-        gameState.elements.narrativeText.textContent = '';
-        setTimeout(() => {
-            gameState.typewriter.type(randomText);
-        }, 100);
-    }
-    
-    // Create and show the summary popup
-    setTimeout(() => {
-        const summaryPopup = document.createElement('div');
-        summaryPopup.className = 'game-over-summary';
-        
-        summaryPopup.innerHTML = `
-            <h2>AWARENESS LOST</h2>
-            <p>${message}</p>
-            <p>Days on the train: ${gameState.day}</p>
-            <p>Awareness level: ${gameState.awarenessLevel}</p>
-            <p>Changes found: ${gameState.changesFound}</p>
-            <button id="replay-button">Take the Train Again</button>
-        `;
-        
-        // Add to document body instead of scene container
-        document.body.appendChild(summaryPopup);
-        
-        // Add event listener to replay button
-        const replayButton = document.getElementById('replay-button');
-        if (replayButton) {
-            replayButton.addEventListener('click', () => {
-                location.reload(); // Reload the page to restart the game
-            });
-        }
-    }, 2000);
+
+    // Create content
+    const content = document.createElement('div');
+    content.innerHTML = `
+        <h2 style="margin: 0 0 20px 0; color: #ff4444;">Game Over</h2>
+        <p style="margin: 0 0 10px 0; font-size: 1.2em;">Awareness increased over ${gameState.day} day${gameState.day !== 1 ? 's' : ''}</p>
+        <p style="margin: 0 0 20px 0; font-size: 1.1em;">Best: ${gameState.bestDay} day${gameState.bestDay !== 1 ? 's' : ''}</p>
+        ${isNewBest ? '<p style="color: #ffdd44; margin: 0 0 20px 0; font-size: 1.1em;">New Best!</p>' : ''}
+        <button id="restartButton" style="padding: 10px 20px; font-size: 1.1em; background-color: #444; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Try Again</button>
+    `;
+    popup.appendChild(content);
+
+    // Add popup to game container
+    document.getElementById('game-container').appendChild(popup);
+
+    // Add click handler to restart button
+    document.getElementById('restartButton').addEventListener('click', () => {
+        popup.remove();
+        resetGame();
+    });
 }
 
 /**
