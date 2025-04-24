@@ -17,6 +17,8 @@ let gameState = {
     typewriter: null,
     awarenessMeter: null,
     changesFound: 0,
+    usedNarratives: [],    // Track used narratives
+    usedThoughts: [],      // Track used thoughts
     elements: {
         // Elements will be defined in init()
     }
@@ -333,6 +335,8 @@ async function init() {
     gameState.currentChange = null;
     gameState.isTransitioning = false;
     gameState.changesFound = 0;
+    gameState.usedNarratives = [];  // Clear used narratives
+    gameState.usedThoughts = [];    // Clear used thoughts
 
     // BUGFIX: Always ensure train button exists
     const trainButton = document.getElementById('train-button');
@@ -1030,9 +1034,21 @@ function showRandomThoughtBubble(isPositive) {
         thoughts = THOUGHTS.negative;
     }
     
-    // Select a random thought
-    const randomThoughtIndex = Math.floor(Math.random() * thoughts.length);
-    const thought = thoughts[randomThoughtIndex];
+    // Filter out thoughts that have already been used
+    const availableThoughts = thoughts.filter(thought => !gameState.usedThoughts.includes(thought));
+    
+    // If all thoughts have been used, reset the used thoughts list
+    if (availableThoughts.length === 0) {
+        gameState.usedThoughts = [];
+        availableThoughts.push(...thoughts);
+    }
+    
+    // Select a random thought from available thoughts
+    const randomThoughtIndex = Math.floor(Math.random() * availableThoughts.length);
+    const thought = availableThoughts[randomThoughtIndex];
+    
+    // Add the thought to used thoughts
+    gameState.usedThoughts.push(thought);
     
     console.log(`Showing thought bubble: "${thought}"`);
     
@@ -1465,4 +1481,33 @@ function diagnoseBtnVisibility() {
         // Remove any classes that might hide it
         trainBtn.classList.remove('hidden');
     }
+}
+
+/**
+ * Update narrative text with typewriter effect
+ */
+function updateNarrativeText() {
+    if (!gameState.typewriter) return;
+    
+    // Get the appropriate narrative text based on the day
+    let narrativeText = '';
+    
+    // Filter out narratives that have already been used
+    const availableNarratives = NARRATIVE_TEXTS.filter(text => !gameState.usedNarratives.includes(text));
+    
+    // If all narratives have been used, reset the used narratives list
+    if (availableNarratives.length === 0) {
+        gameState.usedNarratives = [];
+        availableNarratives.push(...NARRATIVE_TEXTS);
+    }
+    
+    // Select a random narrative from available narratives
+    const randomIndex = Math.floor(Math.random() * availableNarratives.length);
+    narrativeText = availableNarratives[randomIndex];
+    
+    // Add the narrative to used narratives
+    gameState.usedNarratives.push(narrativeText);
+    
+    // Type out the narrative text
+    gameState.typewriter.type(narrativeText);
 }
