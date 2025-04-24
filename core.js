@@ -710,8 +710,27 @@ function initializeTrainPlatformBackground() {
     platformBackground.style.backgroundRepeat = 'no-repeat';
     platformBackground.style.zIndex = '1'; // Set low z-index so it appears behind all other elements
 
+    // Create the bench element
+    const bench = document.createElement('div');
+    bench.id = 'platform-bench';
+    bench.className = 'platform-bench';
+    
+    // Apply bench styles
+    bench.style.position = 'absolute';
+    bench.style.width = '144px';
+    bench.style.height = '54px';
+    bench.style.backgroundImage = 'url(assets/sprites/bench.png)';
+    bench.style.backgroundSize = 'contain';
+    bench.style.backgroundRepeat = 'no-repeat';
+    bench.style.backgroundPosition = 'center';
+    bench.style.zIndex = '2'; // Set higher than background but lower than other elements
+    bench.style.bottom = '23%'; // Position from bottom
+    bench.style.left = '30%'; // Center horizontally
+    bench.style.transform = 'translateX(-50%)'; // Center the bench
+
     // Insert at the beginning of the scene container
     gameState.elements.sceneContainer.insertBefore(platformBackground, gameState.elements.sceneContainer.firstChild);
+    gameState.elements.sceneContainer.appendChild(bench);
 }
 
 /**
