@@ -19,12 +19,16 @@ const THOUGHTS = {
         "Same commute, different day.",
         "Same shoes, same steps.",
         "Coffee. Platform. Silence. Repeat.",
-        "My soul is nearly drained.",
+        "Soul is nearly drained.",
         "Just me and my thoughts again.",
         "Same routine for years, still a stranger.",
         "Do I even belong here?",
         "We're all alone, just in the same place.",
-        "No one ever says good morning."
+        "No one ever says good morning.",
+        "Do I always stand in the same spot?",
+        "Feels like I’ve lived this day before.",
+        "Is this the same old story?",
+        "Is this all there is?"
     ],
     mid: [
         "Why do I do this every day?",
@@ -35,7 +39,10 @@ const THOUGHTS = {
         "Time feels different when you pay attention.",
         "Should I talk to them? Smile?",
         "We all stand together, but apart.",
-        "Not a single nod. Not a smile."
+        "Not a single nod. Not a smile.",
+        "Why is it so quiet when we’re here?",
+        "Am I the only one who feels this?"
+
     ],
     late: [
         "I don't have to do this forever.",
@@ -43,14 +50,19 @@ const THOUGHTS = {
         "There's more to life than this cycle.",
         "My soul feels less drained today.",
         "The grip is loosening.",
-        "Maybe we're not meant to do this."
+        "Maybe we're not meant to do this.",
+        "There’s a version of me I haven’t met yet.",
+        "Maybe this isn’t a rut, it’s a launchpad.",
+        "The rhythm’s still there, but I’m hearing melody."
     ],
     final: [
         "I am not just a drone.",
         "The man ain't got his grip on me.",
         "I'm going to break this cycle.",
         "Today will be different.",
-        "I'm my own person."
+        "I'm my own person.",
+        "I am more than my inbox.",
+        "Awake. For real this time."
     ],
     negative: [
         "Something feels off...",
@@ -69,32 +81,73 @@ const THOUGHTS = {
 const DAY_NARRATIVES = {
     // Early awareness levels (1-2)
     early: [
-        "Everyday the same?",
+        "Everyday the same??",
         "Something's not quite right...",
         "Is this day different somehow?",
-        "The routine feels... off today."
+        "The routine feels... off today.",
+        "Familiar, but not quite right...",
+        "The platform appears unchanged... almost.",
+        "Nothing new... or is there?",
+        "The pieces fit, but not quite the same.",
+        "The routine is familiar, but something's off.",
+        "The morning looks identical, but...",
+        "All seems in order, but..."
     ],
     // Mid awareness levels (3-4)
     mid: [
         "The changes are becoming more obvious...",
-        "My eyes are starting to open...",
-        "The pattern is changing subtly..."
+        "The pattern is changing subtly...",
+        "The shift happens every day now.",
+        "The difference is here, somewhere.",
+        "The change blends into the routine.",
+        "The pattern keeps evolving.",
+        "A new detail is present.",
+        "The scene adapts, will they...",
+        "Familiar forms rearranged again.",
+        "Change hides behind the ordinary.",
+        "The transformation is part of the cycle.",
+        "Alteration has become the norm.",
+        "Each day rewrites the scene.",
+        "The world shifts...",
+        "The illusion updates...",
+        "The platform no longer repeats itself."
     ],
     // Late awareness levels (5-7)
     late: [
-        "I'm starting to notice patterns...",
-        "The world is shifting around me...",
-        "I can see the changes clearly now...",
+        "The world is shifting...",
         "The platform isn't static anymore...",
-        "Reality seems more fluid today..."
+        "Reality seems more fluid today...",
+        "The environment no longer holds its shape.",
+        "Stability is only an illusion.",
+        "The platform breathes between moments.",
+        "Familiarity fades with each sunrise.",
+        "The edges of the scene are beginning to fray.",
+        "The pattern no longer loops — it spirals.",
+        "Nothing settles like it used to.",
+        "The routine melts into something else.",
+        "Structure bends without breaking.",
+        "The rules are rewriting themselves.",
+        "The background hum has changed its pitch.",
+        "Surfaces reflect more than they should."
     ],
     // Final awareness levels (8-10)
     final: [
         "The veil is lifting...",
-        "I'm beginning to see beyond the surface...",
         "The illusion is breaking down...",
-        "My perception expands with each passing day...",
-        "The train isn't just a train anymore..."
+        "Perception expands with each passing day...",
+        "The mask of reality is slipping.",
+        "This was never just a commute.",
+        "The truth hums beneath the surface.",
+        "The system reveals its seams.",
+        "The architecture of illusion is exposed.",
+        "Every object is a message now.",
+        "The ordinary has become sacred.",
+        "Time folds in on itself here.",
+        "The scene is a memory — not a place.",
+        "The simulation stutters under observation.",
+        "Meaning bleeds through the cracks.",
+        "The platform was always a threshold.",
+        "The standard is dissolving."      
     ],
     // Default backup narrative
     default: "The world keeps changing..."
@@ -115,8 +168,13 @@ const LEVEL_UP_NARRATIVES = {
         "The pattern breaks. A person is noticed.",
         "A stranger appears, yet feels familiar.",
         "A new soul emerges...",
-        "Sight expands. Others emerge.",
-        "One sees another. A quiet beginning."
+        "One sees another. A quiet beginning.",
+        "Another awakens within the frame.",
+        "Someone steps forward from the blur.",
+        "A gaze is returned for the first time.",
+        "The veil parts, and someone steps through.",
+        "A shape becomes a person. A person becomes a sign.",
+        "Another soul stirs the stillness."
     ],
     // Mid stage (levels 3-4)
     mid: [
@@ -125,7 +183,11 @@ const LEVEL_UP_NARRATIVES = {
         "They can see more details in each other...",
         "The world is becoming more than a blur...",
         "The people around are taking shape, becoming individuals...",
-        "The fog is lifting from perception..."
+        "The fog is lifting from perception...",
+        "The crowd divides into people.",
+        "Awareness brings the world into focus.",
+        "The veil of sameness is wearing thin.",
+        "Names are not known, but presence is felt."       
     ],
     // Late stage (levels 5-7)
     late: [
@@ -149,14 +211,17 @@ const LEVEL_UP_NARRATIVES = {
 // Game over texts
 const GAME_OVER_TEXTS = [
     "Back to being a drone...",
-    "Your brief moment of clarity fades...",
+    "The brief moment of clarity fades...",
     "The routine claims you once more...",
     "Everyone looks the same again...",
-    "Your awareness flickers and dims...",
+    "Awareness flickers and dims...",
     "The cycle of sameness resumes...",
-    "Your perception blurs back to normal...",
+    "Perception blurs back to normal...",
     "Back to being another passenger...",
     "The numbness returns, familiar and comforting...",
+    "Clarity is lose in the noise...",
+    "Monotony drifts back in...",
+    "Awareness slips away..."
 ];
 
 // Game over summary popup texts
@@ -167,7 +232,12 @@ const GAME_OVER_SUMMARY_TEXT = [
     "The details slipped through the cracks.",
     "Your mind wasn't quite sharp enough to spot the differences.",
     "The changes were there, but your awareness was not.",
-    "Your awareness needs more development."
+    "Your awareness needs more development.",
+    "The shift was beyond your grasp.",
+    "You let the routine blind you to the change.",
+    "Your focus slipped, and the differences vanished.",
+    "Your attention drifted, and the change was lost.",
+    "Your focus faltered, and the changes slipped by."
 ];
 
 // Game settings

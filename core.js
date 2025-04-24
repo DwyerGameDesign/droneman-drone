@@ -1196,7 +1196,7 @@ function showGameOverSummary(message) {
         summaryPopup.innerHTML = `
             <h2>AWARENESS LOST</h2>
             <p>${message}</p>
-            <p>Days on the train: ${gameState.day}</p>
+            <p></p>
             <p>${changesFoundText}</p>
             <button id="replay-button">Take the Train Again</button>
         `;
