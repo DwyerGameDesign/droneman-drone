@@ -219,7 +219,7 @@ const GAME_OVER_TEXTS = [
     "Perception blurs back to normal...",
     "Back to being another passenger...",
     "The numbness returns, familiar and comforting...",
-    "Clarity is lose in the noise...",
+    "Clarity is lost in the noise...",
     "Monotony drifts back in...",
     "Awareness slips away..."
 ];
