@@ -11,7 +11,7 @@ const MAX_SET_DRESSING = 8;
 const SET_DRESSING_POSITIONS = [
     [4, 21],   // Far far left
     [18, 22],  // Between far left and left
-    [31, 23],  // Between left and left-center
+    [31, 20],  // Between left and left-center
     [44, 21],  // Between center and left-center
     [56, 24],  // Between center and right-center
     [69, 22],  // Between right-center and right
@@ -21,7 +21,6 @@ const SET_DRESSING_POSITIONS = [
 
 // Types of set dressing elements - updated to match your available sprites
 const SET_DRESSING_TYPES = [
-    'bench',
     'bottle',
     'caution',
     'cautionalt',
@@ -152,10 +151,6 @@ function addSetDressing() {
     // Calculate dimensions based on type
     let width, height;
     switch(selectedType) {
-        case 'bench':
-            width = 144;
-            height = 54;
-            break;
         case 'bottle':
             width = 18;
             height = 27;

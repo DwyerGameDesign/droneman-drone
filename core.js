@@ -724,7 +724,7 @@ function initializeTrainPlatformBackground() {
     bench.style.backgroundRepeat = 'no-repeat';
     bench.style.backgroundPosition = 'center';
     bench.style.zIndex = '2'; // Set higher than background but lower than other elements
-    bench.style.bottom = '23%'; // Position from bottom
+    bench.style.bottom = '24%'; // Position from bottom
     bench.style.left = '30%'; // Center horizontally
     bench.style.transform = 'translateX(-50%)'; // Center the bench
 
