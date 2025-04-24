@@ -336,7 +336,6 @@ const CHANGE_MESSAGES = {
     setDressing: {
         // Messages for when a new set dressing item is added
         'new': {
-            'bench': "The bench wasn't here yesterday...",
             'bottle': "The bottle wasn't here yesterday...",
             'trash': "The trash wasn't here yesterday...",
             'trashcan': "The trashcan wasn't here yesterday...",
@@ -344,17 +343,7 @@ const CHANGE_MESSAGES = {
             'backpack': "The backpack wasn't here yesterday...",
             'rat': "The rat wasn't here yesterday..."
         },
-        // Messages for when one set dressing piece changes to another
-        'bench': {
-            'bottle': "Yesterday, this was a bench...",
-            'trash': "Yesterday, this was a bench...",
-            'trashcan': "Yesterday, this was a bench...",
-            'caution': "Yesterday, this was a bench...",
-            'backpack': "Yesterday, this was a bench...",
-            'rat': "Yesterday, this was a bench..."
-        },
         'bottle': {
-            'bench': "Yesterday, this was a bottle...",
             'trash': "Yesterday, this was a bottle...",
             'trashcan': "Yesterday, this was a bottle...",
             'caution': "Yesterday, this was a bottle...",
@@ -362,7 +351,6 @@ const CHANGE_MESSAGES = {
             'rat': "Yesterday, this was a bottle..."
         },
         'trash': {
-            'bench': "Yesterday, this was trash...",
             'bottle': "Yesterday, this was trash...",
             'trashcan': "Yesterday, this was trash...",
             'caution': "Yesterday, this was trash...",
@@ -370,7 +358,6 @@ const CHANGE_MESSAGES = {
             'rat': "Yesterday, this was trash..."
         },
         'trashcan': {
-            'bench': "Yesterday, this was a trashcan...",
             'bottle': "Yesterday, this was a trashcan...",
             'trash': "Yesterday, this was a trashcan...",
             'caution': "Yesterday, this was a trashcan...",
@@ -378,7 +365,6 @@ const CHANGE_MESSAGES = {
             'rat': "Yesterday, this was a trashcan..."
         },
         'caution': {
-            'bench': "Yesterday, this was a caution sign...",
             'bottle': "Yesterday, this was a caution sign...",
             'trash': "Yesterday, this was a caution sign...",
             'trashcan': "Yesterday, this was a caution sign...",
@@ -386,7 +372,6 @@ const CHANGE_MESSAGES = {
             'rat': "Yesterday, this was a caution sign..."
         },
         'backpack': {
-            'bench': "Yesterday, this was a backpack...",
             'bottle': "Yesterday, this was a backpack...",
             'trash': "Yesterday, this was a backpack...",
             'trashcan': "Yesterday, this was a backpack...",
@@ -394,7 +379,6 @@ const CHANGE_MESSAGES = {
             'rat': "Yesterday, this was a backpack..."
         },
         'rat': {
-            'bench': "Yesterday, this was a rat...",
             'bottle': "Yesterday, this was a rat...",
             'trash': "Yesterday, this was a rat...",
             'trashcan': "Yesterday, this was a rat...",
