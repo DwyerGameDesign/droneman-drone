@@ -24,13 +24,13 @@ const THOUGHTS = {
         "Same routine for years, still a stranger.",
         "Do I even belong here?",
         "We're all alone, just in the same place.",
-        "No one ever says good morning.",
         "Do I always stand in the same spot?",
         "Feels like I’ve lived this day before.",
         "Is this the same old story?",
         "Is this all there is?"
     ],
     mid: [
+        "No one ever says good morning.",
         "Why do I do this every day?",
         "The train moves, but am I going anywhere?",
         "Do they notice me, like I notice them?",
