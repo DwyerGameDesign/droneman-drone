@@ -25,7 +25,7 @@ const THOUGHTS = {
         "Do I even belong here?",
         "We're all alone, just in the same place.",
         "Do I always stand in the same spot?",
-        "Feels like I’ve lived this day before.",
+        "Feels like I've lived this day before.",
         "Is this the same old story?",
         "Is this all there is?"
     ],
@@ -40,7 +40,7 @@ const THOUGHTS = {
         "Should I talk to them? Smile?",
         "We all stand together, but apart.",
         "Not a single nod. Not a smile.",
-        "Why is it so quiet when we’re here?",
+        "Why is it so quiet when we're here?",
         "Am I the only one who feels this?"
 
     ],
@@ -51,9 +51,9 @@ const THOUGHTS = {
         "My soul feels less drained today.",
         "The grip is loosening.",
         "Maybe we're not meant to do this.",
-        "There’s a version of me I haven’t met yet.",
-        "Maybe this isn’t a rut, it’s a launchpad.",
-        "The rhythm’s still there, but I’m hearing melody."
+        "There's a version of me I haven't met yet.",
+        "Maybe this isn't a rut, it's a launchpad.",
+        "The rhythm's still there, but I'm hearing melody."
     ],
     final: [
         "I am not just a drone.",
@@ -225,20 +225,32 @@ const GAME_OVER_TEXTS = [
 ];
 
 // Game over summary popup texts
-const GAME_OVER_SUMMARY_TEXT = [
-    "Your awareness wasn't strong enough to notice the changes.",
-    "The subtle differences escaped your observation.",
-    "Your perception couldn't capture the changes.",
-    "The details slipped through the cracks.",
-    "Your mind wasn't quite sharp enough to spot the differences.",
-    "The changes were there, but your awareness was not.",
-    "Your awareness needs more development.",
-    "The shift was beyond your grasp.",
-    "You let the routine blind you to the change.",
-    "Your focus slipped, and the differences vanished.",
-    "Your attention drifted, and the change was lost.",
-    "Your focus faltered, and the changes slipped by."
-];
+const GAME_OVER_SUMMARY_TEXT = {
+    // Early awareness levels (1-2)
+    early: [
+        "Your awareness is just beginning to form. Keep trying.",
+        "The changes were too subtle for your current perception.",
+        "You're only seeing the surface level. Look deeper.",
+        "Your mind is still clouded by routine.",
+        "The patterns of conformity still blind you."
+    ],
+    // Mid awareness levels (3-4)
+    mid: [
+        "Your awareness was growing, but not quite strong enough.",
+        "You were starting to see clearly, then lost focus.",
+        "The veil was lifting, but fell back into place.",
+        "You glimpsed beyond the routine, then slipped back.",
+        "Your perception expanded, then contracted again."
+    ],
+    // Late awareness levels (5-10)
+    late: [
+        "So close to true awareness, yet the system pulled you back.",
+        "The illusion almost broke for you, but reasserted itself.",
+        "You were on the verge of breaking free from the cycle.",
+        "Your heightened awareness couldn't be sustained.",
+        "The machinery of routine reclaimed you at the last moment."
+    ]
+};
 
 // Game settings
 const GAME_SETTINGS = {

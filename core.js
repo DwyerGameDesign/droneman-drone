@@ -1198,8 +1198,18 @@ function showGameOverSummary(message) {
     
     // Use default message if none provided
     if (!message) {
-        // Select a random message from the GAME_OVER_SUMMARY_TEXT array
-        message = GAME_OVER_SUMMARY_TEXT[Math.floor(Math.random() * GAME_OVER_SUMMARY_TEXT.length)];
+        // Determine which set of messages to use based on awareness level
+        let messageSet;
+        if (gameState.awarenessLevel <= 2) {
+            messageSet = GAME_OVER_SUMMARY_TEXT.early;
+        } else if (gameState.awarenessLevel <= 4) {
+            messageSet = GAME_OVER_SUMMARY_TEXT.mid;
+        } else {
+            messageSet = GAME_OVER_SUMMARY_TEXT.late;
+        }
+        
+        // Select a random message from the appropriate message set
+        message = messageSet[Math.floor(Math.random() * messageSet.length)];
     }
     
     // Get or update the high score
