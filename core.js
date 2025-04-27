@@ -315,7 +315,8 @@ window.core = {
     gameComplete,
     showGameOverSummary,
     diagnoseBtnVisibility,
-    revealGame
+    revealGame,
+    addClickBlocker
 };
 
 /**
@@ -474,7 +475,70 @@ function revealGame() {
         
         // Enable clicking if we're on day 2 or later
         gameState.canClick = gameState.day >= 2;
+        
+        // Add click blocker on day 1
+        if (gameState.day === 1) {
+            addClickBlocker();
+        }
     }, 1000);
+}
+
+/**
+ * Add a click blocker to prevent interaction with the scene
+ * Shows an appropriate message directing player to take the train
+ */
+function addClickBlocker() {
+    const sceneContainer = gameState.elements.sceneContainer;
+    
+    // Remove any existing click blockers first
+    const existingBlockers = document.querySelectorAll('.click-blocker');
+    existingBlockers.forEach(blocker => {
+        if (blocker.parentNode) {
+            blocker.parentNode.removeChild(blocker);
+        }
+    });
+    
+    // Create click blocker element
+    const clickBlocker = document.createElement('div');
+    clickBlocker.className = 'click-blocker';
+    
+    // Style the click blocker
+    Object.assign(clickBlocker.style, {
+        position: 'absolute',
+        top: '0',
+        left: '0',
+        width: '100%',
+        height: '100%',
+        zIndex: '50',  // High enough to block clicks but below UI elements
+        cursor: 'default',
+        background: 'transparent'
+    });
+    
+    // Add click handler that prevents propagation and shows a message
+    clickBlocker.addEventListener('click', function(event) {
+        event.stopPropagation();
+        
+        // Show different messages based on game state
+        if (gameState.day === 1) {
+            // Day 1 - first time message
+            window.ui.showMessage("Take the 6:40 train to begin your journey", 1500);
+        } else if (gameState.currentChange && gameState.currentChange.found) {
+            // Change was found - tell player to take the train to continue
+            window.ui.showMessage("You already found the change today.\nTake the train to continue your journey", 1500);
+        } else {
+            // Other cases (clicked wrong area, etc.)
+            window.ui.showMessage("Find what changed before taking the train", 1500);
+        }
+    });
+    
+    // Add to scene container
+    sceneContainer.appendChild(clickBlocker);
+    
+    // Make sure train button is visible and clickable (positioned above the blocker)
+    if (gameState.elements.trainButton) {
+        gameState.elements.trainButton.style.zIndex = '100';
+        gameState.elements.trainButton.style.position = 'relative'; // Ensure it's positioned
+    }
 }
 
 /**

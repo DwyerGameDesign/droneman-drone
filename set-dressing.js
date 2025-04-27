@@ -280,12 +280,9 @@ function handleSetDressingClick(event) {
         // Highlight the set dressing element with temporary pulse effect
         highlightElement(setDressingElement);
         
-        // Just create a click blocker without adding permanent found-change class
+        // Add click blocker using the core function
         setTimeout(() => {
-            // Create and add click blocker to prevent further interactions
-            const clickBlocker = document.createElement('div');
-            clickBlocker.className = 'click-blocker';
-            gameState.elements.sceneContainer.appendChild(clickBlocker);
+            window.core.addClickBlocker();
         }, 1500);
         
         // Add doober animation to awareness meter

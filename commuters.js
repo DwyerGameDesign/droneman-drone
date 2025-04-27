@@ -246,12 +246,9 @@ function handleCommuterClick(event) {
         // Highlight the commuter
         commuters.highlightElement(commuterElement);
         
-        // Just create a click blocker without adding permanent found-change class
+        // Add click blocker using the core function
         setTimeout(() => {
-            // Create and add click blocker to prevent further interactions
-            const clickBlocker = document.createElement('div');
-            clickBlocker.className = 'click-blocker';
-            gameState.elements.sceneContainer.appendChild(clickBlocker);
+            window.core.addClickBlocker();
         }, 1500);
         
         // Add doober animation to awareness meter
