@@ -103,8 +103,21 @@ function updateTypewriterText(text) {
  * @param {boolean} positionHigher - Whether to position the message higher on the screen
  */
 function showMessage(text, duration = 2000, positionHigher = false) {
+    // Get the message element
+    const message = document.getElementById('message');
+    if (!message) {
+        console.error("Message element not found");
+        return;
+    }
+    
+    // Set the text content
     message.textContent = text;
+    
+    // Display the message
+    message.style.display = 'block';
     message.style.visibility = 'visible';
+    message.style.opacity = '1';
+    message.style.whiteSpace = 'pre-wrap'; // This makes \n work properly
     
     // Position the message higher if requested
     if (positionHigher) {
@@ -115,12 +128,19 @@ function showMessage(text, duration = 2000, positionHigher = false) {
         message.style.fontSize = '1em'; // Default font size
     }
 
-    setTimeout(() => {
-        message.style.visibility = 'hidden';
-        // Reset position and font size after hiding
-        message.style.top = '30%';
-        message.style.fontSize = '1em';
-    }, duration);
+    // Check for persistent display (very long duration)
+    if (duration >= 60000) {
+        console.log("Showing persistent message: " + text);
+    } else {
+        // For normal messages, hide after the specified duration
+        setTimeout(() => {
+            message.style.display = 'none';
+            message.style.visibility = 'hidden';
+            // Reset position and font size after hiding
+            message.style.top = '30%';
+            message.style.fontSize = '1em';
+        }, duration);
+    }
 }
 
 /**

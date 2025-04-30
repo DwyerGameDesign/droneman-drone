@@ -242,9 +242,18 @@ function handleCommuterClick(event) {
 
         // Mark as found
         gameState.currentChange.found = true;
+        
+        // Clear any tutorial message that might be showing
+        if (gameState.isFirstTimePlayer) {
+            const messageElement = document.getElementById('message');
+            if (messageElement) {
+                messageElement.style.display = 'none';
+                messageElement.style.visibility = 'hidden';
+            }
+        }
 
         // Highlight the commuter
-        commuters.highlightElement(commuterElement);
+        window.commuters.highlightElement(commuterElement);
         
         // Add click blocker using the core function
         setTimeout(() => {

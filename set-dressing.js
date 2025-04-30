@@ -275,6 +275,15 @@ function handleSetDressingClick(event) {
 
         // Mark as found
         gameState.currentChange.found = true;
+        
+        // Clear any tutorial message that might be showing
+        if (gameState.isFirstTimePlayer) {
+            const messageElement = document.getElementById('message');
+            if (messageElement) {
+                messageElement.style.display = 'none';
+                messageElement.style.visibility = 'hidden';
+            }
+        }
 
         // Highlight the set dressing element with temporary pulse effect
         highlightElement(setDressingElement);

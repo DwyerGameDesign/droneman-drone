@@ -20,6 +20,7 @@ let gameState = {
     usedNarratives: [],    // Track used narratives
     usedThoughts: [],      // Track used thoughts
     isFirstTimePlayer: true, // Track if it's the player's first time
+    activeMessageTimer: null, // Track active message timer
     elements: {
         // Elements will be defined in init()
     }
@@ -498,14 +499,19 @@ function revealGame() {
  */
 function showFirstTimeGuide() {
     // Only show if this is the player's first time
-    if (!gameState.isFirstTimePlayer) return;
+    if (!gameState.isFirstTimePlayer) {
+        console.log("Not showing guide: not a first-time player");
+        return;
+    }
+    
+    console.log(`Showing first-time guide for day ${gameState.day}`);
     
     let message = '';
     
     // Different messages for different days
     switch (gameState.day) {
         case 1:
-            message = "Take the 6:40 train to begin your journey";
+            message = "Take the 6:40 train to begin your journey.";
             break;
         case 2:
             message = "Something new has appeared on the platform. Select it if you are aware.";
@@ -514,17 +520,29 @@ function showFirstTimeGuide() {
             message = "What's different from yesterday? Look closely.";
             break;
         case 4:
-            message = "Awareness is the first step to waking up.";
+            message = "Keep finding changes. Awareness is the first step to waking up.";
             break;
         default:
             // No message for later days
+            console.log(`No guide message for day ${gameState.day}`);
             return;
     }
     
-    // Show the guide message using UI
-    setTimeout(() => {
-        window.ui.showMessage(message, 3500);
-    }, 1000);
+    console.log(`Guide message for day ${gameState.day}: "${message}"`);
+    
+    // Clear any existing message timer
+    if (gameState.activeMessageTimer) {
+        clearTimeout(gameState.activeMessageTimer);
+        gameState.activeMessageTimer = null;
+    }
+    
+    // Make sure UI is ready before showing the message
+    if (window.ui && typeof window.ui.showMessage === 'function') {
+        // Show the guide message persistently with higher position
+        window.ui.showMessage(message, 300000, true); // 5 minutes, positioned higher
+    } else {
+        console.error("UI system not available for showing message");
+    }
 }
 
 /**
@@ -568,7 +586,7 @@ function addClickBlocker() {
             window.ui.showMessage("Take the 6:40 train to begin your journey.", 1500);
         } else if (gameState.currentChange && gameState.currentChange.found) {
             // Change was found - tell player to take the train to continue
-            window.ui.showMessage("You already found the change today.\nTake the train to continue your journey.", 1500);
+            window.ui.showMessage("You already found the change today. Take the train to continue your journey.", 1500);
         } else {
             // Other cases (clicked wrong area, etc.)
             window.ui.showMessage("Find what changed before taking the train.", 1500);
@@ -855,6 +873,19 @@ function takeTrain() {
     console.log("Taking the train");
     gameState.isTransitioning = true;
 
+    // Clear any active message timers
+    if (gameState.activeMessageTimer) {
+        clearTimeout(gameState.activeMessageTimer);
+        gameState.activeMessageTimer = null;
+    }
+    
+    // Clear any displayed message
+    const messageElement = document.getElementById('message');
+    if (messageElement) {
+        messageElement.style.display = 'none';
+        messageElement.style.visibility = 'hidden';
+    }
+
     // Reset cursor style
     if (gameState.elements.sceneContainer) {
         gameState.elements.sceneContainer.style.cursor = 'default';
@@ -922,11 +953,11 @@ function proceedToNextDay() {
         
         // Increment day
         gameState.day++;
+        console.log(`Day ${gameState.day} starts, isFirstTimePlayer: ${gameState.isFirstTimePlayer}`);
+        
         if (gameState.elements.dayDisplay) {
             gameState.elements.dayDisplay.textContent = gameState.day;
         }
-        
-        console.log(`Day ${gameState.day} starts`);
         
         // Reset current change
         gameState.currentChange = null;
@@ -954,13 +985,17 @@ function proceedToNextDay() {
                         }, 1500); // 3 seconds delay after narrative text
                     }
                     
-                    // Show first-time player guide if appropriate
-                    if (gameState.isFirstTimePlayer) {
-                        showFirstTimeGuide();
+                    // Important: Show first-time player guide with a longer delay to ensure UI is fully ready
+                    if (gameState.isFirstTimePlayer && gameState.day <= 4) {
+                        console.log(`Scheduling first-time guide for day ${gameState.day}`);
+                        setTimeout(() => {
+                            showFirstTimeGuide();
+                        }, 1000); // Increased delay to ensure UI is ready
                     }
                     
                     // After day 4, mark that the player is no longer a first-time player
                     if (gameState.day > 4 && gameState.isFirstTimePlayer) {
+                        console.log("First-time player experience complete, setting flag to false");
                         localStorage.setItem('droneFirstTime', 'false');
                         gameState.isFirstTimePlayer = false;
                     }
