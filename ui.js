@@ -25,7 +25,7 @@ function updateNarrativeText() {
     // For day 1, always use the specific text
     if (gameState.day === 1) {
         console.log("Day 1: Using specific narrative text 'everyday the same...'");
-        gameState.typewriter.type("everyday the same... until you look closer.");
+        gameState.typewriter.type("everyday the same...");
         return;
     }
 

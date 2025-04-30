@@ -19,6 +19,7 @@ let gameState = {
     changesFound: 0,
     usedNarratives: [],    // Track used narratives
     usedThoughts: [],      // Track used thoughts
+    isFirstTimePlayer: true, // Track if it's the player's first time
     elements: {
         // Elements will be defined in init()
     }
@@ -316,7 +317,8 @@ window.core = {
     showGameOverSummary,
     diagnoseBtnVisibility,
     revealGame,
-    addClickBlocker
+    addClickBlocker,
+    showFirstTimeGuide
 };
 
 /**
@@ -327,6 +329,9 @@ async function init() {
 
     // Game elements should be hidden initially via CSS
     // The loading-overlay will be visible instead
+
+    // Check if this is the player's first time
+    gameState.isFirstTimePlayer = localStorage.getItem('droneFirstTime') !== 'false';
 
     // Initialize game state
     gameState.day = 1;
@@ -480,6 +485,45 @@ function revealGame() {
         if (gameState.day === 1) {
             addClickBlocker();
         }
+        
+        // Show first-time player guide if this is their first time
+        if (gameState.isFirstTimePlayer) {
+            showFirstTimeGuide();
+        }
+    }, 1000);
+}
+
+/**
+ * Show first-time player guide message based on current day
+ */
+function showFirstTimeGuide() {
+    // Only show if this is the player's first time
+    if (!gameState.isFirstTimePlayer) return;
+    
+    let message = '';
+    
+    // Different messages for different days
+    switch (gameState.day) {
+        case 1:
+            message = "Take the 6:40 train to begin your journey";
+            break;
+        case 2:
+            message = "Can you find what was added to the platform?";
+            break;
+        case 3:
+            message = "Can you find what changed from yesterday?";
+            break;
+        case 4:
+            message = "Keep finding changes until you awaken.";
+            break;
+        default:
+            // No message for later days
+            return;
+    }
+    
+    // Show the guide message using UI
+    setTimeout(() => {
+        window.ui.showMessage(message, 3500);
     }, 1000);
 }
 
@@ -521,13 +565,13 @@ function addClickBlocker() {
         // Show different messages based on game state
         if (gameState.day === 1) {
             // Day 1 - first time message
-            window.ui.showMessage("Take the 6:40 train to begin your journey", 1500);
+            window.ui.showMessage("Take the 6:40 train to begin your journey.", 1500);
         } else if (gameState.currentChange && gameState.currentChange.found) {
             // Change was found - tell player to take the train to continue
-            window.ui.showMessage("You already found the change today.\nTake the train to continue your journey", 1500);
+            window.ui.showMessage("You already found the change today.\nTake the train to continue your journey.", 1500);
         } else {
             // Other cases (clicked wrong area, etc.)
-            window.ui.showMessage("Find what changed before taking the train", 1500);
+            window.ui.showMessage("Find what changed before taking the train.", 1500);
         }
     });
     
@@ -902,12 +946,23 @@ function proceedToNextDay() {
                     window.ui.updateNarrativeText();
                     
                     // Show a random thought bubble after the narrative text has been displayed
-                    // and had time to be read (if day is 2 or later)
-                    if (gameState.day >= 2) {
+                    // and had time to be read (if day is 2 or later and not a first-time player in tutorial)
+                    if (gameState.day >= 2 && !(gameState.isFirstTimePlayer && gameState.day <= 4)) {
                         // Increased delay to allow player to read the narrative text first
-                setTimeout(() => {
+                        setTimeout(() => {
                             showRandomThoughtBubble(true);
                         }, 1500); // 3 seconds delay after narrative text
+                    }
+                    
+                    // Show first-time player guide if appropriate
+                    if (gameState.isFirstTimePlayer) {
+                        showFirstTimeGuide();
+                    }
+                    
+                    // After day 4, mark that the player is no longer a first-time player
+                    if (gameState.day > 4 && gameState.isFirstTimePlayer) {
+                        localStorage.setItem('droneFirstTime', 'false');
+                        gameState.isFirstTimePlayer = false;
                     }
                 }, 100);
             }
@@ -1071,6 +1126,9 @@ function removeAwarenessXP(amount) {
 function showRandomThoughtBubble(isPositive) {
     // Only proceed if there are commuters
     if (!commuters.allCommuters || commuters.allCommuters.length === 0) return;
+
+    // Don't show thought bubbles during the first 4 days for first-time players
+    if (gameState.isFirstTimePlayer && gameState.day <= 4) return;
 
     // If we've missed a change, don't show random negative thoughts
     // The custom message will be shown by the click handler instead

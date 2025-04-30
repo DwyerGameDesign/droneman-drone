@@ -23,7 +23,6 @@ const SET_DRESSING_POSITIONS = [
 const SET_DRESSING_TYPES = [
     'bottle',
     'caution',
-    'cautionalt',
     'trash',
     'trashcan',
     'backpack',
