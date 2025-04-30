@@ -508,13 +508,13 @@ function showFirstTimeGuide() {
             message = "Take the 6:40 train to begin your journey";
             break;
         case 2:
-            message = "Can you find what was added to the platform?";
+            message = "Something new has appeared on the platform. Select it if you are aware.";
             break;
         case 3:
-            message = "Can you find what changed from yesterday?";
+            message = "What's different from yesterday? Look closely.";
             break;
         case 4:
-            message = "Keep finding changes until you awaken.";
+            message = "Awareness is the first step to waking up.";
             break;
         default:
             // No message for later days

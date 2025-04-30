@@ -295,10 +295,10 @@ const CHANGE_MESSAGES = {
     commuter: {
         // Messages for when a commuter's appearance changes
         'commuter1': {
-            'commuter1_a': "Yesterday, he had a briefcase...",
+            'commuter1_a': "Yesterday, he did not have a briefcase...",
         },
         'commuter1_a': {
-            'commuter1': "Yesterday, he did not have a briefcase..."
+            'commuter1': "Yesterday, he had a briefcase..."
         },
         'commuter2': {
             'commuter2_a': "Yesterday, she had a briefcase...",
