@@ -276,6 +276,9 @@ function handleSetDressingClick(event) {
         // Mark as found
         gameState.currentChange.found = true;
         
+        // Ensure clean change state for transitions
+        window.core.clearChangeState();
+        
         // Clear any tutorial message that might be showing
         if (gameState.isFirstTimePlayer) {
             const messageElement = document.getElementById('message');

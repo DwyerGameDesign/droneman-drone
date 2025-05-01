@@ -133,13 +133,13 @@ function showMessage(text, duration = 2000, positionHigher = false) {
         console.log("Showing persistent message: " + text);
     } else {
         // For normal messages, hide after the specified duration
-        setTimeout(() => {
+    setTimeout(() => {
             message.style.display = 'none';
-            message.style.visibility = 'hidden';
-            // Reset position and font size after hiding
-            message.style.top = '30%';
-            message.style.fontSize = '1em';
-        }, duration);
+        message.style.visibility = 'hidden';
+        // Reset position and font size after hiding
+        message.style.top = '30%';
+        message.style.fontSize = '1em';
+    }, duration);
     }
 }
 

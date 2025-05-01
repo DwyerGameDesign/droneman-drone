@@ -278,10 +278,10 @@ const AWARENESS_CONFIG = {
         null,   // Level 0 (not used)
         60,     // XP needed for level 1 → level 2
         75,     // XP needed for level 2 → level 3
-        75,     // XP needed for level 3 → level 4
-        75,     // XP needed for level 4 → level 5
-        100,    // XP needed for level 5 → level 6
-        100,    // XP needed for level 6 → level 7
+        100,     // XP needed for level 3 → level 4
+        100,     // XP needed for level 4 → level 5
+        125,    // XP needed for level 5 → level 6
+        125,    // XP needed for level 6 → level 7
         150,    // XP needed for level 7 → level 8
         200,    // XP needed for level 8 → level 9
         200,    // XP needed for level 9 → level 10

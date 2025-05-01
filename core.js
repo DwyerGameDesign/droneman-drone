@@ -319,7 +319,8 @@ window.core = {
     diagnoseBtnVisibility,
     revealGame,
     addClickBlocker,
-    showFirstTimeGuide
+    showFirstTimeGuide,
+    clearChangeState
 };
 
 /**
@@ -868,9 +869,16 @@ function initializeTrainPlatformBackground() {
  */
 function takeTrain() {
     // Prevent multiple clicks during transition
-    if (gameState.isTransitioning) return;
+    if (gameState.isTransitioning) {
+        console.log("Ignoring train button click: already transitioning");
+        return;
+    }
 
     console.log("Taking the train");
+    console.log("Current change state before taking train:", 
+                gameState.currentChange ? JSON.stringify(gameState.currentChange) : "null");
+    
+    // Set transitioning flag
     gameState.isTransitioning = true;
 
     // Clear any active message timers
@@ -885,6 +893,22 @@ function takeTrain() {
         messageElement.style.display = 'none';
         messageElement.style.visibility = 'hidden';
     }
+    
+    // Clear any thought bubbles
+    const thoughtBubbles = document.querySelectorAll('.thought-bubble, .temp-thought');
+    thoughtBubbles.forEach(bubble => {
+        if (bubble.parentNode) {
+            bubble.parentNode.removeChild(bubble);
+        }
+    });
+    
+    // Clear any popup messages
+    const popupMessages = document.querySelectorAll('#popup-message');
+    popupMessages.forEach(popup => {
+        if (popup.parentNode) {
+            popup.parentNode.removeChild(popup);
+        }
+    });
 
     // Reset cursor style
     if (gameState.elements.sceneContainer) {
@@ -902,8 +926,12 @@ function takeTrain() {
         gameState.elements.trainButton.style.display = 'none';
     }
 
+    // Store whether there was an unfound change
+    const hasUnfoundChange = gameState.currentChange && !gameState.currentChange.found;
+    console.log("Has unfound change:", hasUnfoundChange);
+
     // Check if there's an unfound change to highlight
-    if (gameState.currentChange && !gameState.currentChange.found) {
+    if (hasUnfoundChange) {
         // Highlight missed change
         if (!gameState.currentChange.changeType || gameState.currentChange.changeType === 'commuter') {
             commuters.highlightMissedChange();
@@ -913,6 +941,8 @@ function takeTrain() {
 
         // Proceed to next day after highlighting
         setTimeout(() => {
+            // Clear change state before proceeding to next day
+            clearChangeState();
             proceedToNextDay();
         }, 1500);
     } else {
@@ -921,6 +951,8 @@ function takeTrain() {
             addAwarenessXP(calculateTrainXP());
         }
         
+        // Clear change state before proceeding to next day
+        clearChangeState();
         // Proceed immediately
         proceedToNextDay();
     }
@@ -930,6 +962,10 @@ function takeTrain() {
  * Function to handle the transition to the next day
  */
 function proceedToNextDay() {
+    console.log("--- PROCEEDING TO NEXT DAY ---");
+    console.log("Current change state before day transition:", 
+                gameState.currentChange ? JSON.stringify(gameState.currentChange) : "null");
+    
     // Refresh train button reference to prevent stale references
     gameState.elements.trainButton = document.getElementById('train-button');
     
@@ -951,6 +987,28 @@ function proceedToNextDay() {
             }
         });
         
+        // Remove highlight classes
+        const highlightElements = document.querySelectorAll('.highlight-pulse, .highlight-missed');
+        highlightElements.forEach(element => {
+            element.classList.remove('highlight-pulse', 'highlight-missed');
+        });
+        
+        // Clear any remaining thought bubbles that might have been missed
+        const thoughtBubbles = document.querySelectorAll('.thought-bubble, .temp-thought');
+        thoughtBubbles.forEach(bubble => {
+            if (bubble.parentNode) {
+                bubble.parentNode.removeChild(bubble);
+            }
+        });
+        
+        // Clear any popup messages that might remain
+        const popupMessages = document.querySelectorAll('#popup-message');
+        popupMessages.forEach(popup => {
+            if (popup.parentNode) {
+                popup.parentNode.removeChild(popup);
+            }
+        });
+        
         // Increment day
         gameState.day++;
         console.log(`Day ${gameState.day} starts, isFirstTimePlayer: ${gameState.isFirstTimePlayer}`);
@@ -959,11 +1017,19 @@ function proceedToNextDay() {
             gameState.elements.dayDisplay.textContent = gameState.day;
         }
         
-        // Reset current change
-        gameState.currentChange = null;
+        // Reset click state
+        gameState.canClick = false; // Will be set to true after changes are determined
+        
+        // Log change state before generating new changes
+        console.log("Change state before determining changes:", 
+                    gameState.currentChange ? JSON.stringify(gameState.currentChange) : "null");
         
         // Determine if there should be a change today
         determineChangesForDay();
+        
+        // Log the determined changes
+        console.log("Change state after determining changes:", 
+                    gameState.currentChange ? JSON.stringify(gameState.currentChange) : "null");
 
         // Fade back in
         setTimeout(() => {
@@ -1004,6 +1070,12 @@ function proceedToNextDay() {
 
             // Enable interactions after fade-in
             gameState.isTransitioning = false;
+            console.log("Day transition complete, game state:", {
+                day: gameState.day,
+                canClick: gameState.canClick,
+                isTransitioning: gameState.isTransitioning,
+                currentChange: gameState.currentChange ? "exists" : "null"
+            });
         }, 500); // Fade in duration
     }, 500); // Fade out duration
 }
@@ -1012,6 +1084,14 @@ function proceedToNextDay() {
  * Determine which changes should occur for the current day
  */
 function determineChangesForDay() {
+    console.log(`Determining changes for day ${gameState.day}`);
+    
+    // Fully clear the current change state before determining new changes
+    // This is crucial to prevent day-to-day state issues
+    console.log("Resetting current change state from:", 
+                gameState.currentChange ? JSON.stringify(gameState.currentChange) : "null");
+    gameState.currentChange = null;
+    
     // Create changes for the new day based on specific pattern
     if (gameState.day === 2) {
         // On day 2, add a set dressing piece
@@ -1045,6 +1125,9 @@ function determineChangesForDay() {
     if (gameState.day >= 2 && gameState.elements.trainButton) {
         gameState.elements.trainButton.style.display = 'none';
     }
+    
+    console.log("After determining changes: canClick =", gameState.canClick, 
+                ", currentChange =", gameState.currentChange ? JSON.stringify(gameState.currentChange) : "null");
 }
 
 /**
@@ -1677,4 +1760,40 @@ function updateNarrativeText() {
     
     // Type out the narrative text
     gameState.typewriter.type(narrativeText);
+}
+
+/**
+ * Reset all change-related state to prevent issues between days
+ */
+function clearChangeState() {
+    console.log("Clearing change state");
+    
+    // If the current change exists and is found, store this information
+    let foundChange = null;
+    if (gameState.currentChange && gameState.currentChange.found) {
+        // Keep minimal information about the found change for UI messages
+        // without tying it to the complete game state
+        foundChange = {
+            found: true,
+            changeType: gameState.currentChange.changeType
+        };
+    }
+    
+    // Explicitly reset the current change to null
+    gameState.currentChange = null;
+    
+    // If there was a found change, create a minimal state object
+    // This lets the game know something was found today but doesn't 
+    // retain all the original state that could cause bugs
+    if (foundChange) {
+        gameState.currentChange = foundChange;
+    }
+    
+    // Make sure we're not in a transitioning state
+    gameState.isTransitioning = true; // Keep true during transition
+    
+    // Reset click state - will be properly set after new changes are determined
+    gameState.canClick = false;
+    
+    console.log("Change state cleared, found change:", foundChange);
 }

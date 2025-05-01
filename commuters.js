@@ -233,6 +233,9 @@ function handleCommuterClick(event) {
         return;
     }
 
+    // Log current gameState for debugging
+    console.log(`Current change state: ${JSON.stringify(gameState.currentChange)}`);
+
     // Check if this is the current change
     if (gameState.currentChange && 
         !gameState.currentChange.found &&
@@ -242,6 +245,9 @@ function handleCommuterClick(event) {
 
         // Mark as found
         gameState.currentChange.found = true;
+        
+        // Ensure clean change state for transitions
+        window.core.clearChangeState();
         
         // Clear any tutorial message that might be showing
         if (gameState.isFirstTimePlayer) {
