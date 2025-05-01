@@ -216,7 +216,7 @@ function handleCommuterClick(event) {
 
     // Check if we're transitioning
     if (gameState.isTransitioning) {
-        console.log("Game is transitioning");
+        console.log("Game is transitioning, ignoring commuter click");
         return;
     }
 
@@ -233,6 +233,13 @@ function handleCommuterClick(event) {
         return;
     }
 
+    // Check if there's a click blocker in the way
+    const clickBlockers = document.querySelectorAll('.click-blocker');
+    if (clickBlockers.length > 0) {
+        console.log("Click blocker is active, commuter clicks should be blocked");
+        // The click should be caught by the blocker, not here, but we'll log it anyway
+    }
+
     // Log current gameState for debugging
     console.log(`Current change state: ${JSON.stringify(gameState.currentChange)}`);
 
@@ -245,9 +252,7 @@ function handleCommuterClick(event) {
 
         // Mark as found
         gameState.currentChange.found = true;
-        
-        // Ensure clean change state for transitions
-        window.core.clearChangeState();
+        console.log("Updated currentChange to found:", gameState.currentChange);
         
         // Clear any tutorial message that might be showing
         if (gameState.isFirstTimePlayer) {
@@ -256,12 +261,18 @@ function handleCommuterClick(event) {
                 messageElement.style.display = 'none';
                 messageElement.style.visibility = 'hidden';
             }
+            
+            // Clear any message timer
+            if (gameState.activeMessageTimer) {
+                clearTimeout(gameState.activeMessageTimer);
+                gameState.activeMessageTimer = null;
+            }
         }
 
         // Highlight the commuter
         window.commuters.highlightElement(commuterElement);
         
-        // Add click blocker using the core function
+        // Add click blocker using the core function - with a delay to allow animation to complete
         setTimeout(() => {
             window.core.addClickBlocker();
         }, 1500);
@@ -471,6 +482,7 @@ function createFirstChange() {
     };
     
     console.log(`Created first commuter change: ${firstCommuter.type} (${firstCommuter.id}) from ${currentVariation} to ${newVariation}`);
+    console.log("Change object:", JSON.stringify(gameState.currentChange));
 
     // Enable clicking since this is day 4 and we have a change to find
     gameState.canClick = true;
@@ -535,7 +547,7 @@ function createRandomChange(count = 1) {
         commuterId: commuter.id, // Make sure this matches the DOM element ID
         fromVariation: currentVariation,
         toVariation: newVariation,
-        found: false
+        found: false // CRITICAL FIX: Explicitly set found to false
     };
     
     // Verify the DOM element exists
@@ -548,6 +560,12 @@ function createRandomChange(count = 1) {
     
     console.log(`Created commuter change: ${commuter.type} (${commuter.id}) from ${currentVariation} to ${newVariation}`);
     console.log(`Change object: ${JSON.stringify(gameState.currentChange)}`);
+    
+    // Double-check the found status
+    if (gameState.currentChange.found !== false) {
+        console.warn("Warning: Change found status was not false! Correcting it now.");
+        gameState.currentChange.found = false;
+    }
     
     // Enable clicking to find the change
     gameState.canClick = true;
