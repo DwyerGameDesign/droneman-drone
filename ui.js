@@ -101,13 +101,20 @@ function updateTypewriterText(text) {
  * @param {string} text - The message text to display
  * @param {number} duration - How long to display the message in milliseconds
  * @param {boolean} positionHigher - Whether to position the message higher on the screen
+ * @param {boolean} untilTrain - Whether to keep the message visible until Take Train is clicked
  */
-function showMessage(text, duration = 2000, positionHigher = false) {
+function showMessage(text, duration = 2000, positionHigher = false, untilTrain = false) {
     // Get the message element
     const message = document.getElementById('message');
     if (!message) {
         console.error("Message element not found");
         return;
+    }
+    
+    // Clear any existing message timer
+    if (gameState.activeMessageTimer) {
+        clearTimeout(gameState.activeMessageTimer);
+        gameState.activeMessageTimer = null;
     }
     
     // Set the text content
@@ -128,18 +135,28 @@ function showMessage(text, duration = 2000, positionHigher = false) {
         message.style.fontSize = '1em'; // Default font size
     }
 
+    // If message should stay until train is clicked
+    if (untilTrain) {
+        console.log("Showing message until train button is clicked: " + text);
+        
+        // Add a data attribute to mark this as a message that should be cleared when train is clicked
+        message.dataset.clearOnTrain = 'true';
+        
+        // No timeout needed as the message will be cleared when the train button is clicked
+    }
     // Check for persistent display (very long duration)
-    if (duration >= 60000) {
+    else if (duration >= 60000) {
         console.log("Showing persistent message: " + text);
     } else {
         // For normal messages, hide after the specified duration
-    setTimeout(() => {
+        gameState.activeMessageTimer = setTimeout(() => {
             message.style.display = 'none';
-        message.style.visibility = 'hidden';
-        // Reset position and font size after hiding
-        message.style.top = '30%';
-        message.style.fontSize = '1em';
-    }, duration);
+            message.style.visibility = 'hidden';
+            // Reset position and font size after hiding
+            message.style.top = '30%';
+            message.style.fontSize = '1em';
+            message.dataset.clearOnTrain = 'false';
+        }, duration);
     }
 }
 

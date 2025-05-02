@@ -86,7 +86,7 @@ h1 {
     min-height: 50px;
     height: 50px; /* Fixed height to prevent resizing */
     text-align: left;
-    width: 800px; /* Fixed width */
+    width: 800px; /* Full width restored */
     box-sizing: border-box;
     overflow-y: auto; /* Allow scrolling if content is too large */
 }
@@ -1153,5 +1153,126 @@ body.mobile .mobile-controls {
         box-shadow: 0 0 0 0 rgba(78, 78, 178, 0);
         filter: brightness(1);
         transform: translateX(-50%);
+    }
+}
+
+/* Lives HUD */
+.lives-container {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    z-index: 150; /* Above most elements in the scene */
+    padding: 5px 10px;
+    box-sizing: border-box;
+    background-color: rgba(42, 42, 42, 0.85); /* Slightly darker background */
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5), 0 0 5px rgba(78, 78, 178, 0.5); /* Shadow box effect */
+    border: 1px solid rgba(78, 78, 178, 0.5); /* Subtle border */
+    min-width: 120px; /* Minimum width to prevent shrinking */
+}
+
+.lives-container .left-section {
+    width: 60%; /* Match narrative text width */
+    text-align: left;
+}
+
+.lives-container .right-section {
+    width: 40%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.lives-label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    margin-right: 8px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.life-heart {
+    width: 24px;
+    height: 24px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-left: 3px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+/* Empty heart placeholder to maintain spacing when lives are lost */
+.empty-heart {
+    width: 24px;
+    height: 24px;
+    margin-left: 3px;
+    opacity: 0.3; /* Low opacity to show as empty */
+}
+
+/* Flying heart animation when a life is lost */
+.flying-heart {
+    position: fixed;
+    width: 24px;
+    height: 24px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 1000;
+    will-change: transform, opacity, filter;
+}
+
+/* Black heart specific styling */
+.flying-heart.black-heart {
+    filter: brightness(0.1) drop-shadow(0 0 8px rgba(255, 0, 0, 0.8));
+    animation: pulse-dark 0.8s infinite alternate;
+}
+
+@keyframes pulse-dark {
+    from { filter: brightness(0.1) drop-shadow(0 0 5px rgba(255, 0, 0, 0.7)); }
+    to { filter: brightness(0.2) drop-shadow(0 0 8px rgba(255, 0, 0, 1.0)); }
+}
+
+/* Heart break effect container */
+.heart-break-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* Heart doober particles */
+.heart-doober-particle {
+    position: fixed;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #ff3333;
+    box-shadow: 0 0 8px rgba(255, 51, 51, 0.8);
+    pointer-events: none;
+    z-index: 1000;
+    will-change: transform, opacity;
+}
+
+/* Animation for heart breaking */
+@keyframes heart-break {
+    0% { 
+        transform: scale(1); 
+        opacity: 1; 
+        filter: brightness(1);
+    }
+    40% { 
+        transform: scale(1.2); 
+        opacity: 0.9; 
+        filter: brightness(1.5) drop-shadow(0 0 10px rgba(255, 51, 51, 0.8));
+    }
+    100% { 
+        transform: scale(0.5); 
+        opacity: 0; 
+        filter: brightness(0.8) blur(5px);
     }
 }

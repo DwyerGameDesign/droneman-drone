@@ -21,6 +21,7 @@ let gameState = {
     usedThoughts: [],      // Track used thoughts
     isFirstTimePlayer: true, // Track if it's the player's first time
     activeMessageTimer: null, // Track active message timer
+    lives: 3,              // Number of lives the player has
     elements: {
         // Elements will be defined in init()
     }
@@ -320,7 +321,12 @@ window.core = {
     revealGame,
     addClickBlocker,
     showFirstTimeGuide,
-    removeAllClickBlockers
+    removeAllClickBlockers,
+    loseLife,
+    updateLivesDisplay,
+    createLivesHUD,
+    createHeartDoober,
+    createHeartBreakEffect
 };
 
 /**
@@ -345,6 +351,7 @@ async function init() {
     gameState.changesFound = 0;
     gameState.usedNarratives = [];  // Clear used narratives
     gameState.usedThoughts = [];    // Clear used thoughts
+    gameState.lives = 3;           // Initialize with 3 lives
 
     // BUGFIX: Always ensure train button exists
     const trainButton = document.getElementById('train-button');
@@ -389,6 +396,9 @@ async function init() {
 
     // Initialize awareness meter
     createAwarenessMeter();
+
+    // Initialize lives HUD
+    createLivesHUD();
 
     // Add event listeners
     if (gameState.elements.trainButton) {
@@ -557,11 +567,11 @@ function addClickBlocker() {
     const existingBlockers = document.querySelectorAll('.click-blocker');
     if (existingBlockers.length > 0) {
         console.log(`Removing ${existingBlockers.length} existing click blockers before adding new one`);
-        existingBlockers.forEach(blocker => {
-            if (blocker.parentNode) {
-                blocker.parentNode.removeChild(blocker);
-            }
-        });
+    existingBlockers.forEach(blocker => {
+        if (blocker.parentNode) {
+            blocker.parentNode.removeChild(blocker);
+        }
+    });
     }
     
     // Create click blocker element
@@ -912,6 +922,11 @@ function takeTrain() {
     // Clear any displayed message
     const messageElement = document.getElementById('message');
     if (messageElement) {
+        // Check if this is a message that should be cleared when train is clicked
+        if (messageElement.dataset.clearOnTrain === 'true') {
+            console.log("Clearing message marked for train click");
+            messageElement.dataset.clearOnTrain = 'false';
+        }
         messageElement.style.display = 'none';
         messageElement.style.visibility = 'hidden';
     }
@@ -921,14 +936,6 @@ function takeTrain() {
     thoughtBubbles.forEach(bubble => {
         if (bubble.parentNode) {
             bubble.parentNode.removeChild(bubble);
-        }
-    });
-    
-    // Clear any popup messages
-    const popupMessages = document.querySelectorAll('#popup-message');
-    popupMessages.forEach(popup => {
-        if (popup.parentNode) {
-            popup.parentNode.removeChild(popup);
         }
     });
     
@@ -977,8 +984,9 @@ function takeTrain() {
             proceedToNextDay();
         }, 1500);
     } else {
-        // No change exists today - award XP for "observant riding"
-        if (gameState.day >= 0 && !gameState.currentChange) {  // Only if there was no change at all today
+        // Only award XP for taking the train on day 1
+        if (gameState.day === 1 && !gameState.currentChange) {
+            console.log("Day 1: Awarding XP for first train ride");
             addAwarenessXP(calculateTrainXP());
         }
         
@@ -997,6 +1005,21 @@ function beginDay() {
     
     // CRITICAL FIX: Remove any click blockers that might still be present
     removeAllClickBlockers();
+    
+    // Clear any active message timers
+    if (gameState.activeMessageTimer) {
+        clearTimeout(gameState.activeMessageTimer);
+        gameState.activeMessageTimer = null;
+    }
+    
+    // Clear any displayed message
+    const messageElement = document.getElementById('message');
+    if (messageElement) {
+        messageElement.style.display = 'none';
+        messageElement.style.visibility = 'hidden';
+        // Reset any train-specific attributes
+        messageElement.dataset.clearOnTrain = 'false';
+    }
     
     // Update narrative text with typewriter effect
     if (gameState.typewriter) {
@@ -1110,7 +1133,7 @@ function proceedToNextDay() {
         // Fade back in
         setTimeout(() => {
             gameState.elements.sceneContainer.classList.remove('fading');
-            
+
             // Begin the day with a clean UI
             beginDay();
         }, 500); // Fade in duration
@@ -1849,4 +1872,292 @@ function removeAllClickBlockers() {
         return true;
     }
     return false;
+}
+
+/**
+ * Create and initialize the lives HUD
+ */
+function createLivesHUD() {
+    // Create the container for lives
+    const livesContainer = document.createElement('div');
+    livesContainer.id = 'lives-container';
+    livesContainer.className = 'lives-container';
+    
+    // Add a label for the lives
+    const livesLabel = document.createElement('div');
+    livesLabel.textContent = 'LIVES:';
+    livesLabel.className = 'lives-label';
+    
+    livesContainer.appendChild(livesLabel);
+    
+    // Create a canvas to draw the heart image
+    const heartCanvas = document.createElement('canvas');
+    heartCanvas.width = 28;
+    heartCanvas.height = 28;
+    const ctx = heartCanvas.getContext('2d');
+    
+    // Draw heart shape
+    ctx.fillStyle = '#ff3333'; // Red heart
+    ctx.beginPath();
+    ctx.moveTo(14, 6);
+    ctx.bezierCurveTo(14, 3, 10, 0, 7, 0);
+    ctx.bezierCurveTo(0, 0, 0, 9, 0, 9);
+    ctx.bezierCurveTo(0, 12, 3, 19, 14, 28);
+    ctx.bezierCurveTo(25, 19, 28, 12, 28, 9);
+    ctx.bezierCurveTo(28, 9, 28, 0, 21, 0);
+    ctx.bezierCurveTo(18, 0, 14, 3, 14, 6);
+    ctx.fill();
+    
+    // Add a subtle black outline to make the heart more visible
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+    // Convert canvas to data URL
+    const heartImageURL = heartCanvas.toDataURL();
+    
+    // Create heart elements for each life
+    for (let i = 0; i < gameState.lives; i++) {
+        const heartElement = document.createElement('div');
+        heartElement.className = 'life-heart';
+        heartElement.style.backgroundImage = `url(${heartImageURL})`;
+        livesContainer.appendChild(heartElement);
+    }
+    
+    // Add the lives container to the scene
+    const sceneContainer = document.getElementById('scene-container');
+    if (sceneContainer) {
+        sceneContainer.appendChild(livesContainer);
+    } else {
+        // Fallback if scene container not found
+        document.body.appendChild(livesContainer);
+    }
+    
+    // Store reference to lives container for updates
+    gameState.elements.livesContainer = livesContainer;
+    
+    // Store the heart image URL for later use
+    gameState.heartImageURL = heartImageURL;
+    
+    // Restore narrative text to full width
+    if (gameState.elements.narrativeText) {
+        gameState.elements.narrativeText.style.width = '800px';
+    }
+    
+    console.log(`Lives HUD created with ${gameState.lives} lives`);
+}
+
+/**
+ * Update the lives display after losing a life
+ */
+function updateLivesDisplay() {
+    if (!gameState.elements.livesContainer) return;
+    
+    // Remove all heart elements
+    const hearts = gameState.elements.livesContainer.querySelectorAll('.life-heart, .empty-heart');
+    hearts.forEach(heart => heart.remove());
+    
+    // Always create 3 heart elements (the initial max)
+    const maxLives = 3;
+    
+    for (let i = 0; i < maxLives; i++) {
+        if (i < gameState.lives) {
+            // Create full heart for remaining lives
+            const heartElement = document.createElement('div');
+            heartElement.className = 'life-heart';
+            heartElement.style.backgroundImage = `url(${gameState.heartImageURL})`;
+            gameState.elements.livesContainer.appendChild(heartElement);
+        } else {
+            // Create empty heart placeholder to maintain spacing
+            const emptyHeart = document.createElement('div');
+            emptyHeart.className = 'empty-heart';
+            emptyHeart.style.backgroundImage = `url(${gameState.heartImageURL})`;
+            emptyHeart.style.filter = 'grayscale(100%) opacity(0.3)';
+            gameState.elements.livesContainer.appendChild(emptyHeart);
+        }
+    }
+    
+    console.log(`Lives display updated: ${gameState.lives} lives remaining`);
+}
+
+/**
+ * Remove a life from the player
+ * @param {HTMLElement} clickedElement - The element that was clicked incorrectly
+ * @returns {boolean} - True if player still has lives, false if game over
+ */
+function loseLife(clickedElement) {
+    // Verify we have required elements
+    if (!clickedElement || !gameState.elements.livesContainer) {
+        // Just decrement lives with no animation if elements are missing
+        gameState.lives--;
+        updateLivesDisplay();
+        return gameState.lives > 0;
+    }
+    
+    // Capture the current number of lives so we can get the position before decrementing
+    const currentLives = gameState.lives;
+    
+    // Create a visual effect of a black heart flying from the clicked element to the HUD
+    // We pass the clicked element and the current lives count
+    createHeartDoober(clickedElement, currentLives);
+    
+    // Decrement lives but don't update display yet
+    gameState.lives--;
+    console.log(`Player lost a life. Remaining lives: ${gameState.lives}`);
+    
+    // Delay updating the visual heart display until after the animation
+    setTimeout(() => {
+        // Update the lives display after animation is almost complete
+        updateLivesDisplay();
+    }, 750); // Just before the animation completes at 800ms
+    
+    // Return whether the player still has lives
+    return gameState.lives > 0;
+}
+
+/**
+ * Create a doober effect for a heart being lost
+ * @param {HTMLElement} clickedElement - The element that was clicked incorrectly
+ * @param {number} currentLives - Current number of lives before decrementing
+ */
+function createHeartDoober(clickedElement, currentLives) {
+    // Create a black heart to animate
+    const blackHeart = document.createElement('div');
+    blackHeart.className = 'flying-heart black-heart';
+    
+    // Get positions
+    const targetRect = clickedElement.getBoundingClientRect();
+    const livesRect = gameState.elements.livesContainer.getBoundingClientRect();
+    
+    // Get all heart elements to find the correct one based on currentLives
+    const heartElements = gameState.elements.livesContainer.querySelectorAll('.life-heart');
+    
+    // Calculate which heart to target (index is 0-based, but lives are 1-based)
+    // Subtract 1 from currentLives because we're losing that heart
+    const heartIndex = currentLives - 1;
+    
+    // Default position (right side of container) in case we can't find the specific heart
+    let targetX = livesRect.right - 30;
+    let targetY = livesRect.top + livesRect.height/2;
+    
+    // If we have heart elements and the index is valid, get the specific heart's position
+    if (heartElements && heartElements.length > heartIndex && heartIndex >= 0) {
+        const heartToRemove = heartElements[heartIndex];
+        const heartRect = heartToRemove.getBoundingClientRect();
+        
+        // Get the exact center position of the heart
+        targetX = heartRect.left + (heartRect.width / 2);
+        targetY = heartRect.top + (heartRect.height / 2);
+        
+        console.log(`Targeting heart at index ${heartIndex} with exact position: x=${targetX}, y=${targetY}`);
+    } else {
+        console.log(`Could not find heart at index ${heartIndex}, using default position`);
+    }
+    
+    // Size of the flying heart
+    const heartSize = 24;
+    
+    // Position the black heart at the clicked element's position
+    blackHeart.style.position = 'fixed';
+    blackHeart.style.left = `${targetRect.left + targetRect.width/2 - heartSize/2}px`;  // Center horizontally
+    blackHeart.style.top = `${targetRect.top + targetRect.height/2 - heartSize/2}px`;   // Center vertically
+    blackHeart.style.width = `${heartSize}px`;
+    blackHeart.style.height = `${heartSize}px`;
+    blackHeart.style.backgroundImage = `url(${gameState.heartImageURL})`;
+    blackHeart.style.backgroundSize = 'contain';
+    blackHeart.style.backgroundRepeat = 'no-repeat';
+    blackHeart.style.backgroundPosition = 'center';
+    blackHeart.style.zIndex = '1000';
+    blackHeart.style.filter = 'brightness(0.1) drop-shadow(0 0 5px rgba(255, 0, 0, 0.7))';
+    blackHeart.style.transition = 'none';
+    
+    // Add to document body
+    document.body.appendChild(blackHeart);
+    
+    // Force a reflow to ensure transition works
+    void blackHeart.offsetWidth;
+    
+    // Add transition and animate to the target heart position
+    blackHeart.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+    // Account for the size of the flying heart to center it on the target
+    blackHeart.style.left = `${targetX - (heartSize/2)}px`;  // Center on target
+    blackHeart.style.top = `${targetY - (heartSize/2)}px`;   // Center on target
+    blackHeart.style.transform = 'scale(0.8)';
+    blackHeart.style.opacity = '0.4';
+    
+    // Create break particle effect at the clicked element
+    createHeartBreakEffect(targetRect);
+    
+    // Remove the black heart element after animation completes
+    setTimeout(() => {
+        if (blackHeart.parentNode) {
+            // Add a fade out
+            blackHeart.style.opacity = '0';
+            setTimeout(() => {
+                if (blackHeart.parentNode) {
+                    blackHeart.parentNode.removeChild(blackHeart);
+                }
+            }, 300);
+        }
+    }, 800);
+}
+
+/**
+ * Create heart break effect at the clicked position
+ */
+function createHeartBreakEffect(targetRect) {
+    const container = document.createElement('div');
+    container.className = 'heart-break-effect';
+    
+    const centerX = targetRect.left + targetRect.width/2;
+    const centerY = targetRect.top + targetRect.height/2;
+    
+    // Create several particles
+    for (let i = 0; i < 10; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'heart-doober-particle';
+        
+        // Style the particle
+        particle.style.position = 'fixed';
+        particle.style.left = `${centerX}px`;
+        particle.style.top = `${centerY}px`;
+        particle.style.width = '5px';
+        particle.style.height = '5px';
+        particle.style.backgroundColor = '#ff3333';
+        particle.style.borderRadius = '50%';
+        particle.style.boxShadow = '0 0 6px rgba(255, 30, 30, 0.9)';
+        particle.style.transform = 'translate(-50%, -50%)';
+        particle.style.opacity = '1';
+        
+        // Add to container
+        container.appendChild(particle);
+        
+        // Animate with random direction
+        const angle = (i / 10) * Math.PI * 2 + (Math.random() * 0.5); // Add some randomness
+        const distance = 30 + Math.random() * 50;
+        const duration = 400 + Math.random() * 300;
+        
+        // Calculate end position
+        const endX = centerX + Math.cos(angle) * distance;
+        const endY = centerY + Math.sin(angle) * distance;
+        
+        // Animate with Web Animations API
+        particle.animate([
+            { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+            { transform: `translate(calc(${endX - centerX}px - 50%), calc(${endY - centerY}px - 50%)) scale(0)`, opacity: 0 }
+        ], {
+            duration: duration,
+            easing: 'cubic-bezier(0.2, 0.9, 0.3, 1)',
+            fill: 'forwards'
+        });
+    }
+    
+    document.body.appendChild(container);
+    
+    // Remove after animation completes
+    setTimeout(() => {
+        if (container.parentNode) {
+            container.parentNode.removeChild(container);
+        }
+    }, 800);
 }

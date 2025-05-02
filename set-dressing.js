@@ -304,6 +304,13 @@ function handleSetDressingClick(event) {
         // Increment changes found counter
         gameState.changesFound++;
 
+        // Show special message for first-time players on day 2
+        if (gameState.isFirstTimePlayer && gameState.day === 2) {
+            setTimeout(() => {
+                window.ui.showMessage("Each day has one new change. After finding it, select Take Train to continue your journey.", 4000, true, true);
+            }, 1500); // Show after highlight animation
+        }
+
         // Get awareness gain from central calculation function
         const awarenessGain = calculateAwarenessXP();
 
@@ -329,133 +336,104 @@ function handleSetDressingClick(event) {
     } else {
         console.log("Wrong set dressing element clicked or no change to find");
         
-        // Get the custom message for this change
-        let message = null;
-        if (gameState.currentChange && !gameState.currentChange.found) {
-            if (gameState.currentChange.changeType === 'commuter') {
-                const fromVariation = gameState.currentChange.fromVariation;
-                const toVariation = gameState.currentChange.toVariation;
-                
-                console.log(`Looking for message with fromVariation: "${fromVariation}", toVariation: "${toVariation}"`);
-                
-                // Extract base types from variations properly
-                // Format could be "commuter1.png" or "commuter1_a.png"
-                let fromBase, toBase;
-                
-                // Extract the base name (e.g., "commuter1") and variation suffix (e.g., "_a") if any
-                if (fromVariation.includes('_')) {
-                    // Handle variations like "commuter1_a.png"
-                    fromBase = fromVariation.split('.')[0]; // "commuter1_a"
-                    const mainParts = fromBase.split('_');
-                    fromBase = mainParts[0]; // "commuter1"
-                } else {
-                    // Handle base sprites like "commuter1.png"
-                    fromBase = fromVariation.split('.')[0]; // "commuter1"
-                }
-                
-                if (toVariation.includes('_')) {
-                    // Handle variations like "commuter1_a.png"
-                    toBase = toVariation.split('.')[0]; // "commuter1_a"
-                } else {
-                    // Handle base sprites like "commuter1.png"
-                    toBase = toVariation.split('.')[0]; // "commuter1"
-                }
-                
-                console.log(`Extracted types - fromBase: "${fromBase}", toBase: "${toBase}"`);
-                
-                // Debug: Show available keys in CHANGE_MESSAGES.commuter
-                console.log(`CHANGE_MESSAGES.commuter keys: ${Object.keys(CHANGE_MESSAGES.commuter)}`);
-                
-                // First, try to find the message using the exact keys we have
-                if (CHANGE_MESSAGES.commuter[fromBase] && CHANGE_MESSAGES.commuter[fromBase][toBase]) {
-                    message = CHANGE_MESSAGES.commuter[fromBase][toBase];
-                    console.log(`Found message using fromBase[toBase]: "${message}"`);
-                } else {
-                    // We might need to add suffix for the variation
-                    // If toBase is "commuter1" and there's a variation suffix in toVariation like "commuter1_a.png", 
-                    // we need to check for "commuter1" -> "commuter1_a"
-                    const toVarName = toVariation.split('.')[0]; // Remove extension
+        // Lose a life
+        const hasLivesLeft = window.core.loseLife(setDressingElement);
+        
+        // If no lives left, show the game over flow
+        if (!hasLivesLeft) {
+            console.log("No lives left, showing game over");
+            
+            // Get the custom message for this change
+            let message = null;
+            if (gameState.currentChange && !gameState.currentChange.found) {
+                if (gameState.currentChange.changeType === 'commuter') {
+                    const fromVariation = gameState.currentChange.fromVariation;
+                    const toVariation = gameState.currentChange.toVariation;
                     
-                    if (CHANGE_MESSAGES.commuter[fromBase] && CHANGE_MESSAGES.commuter[fromBase][toVarName]) {
+                    // First extract the full variant name without extension
+                    const fromVarName = fromVariation.split('.')[0];
+                    const toVarName = toVariation.split('.')[0];
+                    
+                    // Extract base names from variations
+                    const fromBase = fromVarName.split('_')[0];
+                    const toBase = toVarName.split('_')[0];
+                    
+                    // Try multiple lookup patterns in order of specificity
+                    // 1. Try the full variant names
+                    if (CHANGE_MESSAGES.commuter[fromVarName] && CHANGE_MESSAGES.commuter[fromVarName][toVarName]) {
+                        message = CHANGE_MESSAGES.commuter[fromVarName][toVarName];
+                    }
+                    // 2. Try from base name to full variant name
+                    else if (CHANGE_MESSAGES.commuter[fromBase] && CHANGE_MESSAGES.commuter[fromBase][toVarName]) {
                         message = CHANGE_MESSAGES.commuter[fromBase][toVarName];
-                        console.log(`Found message using fromBase[toVarName]: "${message}"`);
+                    }
+                    // 3. Try from full variant name to base name
+                    else if (CHANGE_MESSAGES.commuter[fromVarName] && CHANGE_MESSAGES.commuter[fromVarName][toBase]) {
+                        message = CHANGE_MESSAGES.commuter[fromVarName][toBase];
+                    }
+                    // 4. Try from base name to base name
+                    else if (CHANGE_MESSAGES.commuter[fromBase] && CHANGE_MESSAGES.commuter[fromBase][toBase]) {
+                        message = CHANGE_MESSAGES.commuter[fromBase][toBase];
+                    }
+                    
+                    // If no custom message is found, use a default
+                    if (!message) {
+                        message = "I noticed something change with that commuter...";
+                    }
+                } else if (gameState.currentChange.changeType === 'setDressing') {
+                    const toType = gameState.currentChange.toType;
+                    
+                    // Check if this is a new item being added
+                    if (gameState.currentChange.changeAction === 'add' || gameState.currentChange.isNewlyAdded) {
+                        if (CHANGE_MESSAGES.setDressing && CHANGE_MESSAGES.setDressing.new && CHANGE_MESSAGES.setDressing.new[toType]) {
+                            message = CHANGE_MESSAGES.setDressing.new[toType];
+                        }
                     } else {
-                        // Try the other direction
-                        const fromVarName = fromVariation.split('.')[0]; // Remove extension
-                        
-                        if (CHANGE_MESSAGES.commuter[toBase] && CHANGE_MESSAGES.commuter[toBase][fromVarName]) {
-                            message = CHANGE_MESSAGES.commuter[toBase][fromVarName];
-                            console.log(`Found message using toBase[fromVarName]: "${message}"`);
+                        // This is a change from one type to another
+                        const fromType = gameState.currentChange.fromType;
+                        if (CHANGE_MESSAGES.setDressing && CHANGE_MESSAGES.setDressing[fromType] && CHANGE_MESSAGES.setDressing[fromType][toType]) {
+                            message = CHANGE_MESSAGES.setDressing[fromType][toType];
+                        }
+                    }
+                    
+                    if (!message) {
+                        if (gameState.currentChange.changeAction === 'add' || gameState.currentChange.isNewlyAdded) {
+                            message = `I noticed a new ${toType} on the platform...`;
                         } else {
-                            console.log(`No message found in CHANGE_MESSAGES.commuter for these variations`);
-                            if (CHANGE_MESSAGES.commuter[fromBase]) {
-                                console.log(`CHANGE_MESSAGES.commuter[${fromBase}] keys: ${Object.keys(CHANGE_MESSAGES.commuter[fromBase])}`);
-                            }
-                            if (CHANGE_MESSAGES.commuter[toBase]) {
-                                console.log(`CHANGE_MESSAGES.commuter[${toBase}] keys: ${Object.keys(CHANGE_MESSAGES.commuter[toBase])}`);
-                            }
+                            message = "I noticed something change with the platform...";
                         }
                     }
                 }
                 
-                // If no custom message is found, use a default
-                if (!message) {
-                    message = "I noticed something change with that commuter...";
-                }
-            } else if (gameState.currentChange.changeType === 'setDressing') {
-                const fromType = gameState.currentChange.fromType;
-                const toType = gameState.currentChange.toType;
-                
-                // Check if this is a new item being added
-                if (gameState.currentChange.changeAction === 'add' || gameState.currentChange.isNewlyAdded) {
-                    console.log(`Looking for new set dressing message for type: ${toType}`);
-                    if (CHANGE_MESSAGES.setDressing.new && CHANGE_MESSAGES.setDressing.new[toType]) {
-                        message = CHANGE_MESSAGES.setDressing.new[toType];
-                        console.log(`Found new set dressing message: "${message}"`);
-                    } else {
-                        console.log(`No message found for new set dressing type: ${toType}`);
-                    }
+                // Show the custom message using the UI message system
+                if (message) {
+                    window.ui.showMessage(message, 3000, true); // Show message higher on the screen
                 } else {
-                    // This is a change from one type to another
-                    console.log(`Looking for set dressing change message from ${fromType} to ${toType}`);
-                    if (CHANGE_MESSAGES.setDressing[fromType] && CHANGE_MESSAGES.setDressing[fromType][toType]) {
-                        message = CHANGE_MESSAGES.setDressing[fromType][toType];
-                        console.log(`Found set dressing change message: "${message}"`);
-                    } else {
-                        console.log(`No message found for set dressing change from ${fromType} to ${toType}`);
-                    }
+                    // Fallback message as a last resort
+                    window.ui.showMessage("Something changed on the platform...", 3000, true);
                 }
-                
-                if (!message) {
-                    message = "I noticed something change with the platform...";
+            } else {
+                console.warn("No current change found or change was already found!");
+                window.ui.showMessage("Something feels different today...", 3000, true);
+            }
+            
+            // Highlight the actual change based on its type
+            if (gameState.currentChange && !gameState.currentChange.found) {
+                if (gameState.currentChange.changeType === 'setDressing') {
+                    window.setDressing.highlightMissedChange();
+                } else if (gameState.currentChange.changeType === 'commuter') {
+                    window.commuters.highlightMissedChange();
                 }
             }
-        }
-        
-        // Show the custom message using the UI message system instead of thought bubble
-        if (message) {
-            window.ui.showMessage(message, 3000, true); // Show message higher on the screen
-        } else if (gameState.currentChange && !gameState.currentChange.found) {
-            // If we couldn't find a message, but there is a change, show a default message
-            window.ui.showMessage("Something changed, but I can't quite place it...", 3000, true);
+            
+            // End the game with a summary after showing the highlight
+            setTimeout(() => {
+                window.core.showGameOverSummary();
+            }, 3000); // Increased from 1500ms to 4500ms to allow message to be fully displayed
         } else {
-            // Only show random negative thought if there's no change to find
-            window.core.showRandomThoughtBubble(false);
+            // Only show the default message if the player still has lives
+            window.ui.showMessage("That's not what changed. This item looks the same as yesterday.", 3000, true);
         }
-        
-        // Highlight the actual change based on its type
-        if (gameState.currentChange && !gameState.currentChange.found) {
-            if (gameState.currentChange.changeType === 'setDressing') {
-                window.setDressing.highlightMissedChange();
-            } else if (gameState.currentChange.changeType === 'commuter') {
-                window.commuters.highlightMissedChange();
-            }
-        }
-        
-        // End the game with a summary after showing the highlight
-        setTimeout(() => {
-            window.core.showGameOverSummary();
-        }, 1500); // Match the highlight animation duration
     }
 }
 

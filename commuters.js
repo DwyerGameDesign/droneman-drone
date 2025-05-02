@@ -288,6 +288,13 @@ function handleCommuterClick(event) {
         // Increment changes found counter
         gameState.changesFound++;
 
+        // Show special message for first-time players on day 2
+        if (gameState.isFirstTimePlayer && gameState.day === 2) {
+            setTimeout(() => {
+                window.ui.showMessage("Each day has one new change. After finding it, select Take Train to continue your journey.", 4000, true, true);
+            }, 1500); // Show after highlight animation
+        }
+
         // Get awareness gain from central calculation function
         const awarenessGain = calculateAwarenessXP();
 
@@ -313,136 +320,112 @@ function handleCommuterClick(event) {
     } else {
         console.log("Wrong commuter clicked or no change to find");
 
-        // Get the custom message for this change
-        let message = null;
-        if (gameState.currentChange && !gameState.currentChange.found) {
-            if (gameState.currentChange.changeType === 'commuter') {
-                const fromVariation = gameState.currentChange.fromVariation;
-                const toVariation = gameState.currentChange.toVariation;
-                
-                console.log(`Looking for message with fromVariation: "${fromVariation}", toVariation: "${toVariation}"`);
-                
-                // Extract base types from variations properly
-                // Format could be "commuter1.png" or "commuter1_a.png"
-                let fromBase, toBase, fromVarName, toVarName;
-                
-                // Extract the base name (e.g., "commuter1") and full variant name (e.g., "commuter1_a")
-                fromVarName = fromVariation.split('.')[0]; // Remove extension first
-                toVarName = toVariation.split('.')[0]; // Remove extension first
-                
-                // Extract the base commuter type
-                if (fromVarName.includes('_')) {
-                    // Handle variations like "commuter1_a"
-                    fromBase = fromVarName.split('_')[0]; // "commuter1"
-                } else {
-                    // Handle base sprites like "commuter1"
-                    fromBase = fromVarName;
-                }
-                
-                if (toVarName.includes('_')) {
-                    // Handle variations like "commuter1_a"
-                    toBase = toVarName.split('_')[0]; // "commuter1"
-                } else {
-                    // Handle base sprites like "commuter1"
-                    toBase = toVarName;
-                }
-                
-                console.log(`Extracted types - fromVarName: "${fromVarName}", toVarName: "${toVarName}", fromBase: "${fromBase}", toBase: "${toBase}"`);
-                
-                // Debug: Show available keys in CHANGE_MESSAGES.commuter
-                console.log(`CHANGE_MESSAGES.commuter keys: ${Object.keys(CHANGE_MESSAGES.commuter)}`);
-                
-                // Look up the message directly using the full variant names
-                if (CHANGE_MESSAGES.commuter[fromVarName] && CHANGE_MESSAGES.commuter[fromVarName][toVarName]) {
-                    message = CHANGE_MESSAGES.commuter[fromVarName][toVarName];
-                    console.log(`Found message using fromVarName[toVarName]: "${message}"`);
-                } 
-                // If that failed, look up with base names if the variants are different formats
-                else if (CHANGE_MESSAGES.commuter[fromBase] && CHANGE_MESSAGES.commuter[fromBase][toVarName]) {
-                    message = CHANGE_MESSAGES.commuter[fromBase][toVarName];
-                    console.log(`Found message using fromBase[toVarName]: "${message}"`);
-                } 
-                // Try looking up with the variant in the messages
-                else if (CHANGE_MESSAGES.commuter[fromVarName] && CHANGE_MESSAGES.commuter[fromVarName][toBase]) {
-                    message = CHANGE_MESSAGES.commuter[fromVarName][toBase];
-                    console.log(`Found message using fromVarName[toBase]: "${message}"`);
-                } 
-                // If all else fails, log what we tried
-                else {
-                    console.log(`No message found in CHANGE_MESSAGES.commuter for these variations`);
-                    console.log(`Tried to look up: CHANGE_MESSAGES.commuter[${fromVarName}][${toVarName}]`);
-                    console.log(`Tried to look up: CHANGE_MESSAGES.commuter[${fromBase}][${toVarName}]`);
-                    console.log(`Tried to look up: CHANGE_MESSAGES.commuter[${fromVarName}][${toBase}]`);
+        // Lose a life
+        const hasLivesLeft = window.core.loseLife(commuterElement);
+        
+        // If no lives left, show the game over flow with custom message
+        if (!hasLivesLeft) {
+            console.log("No lives left, showing game over");
+            
+            // Get the custom message for this change
+            let message = null;
+            if (gameState.currentChange && !gameState.currentChange.found) {
+                if (gameState.currentChange.changeType === 'commuter') {
+                    const fromVariation = gameState.currentChange.fromVariation;
+                    const toVariation = gameState.currentChange.toVariation;
                     
-                    if (CHANGE_MESSAGES.commuter[fromVarName]) {
-                        console.log(`CHANGE_MESSAGES.commuter[${fromVarName}] keys: ${Object.keys(CHANGE_MESSAGES.commuter[fromVarName])}`);
-                    }
-                    if (CHANGE_MESSAGES.commuter[fromBase]) {
-                        console.log(`CHANGE_MESSAGES.commuter[${fromBase}] keys: ${Object.keys(CHANGE_MESSAGES.commuter[fromBase])}`);
-                    }
-                }
-                
-                // If no custom message is found, use a default
-                if (!message) {
-                    message = "I noticed something change with that commuter...";
-                }
-            } else if (gameState.currentChange.changeType === 'setDressing') {
-                const fromType = gameState.currentChange.fromType;
-                const toType = gameState.currentChange.toType;
-                
-                // Check if this is a new item being added
-                if (gameState.currentChange.changeAction === 'add' || gameState.currentChange.isNewlyAdded) {
-                    console.log(`Looking for new set dressing message for type: ${toType}`);
-                    if (CHANGE_MESSAGES.setDressing.new && CHANGE_MESSAGES.setDressing.new[toType]) {
-                        message = CHANGE_MESSAGES.setDressing.new[toType];
-                        console.log(`Found new set dressing message: "${message}"`);
+                    // Extract base types from variations properly
+                    // Format could be "commuter1.png" or "commuter1_a.png"
+                    let fromBase, toBase, fromVarName, toVarName;
+                    
+                    // Extract the base name (e.g., "commuter1") and full variant name (e.g., "commuter1_a")
+                    fromVarName = fromVariation.split('.')[0]; // Remove extension first
+                    toVarName = toVariation.split('.')[0]; // Remove extension first
+                    
+                    // Extract the base commuter type
+                    if (fromVarName.includes('_')) {
+                        // Handle variations like "commuter1_a"
+                        fromBase = fromVarName.split('_')[0]; // "commuter1"
                     } else {
-                        console.log(`No message found for new set dressing type: ${toType}`);
+                        // Handle base sprites like "commuter1"
+                        fromBase = fromVarName;
                     }
-                } else {
-                    // This is a change from one type to another
-                    console.log(`Looking for set dressing change message from ${fromType} to ${toType}`);
-                    if (CHANGE_MESSAGES.setDressing[fromType] && CHANGE_MESSAGES.setDressing[fromType][toType]) {
-                        message = CHANGE_MESSAGES.setDressing[fromType][toType];
-                        console.log(`Found set dressing change message: "${message}"`);
+                    
+                    if (toVarName.includes('_')) {
+                        // Handle variations like "commuter1_a"
+                        toBase = toVarName.split('_')[0]; // "commuter1"
                     } else {
-                        console.log(`No message found for set dressing change from ${fromType} to ${toType}`);
+                        // Handle base sprites like "commuter1"
+                        toBase = toVarName;
+                    }
+                    
+                    // Look up the message with multiple fallbacks in order of specificity
+                    // 1. First try the full variant names
+                    if (CHANGE_MESSAGES.commuter[fromVarName] && CHANGE_MESSAGES.commuter[fromVarName][toVarName]) {
+                        message = CHANGE_MESSAGES.commuter[fromVarName][toVarName];
+                    } 
+                    // 2. Try from base name to full variant name
+                    else if (CHANGE_MESSAGES.commuter[fromBase] && CHANGE_MESSAGES.commuter[fromBase][toVarName]) {
+                        message = CHANGE_MESSAGES.commuter[fromBase][toVarName];
+                    } 
+                    // 3. Try from full variant name to base name
+                    else if (CHANGE_MESSAGES.commuter[fromVarName] && CHANGE_MESSAGES.commuter[fromVarName][toBase]) {
+                        message = CHANGE_MESSAGES.commuter[fromVarName][toBase];
+                    }
+                    // 4. Try from base name to base name
+                    else if (CHANGE_MESSAGES.commuter[fromBase] && CHANGE_MESSAGES.commuter[fromBase][toBase]) {
+                        message = CHANGE_MESSAGES.commuter[fromBase][toBase];
+                    }
+                    
+                    // If no custom message is found, use a default
+                    if (!message) {
+                        message = "I noticed something change with that commuter...";
+                    }
+                } else if (gameState.currentChange.changeType === 'setDressing') {
+                    // Handle set dressing changes when clicking on commuters
+                    const fromType = gameState.currentChange.fromType;
+                    const toType = gameState.currentChange.toType;
+                    
+                    // Check if this is a new item being added
+                    if (gameState.currentChange.changeAction === 'add' || gameState.currentChange.isNewlyAdded) {
+                        if (CHANGE_MESSAGES.setDressing.new && CHANGE_MESSAGES.setDressing.new[toType]) {
+                            message = CHANGE_MESSAGES.setDressing.new[toType];
+                        }
+                    } else {
+                        // This is a change from one type to another
+                        if (CHANGE_MESSAGES.setDressing[fromType] && CHANGE_MESSAGES.setDressing[fromType][toType]) {
+                            message = CHANGE_MESSAGES.setDressing[fromType][toType];
+                        }
+                    }
+                    
+                    if (!message) {
+                        message = "I noticed something new on the platform...";
                     }
                 }
                 
-                if (!message) {
-                    message = "I noticed something change with the platform...";
+                // Show the custom message using the UI message system
+                if (message) {
+                    window.ui.showMessage(message, 3000, true); // Show message higher on the screen
                 }
             }
-        }
-        
-        // Show the custom message using the UI message system instead of thought bubble
-        if (message) {
-            window.ui.showMessage(message, 3000, true); // Show message higher on the screen
-        } else if (gameState.currentChange && !gameState.currentChange.found) {
-            // If we couldn't find a message, but there is a change, show a default message
-            window.ui.showMessage("Something changed, but I can't quite place it...", 3000, true);
+            
+            // Highlight the actual change based on its type
+            if (gameState.currentChange && !gameState.currentChange.found) {
+                if (gameState.currentChange.changeType === 'setDressing') {
+                    window.setDressing.highlightMissedChange();
+                } else if (gameState.currentChange.changeType === 'commuter') {
+                    window.commuters.highlightMissedChange();
+                }
+            }
+            
+            // End the game with a summary after showing the highlight
+            setTimeout(() => {
+                window.core.showGameOverSummary();
+            }, 3000); // Increased from 1500ms to 4500ms to allow message to be fully displayed
         } else {
-            // Only show random negative thought if there's no change to find
-            showRandomThoughtBubble(false);
+            // Only show the default message if the player still has lives
+            window.ui.showMessage("That's not what changed. This commuter looks the same as yesterday.", 3000, true);
         }
-        
-        // Highlight the actual change if it's a commuter change
-        if (gameState.currentChange && 
-            !gameState.currentChange.found && 
-            gameState.currentChange.changeType !== 'setDressing') {
-            window.commuters.highlightMissedChange();
-        } else if (gameState.currentChange && 
-            !gameState.currentChange.found && 
-            gameState.currentChange.changeType === 'setDressing' &&
-            window.setDressing) {
-            window.setDressing.highlightMissedChange();
-        }
-        
-        // End the game with a summary after showing the highlight
-        setTimeout(() => {
-            showGameOverSummary();
-        }, 1500); // Match the highlight animation duration
     }
 }
 
