@@ -1890,37 +1890,25 @@ function createLivesHUD() {
     
     livesContainer.appendChild(livesLabel);
     
-    // Create a canvas to draw the heart image
-    const heartCanvas = document.createElement('canvas');
-    heartCanvas.width = 28;
-    heartCanvas.height = 28;
-    const ctx = heartCanvas.getContext('2d');
+    // Use heart sprite images instead of canvas drawing
+    const heartImageURL = 'assets/sprites/heart.png';
+    const grayHeartImageURL = 'assets/sprites/heart_gray.png';
+    const emptyHeartImageURL = 'assets/sprites/heart_empty.png';
     
-    // Draw heart shape
-    ctx.fillStyle = '#ff3333'; // Red heart
-    ctx.beginPath();
-    ctx.moveTo(14, 6);
-    ctx.bezierCurveTo(14, 3, 10, 0, 7, 0);
-    ctx.bezierCurveTo(0, 0, 0, 9, 0, 9);
-    ctx.bezierCurveTo(0, 12, 3, 19, 14, 28);
-    ctx.bezierCurveTo(25, 19, 28, 12, 28, 9);
-    ctx.bezierCurveTo(28, 9, 28, 0, 21, 0);
-    ctx.bezierCurveTo(18, 0, 14, 3, 14, 6);
-    ctx.fill();
-    
-    // Add a subtle black outline to make the heart more visible
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    
-    // Convert canvas to data URL
-    const heartImageURL = heartCanvas.toDataURL();
+    // Store heart image URLs for later use
+    gameState.heartImageURL = heartImageURL;
+    gameState.grayHeartImageURL = grayHeartImageURL;
+    gameState.emptyHeartImageURL = emptyHeartImageURL;
     
     // Create heart elements for each life
     for (let i = 0; i < gameState.lives; i++) {
         const heartElement = document.createElement('div');
         heartElement.className = 'life-heart';
         heartElement.style.backgroundImage = `url(${heartImageURL})`;
+        heartElement.style.width = '28px';
+        heartElement.style.height = '28px';
+        heartElement.style.backgroundSize = 'contain';
+        heartElement.style.backgroundRepeat = 'no-repeat';
         livesContainer.appendChild(heartElement);
     }
     
@@ -1935,9 +1923,6 @@ function createLivesHUD() {
     
     // Store reference to lives container for updates
     gameState.elements.livesContainer = livesContainer;
-    
-    // Store the heart image URL for later use
-    gameState.heartImageURL = heartImageURL;
     
     // Restore narrative text to full width
     if (gameState.elements.narrativeText) {
@@ -1966,13 +1951,20 @@ function updateLivesDisplay() {
             const heartElement = document.createElement('div');
             heartElement.className = 'life-heart';
             heartElement.style.backgroundImage = `url(${gameState.heartImageURL})`;
+            heartElement.style.width = '28px';
+            heartElement.style.height = '28px';
+            heartElement.style.backgroundSize = 'contain';
+            heartElement.style.backgroundRepeat = 'no-repeat';
             gameState.elements.livesContainer.appendChild(heartElement);
         } else {
-            // Create empty heart placeholder to maintain spacing
+            // Create empty heart placeholder
             const emptyHeart = document.createElement('div');
             emptyHeart.className = 'empty-heart';
-            emptyHeart.style.backgroundImage = `url(${gameState.heartImageURL})`;
-            emptyHeart.style.filter = 'grayscale(100%) opacity(0.3)';
+            emptyHeart.style.backgroundImage = `url(${gameState.emptyHeartImageURL})`;
+            emptyHeart.style.width = '28px';
+            emptyHeart.style.height = '28px';
+            emptyHeart.style.backgroundSize = 'contain';
+            emptyHeart.style.backgroundRepeat = 'no-repeat';
             gameState.elements.livesContainer.appendChild(emptyHeart);
         }
     }
@@ -2055,7 +2047,7 @@ function createHeartDoober(clickedElement, currentLives) {
     }
     
     // Size of the flying heart
-    const heartSize = 24;
+    const heartSize = 28;
     
     // Position the black heart at the clicked element's position
     blackHeart.style.position = 'fixed';
@@ -2063,12 +2055,12 @@ function createHeartDoober(clickedElement, currentLives) {
     blackHeart.style.top = `${targetRect.top + targetRect.height/2 - heartSize/2}px`;   // Center vertically
     blackHeart.style.width = `${heartSize}px`;
     blackHeart.style.height = `${heartSize}px`;
-    blackHeart.style.backgroundImage = `url(${gameState.heartImageURL})`;
+    blackHeart.style.backgroundImage = `url(${gameState.grayHeartImageURL})`;
     blackHeart.style.backgroundSize = 'contain';
     blackHeart.style.backgroundRepeat = 'no-repeat';
     blackHeart.style.backgroundPosition = 'center';
     blackHeart.style.zIndex = '1000';
-    blackHeart.style.filter = 'brightness(0.1) drop-shadow(0 0 5px rgba(255, 0, 0, 0.7))';
+    blackHeart.style.filter = 'drop-shadow(0 0 5px rgba(255, 0, 0, 0.7))';
     blackHeart.style.transition = 'none';
     
     // Add to document body
