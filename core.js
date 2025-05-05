@@ -444,6 +444,11 @@ async function init() {
                 window.albumLink.initAlbumLink();
             }
             
+            // Initialize play speaker
+            if (window.playSpeaker && window.playSpeaker.initPlaySpeaker) {
+                window.playSpeaker.initPlaySpeaker();
+            }
+            
             // All systems initialized, now reveal the game
             // Small delay to ensure everything is ready
             setTimeout(revealGame, 500);
@@ -1443,6 +1448,11 @@ function setupMobileSupport() {
     window.addEventListener('resize', () => {
         if (window.albumLink && window.albumLink.updateAlbumPosition) {
             window.albumLink.updateAlbumPosition();
+        }
+        
+        // Update speaker position on resize
+        if (window.playSpeaker && window.playSpeaker.updateSpeakerPosition) {
+            window.playSpeaker.updateSpeakerPosition();
         }
     });
 }
