@@ -508,3 +508,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100);
     };
 });
+
+// Add event listener to initialize extensions after DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize color system if enabled
+    if (colorSystem && colorSystem.enabled) {
+        colorSystem.init();
+    }
+    
+    // Initialize audio system if enabled
+    if (audioSystem && audioSystem.enabled) {
+        audioSystem.init();
+    }
+    
+    // Initialize play speaker
+    if (window.playSpeaker && window.playSpeaker.initPlaySpeaker) {
+        window.addEventListener('load', function() {
+            // Small delay to ensure core game is initialized first
+            setTimeout(function() {
+                window.playSpeaker.initPlaySpeaker();
+            }, 1000);
+        });
+    }
+    
+    console.log("Game extensions initialized");
+});

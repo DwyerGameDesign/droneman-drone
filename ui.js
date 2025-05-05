@@ -151,12 +151,12 @@ function showMessage(text, duration = 2000, positionHigher = false, untilTrain =
         // For normal messages, hide after the specified duration
         gameState.activeMessageTimer = setTimeout(() => {
             message.style.display = 'none';
-            message.style.visibility = 'hidden';
-            // Reset position and font size after hiding
-            message.style.top = '30%';
-            message.style.fontSize = '1em';
+        message.style.visibility = 'hidden';
+        // Reset position and font size after hiding
+        message.style.top = '30%';
+        message.style.fontSize = '1em';
             message.dataset.clearOnTrain = 'false';
-        }, duration);
+    }, duration);
     }
 }
 

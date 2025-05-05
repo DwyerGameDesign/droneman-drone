@@ -54,7 +54,7 @@ function addAlbumToScene() {
     albumElement.style.backgroundSize = 'contain';
     albumElement.style.backgroundRepeat = 'no-repeat';
     albumElement.style.backgroundPosition = 'bottom center';
-    albumElement.style.zIndex = '6'; // Between set dressing (5) and commuters (10)
+    albumElement.style.zIndex = '200'; // Increased to be above click-blocker (z-index: 150)
     albumElement.style.cursor = 'pointer';
     albumElement.style.transition = 'transform 0.2s ease, filter 0.3s ease';
     
